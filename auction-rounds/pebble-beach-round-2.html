@@ -395,7 +395,7 @@
     <script src="../shared-auctions.js"></script>
     <script src="../auction-gallery.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', async () => {
             AUTH.requireLogin('../login.html');
             AUTH.applyHeader('../');
 
@@ -407,7 +407,13 @@
                 return;
             }
 
-            const auctions = loadSharedAuctions();
+            // Always fetch fresh data from server so admin changes are reflected immediately
+            let auctions;
+            if (typeof EPICDB !== 'undefined') {
+                auctions = await EPICDB.getAuctions();
+            } else {
+                auctions = loadSharedAuctions();
+            }
             const data = auctions.find(a => a.id === auctionId);
 
             if (!data) {
