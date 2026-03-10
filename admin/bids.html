@@ -252,6 +252,8 @@
         </div>
     </div>
 
+    <script src="../db.js"></script>
+    <script src="../auth.js"></script>
     <script>
         const USERS_KEY = 'epic_users';
 
@@ -335,8 +337,10 @@
                 return;
             }
 
-            // Save modified users payload back to localStorage permanently
+            // Save modified users payload back to localStorage and server
+            const updatedUser = users[userIndex];
             localStorage.setItem(USERS_KEY, JSON.stringify(users));
+            if (typeof EPICDB !== 'undefined') EPICDB.saveUser(updatedUser).catch(console.warn);
 
             // 2. Adjust the global Auction metrics inside epic_auctions
             try {
@@ -390,7 +394,7 @@
                         totalPledged += Number(a.currentBid);
                     }
                 });
-            } catch(e) {}
+            } catch (e) { }
             document.getElementById('statTotalValue').textContent = '$' + totalPledged.toLocaleString();
 
             // Avg Bid Size = average of all individual bids (still useful for the admin)
@@ -445,7 +449,15 @@
             }).join('');
         }
 
-        renderTable();
+        // Wait for db.js to load fresh data before rendering
+        (async function init() {
+            const tbody = document.getElementById('bidsTbody');
+            tbody.innerHTML = '<tr><td colspan="6"><div class="empty-state">Loading bids from database…</div></td></tr>';
+            if (typeof EPICDB !== 'undefined') {
+                await EPICDB.init();
+            }
+            renderTable();
+        })();
     </script>
 </body>
 

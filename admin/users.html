@@ -461,58 +461,10 @@
         </div>
     </div>
 
+    <script src="../db.js"></script>
+    <script src="../auth.js"></script>
     <script>
         const USERS_KEY = 'epic_users';
-
-        // ── Seed a dummy user if the store is empty ──────────────────────
-        (function seedDummy() {
-            const existing = JSON.parse(localStorage.getItem(USERS_KEY) || '[]');
-            if (existing.length === 0) {
-                localStorage.setItem(USERS_KEY, JSON.stringify([
-                    {
-                        id: 'u_demo_001',
-                        firstName: 'James',
-                        lastName: 'Harrington',
-                        email: 'james.harrington@example.com',
-                        phone: '(555) 214-8823',
-                        dob: '1984-06-15',
-                        address: '412 Fairway Drive',
-                        city: 'Pebble Beach',
-                        state: 'CA',
-                        zip: '93953',
-                        password: 'demo1234',
-                        memberType: 'epic_member',
-                        joinedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
-                        watchlist: ['pebble-beach-round-2'],
-                        bids: ['bid_001'],
-                    },
-                    {
-                        id: 'u_demo_002',
-                        firstName: 'Sarah',
-                        lastName: 'Mitchell',
-                        email: 'sarah.mitchell@example.com',
-                        phone: '(555) 839-2271',
-                        password: 'demo1234',
-                        memberType: 'public',
-                        joinedAt: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString(),
-                        watchlist: [],
-                        bids: [],
-                    },
-                    {
-                        id: 'u_demo_003',
-                        firstName: 'Robert',
-                        lastName: 'Chen',
-                        email: 'r.chen@example.com',
-                        phone: '(555) 471-0093',
-                        password: 'demo1234',
-                        memberType: 'epic_member',
-                        joinedAt: new Date(Date.now() - 45 * 24 * 60 * 60 * 1000).toISOString(),
-                        watchlist: ['pine-valley'],
-                        bids: ['bid_002', 'bid_003'],
-                    }
-                ]));
-            }
-        })();
 
         function loadUsers() {
             try { return JSON.parse(localStorage.getItem(USERS_KEY)) || []; }
@@ -587,6 +539,8 @@
             if (idx === -1) return;
             users[idx].memberType = type;
             localStorage.setItem(USERS_KEY, JSON.stringify(users));
+            // Sync to server
+            if (typeof EPICDB !== 'undefined') EPICDB.saveUser(users[idx]).catch(console.warn);
             // Also refresh the session if this is the currently logged-in user
             try {
                 const session = JSON.parse(localStorage.getItem('epic_session'));
@@ -693,7 +647,15 @@
             }
         }
 
-        renderTable();
+        // Wait for db.js to load fresh data before rendering
+        (async function init() {
+            const tbody = document.getElementById('usersTbody');
+            tbody.innerHTML = '<tr><td colspan="8"><div class="empty-state">Loading users from database…</div></td></tr>';
+            if (typeof EPICDB !== 'undefined') {
+                await EPICDB.init();
+            }
+            renderTable();
+        })();
     </script>
 </body>
 
