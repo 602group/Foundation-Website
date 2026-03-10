@@ -1100,6 +1100,8 @@
         </div>
     </div>
 
+    <script src="../db.js"></script>
+    <script src="../auth.js"></script>
     <script src="../shared-events.js"></script>
     <script>
         // Shared image upload helper — reads file as base64 data URL
@@ -1162,9 +1164,21 @@
             });
         }
 
+        let adminUsers = []; // populated from DB on page load
+
         // ── Render ────────────────────────────────────────────────────────────
-        document.addEventListener('DOMContentLoaded', () => {
-            recomputeAllSpotsSold(); // auto-heal any stale spotsSold data on load
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Fetch fresh data from server before rendering
+            if (typeof EPICDB !== 'undefined') {
+                const [freshEvents, freshUsers] = await Promise.all([EPICDB.getEvents(), EPICDB.getUsers()]);
+                if (freshEvents && freshEvents.length) saveSharedEvents(freshEvents);
+                adminUsers = freshUsers || [];
+                // Also seed localStorage for functions that still read it
+                if (adminUsers.length) localStorage.setItem('epic_users', JSON.stringify(adminUsers));
+            } else {
+                adminUsers = JSON.parse(localStorage.getItem('epic_users') || '[]');
+            }
+            recomputeAllSpotsSold();
             renderEvents();
             renderDestinations();
         });
@@ -1339,7 +1353,7 @@
         function renderAttendees(eventId) {
             const tbody = document.getElementById('attendees-tbody');
             const emptyState = document.getElementById('attendees-empty-state');
-            const users = JSON.parse(localStorage.getItem('epic_users') || '[]');
+            const users = adminUsers.length ? adminUsers : JSON.parse(localStorage.getItem('epic_users') || '[]');
 
             // Populate the Dropdown for manual additions
             const select = document.getElementById('manualAttendeeSelect');
@@ -1382,14 +1396,15 @@
         }
 
         function removeAttendee(userId, eventId, spotsToReturn) {
-            // Note: window.confirm is blocked in drawer/modal context by Chromium — removed.
-
             // 1. Remove trip from user
-            const users = JSON.parse(localStorage.getItem('epic_users') || '[]');
+            const users = adminUsers.length ? adminUsers : JSON.parse(localStorage.getItem('epic_users') || '[]');
             const uIdx = users.findIndex(u => u.id === userId);
             if (uIdx > -1 && users[uIdx].trips) {
                 users[uIdx].trips = users[uIdx].trips.filter(t => t.eventId !== eventId);
                 localStorage.setItem('epic_users', JSON.stringify(users));
+                adminUsers = users;
+                // Sync to server
+                if (typeof EPICDB !== 'undefined') EPICDB.saveUser(users[uIdx]).catch(console.warn);
             }
 
             // 2. Return spots to event pool
@@ -1397,7 +1412,8 @@
             const eIdx = liveEvents.findIndex(e => e.id === eventId);
             if (eIdx > -1) {
                 liveEvents[eIdx].spotsSold = Math.max(0, (liveEvents[eIdx].spotsSold || 0) - spotsToReturn);
-                saveEvent(liveEvents[eIdx]); // persist the updated spotsSold
+                saveEvent(liveEvents[eIdx]);
+                if (typeof EPICDB !== 'undefined') EPICDB.saveEvent(liveEvents[eIdx]).catch(console.warn);
             }
 
             // 3. Refresh views
@@ -1432,7 +1448,7 @@
             }
 
             // 1. Update User Profile
-            const users = JSON.parse(localStorage.getItem('epic_users') || '[]');
+            const users = adminUsers.length ? adminUsers : JSON.parse(localStorage.getItem('epic_users') || '[]');
             const uIdx = users.findIndex(u => u.id === userId);
             if (uIdx > -1) {
                 const u = users[uIdx];
@@ -1454,11 +1470,15 @@
                     guestDetails: isGuest ? { name: 'Admin TBD Guest', email: '' } : null
                 });
                 localStorage.setItem('epic_users', JSON.stringify(users));
+                adminUsers = users;
+                // Sync to server
+                if (typeof EPICDB !== 'undefined') EPICDB.saveUser(u).catch(console.warn);
             }
 
             // 2. Adjust capacity
             dbEvent.spotsSold = (dbEvent.spotsSold || 0) + spotsNeeded;
-            saveEvent(dbEvent); // persist the updated spotsSold
+            saveEvent(dbEvent);
+            if (typeof EPICDB !== 'undefined') EPICDB.saveEvent(dbEvent).catch(console.warn);
 
             // 3. Reset form and refresh tables
             document.getElementById('manualAttendeeSelect').value = '';

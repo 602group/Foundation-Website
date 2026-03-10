@@ -48,6 +48,12 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         })
     ],
     callbacks: {
+        async redirect({ url, baseUrl }) {
+            // After sign in, always go to dashboard
+            if (url === baseUrl || url === `${baseUrl}/`) return `${baseUrl}/dashboard`
+            if (url.startsWith(baseUrl)) return url
+            return `${baseUrl}/dashboard`
+        },
         async jwt({ token, user }) {
             if (user) {
                 token.role = user.role

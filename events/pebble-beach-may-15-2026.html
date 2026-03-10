@@ -430,6 +430,10 @@
 
             dbUser.trips.unshift(tripPayload);
             localStorage.setItem('epic_users', JSON.stringify(usersDb));
+            // Sync trip to server so admin and other browsers can see it
+            if (typeof EPICDB !== 'undefined') EPICDB.saveUser(dbUser).catch(console.warn);
+            // Also sync the event's updated spotsSold count to the server
+            if (typeof EPICDB !== 'undefined') EPICDB.saveEvent(dbEvent).catch(console.warn);
 
             // Update session cache
             if (user.id === dbUser.id) {

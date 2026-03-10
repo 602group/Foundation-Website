@@ -13,20 +13,11 @@ export default function Footer() {
                     <h4 className="footer-title">Quick Links</h4>
                     <ul className="footer-links">
                         <li><Link href="/">Home</Link></li>
-                        <li><Link href="/auctions">Auctions</Link></li>
                         <li><Link href="/about">About Us</Link></li>
                         <li><Link href="/contact">Contact</Link></li>
                     </ul>
                 </div>
 
-                <div className="footer-column">
-                    <h4 className="footer-title">Explore</h4>
-                    <ul className="footer-links">
-                        <li><Link href="/travel-events">Travel &amp; Events</Link></li>
-                        <li><Link href="#content">Content</Link></li>
-                        <li><Link href="#faq">FAQ</Link></li>
-                    </ul>
-                </div>
 
                 <div className="footer-column">
                     <h4 className="footer-title">Legal</h4>

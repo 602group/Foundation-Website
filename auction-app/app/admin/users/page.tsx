@@ -49,7 +49,7 @@ export default async function AdminUsers() {
                         </tr>
                     </thead>
                     <tbody>
-                        {users.map((user) => (
+                        {users.map((user: any) => (
                             <tr key={user.id} style={{ transition: "background 0.1s" }}>
                                 <td style={{ ...tableCellStyle, fontWeight: "600" }}>{user.name || "—"}</td>
                                 <td style={{ ...tableCellStyle, color: "#555" }}>{user.email}</td>

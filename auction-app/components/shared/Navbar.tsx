@@ -54,8 +54,8 @@ export default function Navbar() {
                 <Link href="/" className="logo">EPIC Foundation</Link>
                 <nav className="nav-menu">
                     <Link href="/" className="nav-link">Home</Link>
-                    <Link href="/auctions" className="nav-link">Auction</Link>
-                    <Link href="/travel-events" className="nav-link">Travel &amp; Events</Link>
+                    {session && <Link href="/auctions" className="nav-link">Auction</Link>}
+                    {session && <Link href="/travel-events" className="nav-link">Travel &amp; Events</Link>}
                     <Link href="/about" className="nav-link">About Us</Link>
                     <Link href="/contact" className="nav-link">Contact Us</Link>
 
