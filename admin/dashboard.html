@@ -127,7 +127,7 @@
         <div class="sidebar-header">
             <a href="../index.html" class="logo">EPIC ADMIN</a>
         </div>
-                <nav class="nav-links">
+        <nav class="nav-links">
             <a href="dashboard.html" class="nav-item active"><span class="nav-icon">📊</span> Dashboard</a>
             <a href="auctions.html" class="nav-item"><span class="nav-icon">⛳</span> Auctions</a>
             <a href="users.html" class="nav-item"><span class="nav-icon">👥</span> Users</a>
@@ -223,158 +223,171 @@
         </div>
     </div>
 
+    <script src="../db.js"></script>
+    <script src="../auth.js"></script>
     <script src="../shared-auctions.js"></script>
     <script>
-        const USERS_KEY = 'epic_users';
+        (async () => {
+            // ── Load fresh data from server ──────────────────────────────────
+            const allAuctions = (typeof EPICDB !== 'undefined')
+                ? (await EPICDB.getAuctions() || [])
+                : loadSharedAuctions();
+            const allUsers = (typeof EPICDB !== 'undefined')
+                ? (await EPICDB.getUsers() || [])
+                : JSON.parse(localStorage.getItem('epic_users') || '[]');
 
-        // ── Load data ───────────────────────────────────────────────────────
-        const allAuctions = loadSharedAuctions();
-        const allUsers = JSON.parse(localStorage.getItem(USERS_KEY) || '[]');
+            // ── Derived stats ─────────────────────────────────────────────────
+            const activeAuctions = allAuctions.filter(a => a.status === 'active' || a.status === 'scheduled');
+            const endedAuctions = allAuctions.filter(a => a.status === 'ended');
 
-        // ── Derived stats ───────────────────────────────────────────────────
-        const activeAuctions = allAuctions.filter(a => a.status === 'active' || a.status === 'scheduled');
-        const endedAuctions = allAuctions.filter(a => a.status === 'ended');
-
-        // Collect all bids across all users
-        const allBids = [];
-        allUsers.forEach(u => {
-            (u.bids || []).forEach(b => {
-                if (typeof b === 'object') allBids.push({ ...b, userName: u.firstName + ' ' + u.lastName, userId: u.id });
+            // Build per-auction bid count map from user bid arrays (source of truth)
+            const bidCountMap = {};
+            const allBids = [];
+            allUsers.forEach(u => {
+                (u.bids || []).forEach(b => {
+                    if (typeof b === 'object') {
+                        allBids.push({ ...b, userName: u.firstName + ' ' + u.lastName, userId: u.id });
+                        if (b.auctionId) bidCountMap[b.auctionId] = (bidCountMap[b.auctionId] || 0) + 1;
+                    }
+                });
             });
-        });
 
-        // Collect all purchases/wins
-        const allWins = [];
-        allUsers.forEach(u => {
-            (u.purchases || []).forEach(p => {
-                allWins.push({ ...p, userName: u.firstName + ' ' + u.lastName, userId: u.id });
+            // Collect all purchases/wins
+            const allWins = [];
+            allUsers.forEach(u => {
+                (u.purchases || []).forEach(p => {
+                    allWins.push({ ...p, userName: u.firstName + ' ' + u.lastName, userId: u.id });
+                });
             });
-        });
 
-        const totalRaised = allWins.reduce((sum, w) => sum + (w.amount || 0), 0);
-        const totalBids = allBids.length;
+            const totalRaised = allWins.reduce((sum, w) => sum + (w.amount || 0), 0);
+            const totalBids = allBids.length;
 
-        // ── Stat Cards ──────────────────────────────────────────────────────
-        document.getElementById('dash-total-raised').textContent = '$' + totalRaised.toLocaleString();
-        document.getElementById('dash-raised-sub').textContent = allWins.length + ' auction' + (allWins.length !== 1 ? 's' : '') + ' won';
-        document.getElementById('dash-active-auctions').textContent = activeAuctions.length;
-        document.getElementById('dash-auctions-sub').textContent = endedAuctions.length + ' ended, ' + allAuctions.length + ' total';
-        document.getElementById('dash-total-bids').textContent = totalBids;
-        document.getElementById('dash-bids-sub').textContent = allUsers.filter(u => (u.bids || []).length > 0).length + ' active bidders';
-        document.getElementById('dash-total-users').textContent = allUsers.length;
-        document.getElementById('dash-users-sub').textContent = allUsers.filter(u => u.memberType === 'epic_member').length + ' Epic Members';
+            // ── Stat Cards ────────────────────────────────────────────────────
+            document.getElementById('dash-total-raised').textContent = '$' + totalRaised.toLocaleString();
+            document.getElementById('dash-raised-sub').textContent = allWins.length + ' auction' + (allWins.length !== 1 ? 's' : '') + ' won';
+            document.getElementById('dash-active-auctions').textContent = activeAuctions.length;
+            document.getElementById('dash-auctions-sub').textContent = endedAuctions.length + ' ended, ' + allAuctions.length + ' total';
+            document.getElementById('dash-total-bids').textContent = totalBids;
+            document.getElementById('dash-bids-sub').textContent = allUsers.filter(u => (u.bids || []).length > 0).length + ' active bidders';
+            document.getElementById('dash-total-users').textContent = allUsers.length;
+            document.getElementById('dash-users-sub').textContent = allUsers.filter(u => u.memberType === 'epic_member').length + ' Epic Members';
 
-        // ── Recent Bids ─────────────────────────────────────────────────────
-        const recentBids = allBids
-            .sort((a, b) => new Date(b.placedAt || 0) - new Date(a.placedAt || 0))
-            .slice(0, 8);
+            // ── Recent Bids ───────────────────────────────────────────────────
+            const recentBids = allBids
+                .sort((a, b) => new Date(b.date || b.placedAt || 0) - new Date(a.date || a.placedAt || 0))
+                .slice(0, 8);
 
-        const bidsEl = document.getElementById('dash-recent-bids');
-        if (!recentBids.length) {
-            bidsEl.innerHTML = '<div class="empty-dash">No bids placed yet</div>';
-        } else {
-            bidsEl.innerHTML = recentBids.map(b => `
-                <div class="dash-row">
-                    <div class="dr-left">
-                        <span>🎫</span>
-                        <span>
-                            <a href="user-profile.html?id=${b.userId}" style="text-decoration:none;color:#333;font-weight:600;">${b.userName}</a>
-                            <span class="dr-sub">${b.title || b.auctionId || '—'}</span>
-                        </span>
-                    </div>
-                    <div class="dr-right">
-                        $${(b.amount || 0).toLocaleString()}
-                        <span class="dr-sub" style="font-weight:400;color:#aaa;text-align:right;">${b.placedAt ? timeAgo(new Date(b.placedAt)) : '—'}</span>
-                    </div>
-                </div>`).join('');
-        }
+            const bidsEl = document.getElementById('dash-recent-bids');
+            if (!recentBids.length) {
+                bidsEl.innerHTML = '<div class="empty-dash">No bids placed yet</div>';
+            } else {
+                bidsEl.innerHTML = recentBids.map(b => `
+                    <div class="dash-row">
+                        <div class="dr-left">
+                            <span>🎫</span>
+                            <span>
+                                <a href="user-profile.html?id=${b.userId}" style="text-decoration:none;color:#333;font-weight:600;">${b.userName}</a>
+                                <span class="dr-sub">${b.title || b.auctionId || '—'}</span>
+                            </span>
+                        </div>
+                        <div class="dr-right">
+                            $${(b.amount || 0).toLocaleString()}
+                            <span class="dr-sub" style="font-weight:400;color:#aaa;text-align:right;">${b.date || b.placedAt ? timeAgo(new Date(b.date || b.placedAt)) : '—'}</span>
+                        </div>
+                    </div>`).join('');
+            }
 
-        // ── Recent Signups ──────────────────────────────────────────────────
-        const recentUsers = allUsers
-            .slice()
-            .sort((a, b) => new Date(b.joinedAt || 0) - new Date(a.joinedAt || 0))
-            .slice(0, 8);
+            // ── Recent Signups ────────────────────────────────────────────────
+            const recentUsers = allUsers
+                .slice()
+                .sort((a, b) => new Date(b.joinedAt || 0) - new Date(a.joinedAt || 0))
+                .slice(0, 8);
 
-        const usersEl = document.getElementById('dash-recent-users');
-        if (!recentUsers.length) {
-            usersEl.innerHTML = '<div class="empty-dash">No users yet</div>';
-        } else {
-            usersEl.innerHTML = recentUsers.map(u => `
-                <div class="dash-row">
-                    <div class="dr-left">
-                        <span style="width:30px;height:30px;border-radius:50%;background:#000;color:#fff;display:flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:700;flex-shrink:0;">
-                            ${(u.firstName[0] + (u.lastName[0] || '')).toUpperCase()}
-                        </span>
-                        <span>
-                            <a href="user-profile.html?id=${u.id}" style="text-decoration:none;color:#333;font-weight:600;">${u.firstName} ${u.lastName}</a>
-                            <span class="dr-sub">${u.email}</span>
-                        </span>
-                    </div>
-                    <div class="dr-right">
-                        <span class="badge ${u.memberType === 'epic_member' ? 'badge-active' : 'badge-ended'}">${u.memberType === 'epic_member' ? 'Epic' : 'Public'}</span>
-                        <span class="dr-sub" style="text-align:right;margin-top:2px;">${u.joinedAt ? timeAgo(new Date(u.joinedAt)) : '—'}</span>
-                    </div>
-                </div>`).join('');
-        }
+            const usersEl = document.getElementById('dash-recent-users');
+            if (!recentUsers.length) {
+                usersEl.innerHTML = '<div class="empty-dash">No users yet</div>';
+            } else {
+                usersEl.innerHTML = recentUsers.map(u => `
+                    <div class="dash-row">
+                        <div class="dr-left">
+                            <span style="width:30px;height:30px;border-radius:50%;background:#000;color:#fff;display:flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:700;flex-shrink:0;">
+                                ${((u.firstName || '?')[0] + ((u.lastName || '?')[0] || '')).toUpperCase()}
+                            </span>
+                            <span>
+                                <a href="user-profile.html?id=${u.id}" style="text-decoration:none;color:#333;font-weight:600;">${u.firstName} ${u.lastName}</a>
+                                <span class="dr-sub">${u.email}</span>
+                            </span>
+                        </div>
+                        <div class="dr-right">
+                            <span class="badge ${u.memberType === 'epic_member' ? 'badge-active' : 'badge-ended'}">${u.memberType === 'epic_member' ? 'Epic' : 'Public'}</span>
+                            <span class="dr-sub" style="text-align:right;margin-top:2px;">${u.joinedAt ? timeAgo(new Date(u.joinedAt)) : '—'}</span>
+                        </div>
+                    </div>`).join('');
+            }
 
-        // ── Live Auctions ───────────────────────────────────────────────────
-        const liveEl = document.getElementById('dash-live-auctions');
-        if (!activeAuctions.length) {
-            liveEl.innerHTML = '<div class="empty-dash">No active auctions</div>';
-        } else {
-            liveEl.innerHTML = activeAuctions.slice(0, 8).map(a => `
-                <div class="dash-row">
-                    <div class="dr-left">
-                        <span>⛳</span>
-                        <span>
-                            <span style="font-weight:600;">${a.title}</span>
-                            <span class="dr-sub">${a.bidCount || 0} bids · ends ${new Date(a.endDate).toLocaleDateString()}</span>
-                        </span>
-                    </div>
-                    <div class="dr-right">
-                        $${(a.currentBid || a.startBid || 0).toLocaleString()}
-                        <span class="dr-sub" style="text-align:right;">Current bid</span>
-                    </div>
-                </div>`).join('');
-        }
+            // ── Live Auctions ─────────────────────────────────────────────────
+            const liveEl = document.getElementById('dash-live-auctions');
+            if (!activeAuctions.length) {
+                liveEl.innerHTML = '<div class="empty-dash">No active auctions</div>';
+            } else {
+                liveEl.innerHTML = activeAuctions.slice(0, 8).map(a => {
+                    const liveBidCount = bidCountMap[a.id] || a.bidCount || 0;
+                    return `
+                    <div class="dash-row">
+                        <div class="dr-left">
+                            <span>⛳</span>
+                            <span>
+                                <span style="font-weight:600;">${a.title}</span>
+                                <span class="dr-sub">${liveBidCount} bid${liveBidCount !== 1 ? 's' : ''} · ends ${a.endDate ? new Date(a.endDate).toLocaleDateString() : 'TBD'}</span>
+                            </span>
+                        </div>
+                        <div class="dr-right">
+                            $${(a.currentBid || a.startBid || 0).toLocaleString()}
+                            <span class="dr-sub" style="text-align:right;">Current bid</span>
+                        </div>
+                    </div>`;
+                }).join('');
+            }
 
-        // ── Won Auctions ────────────────────────────────────────────────────
-        const wonEl = document.getElementById('dash-won-auctions');
-        const recentWins = allWins
-            .sort((a, b) => new Date(b.purchasedAt || b.date || 0) - new Date(a.purchasedAt || a.date || 0))
-            .slice(0, 8);
+            // ── Won Auctions ──────────────────────────────────────────────────
+            const wonEl = document.getElementById('dash-won-auctions');
+            const recentWins = allWins
+                .sort((a, b) => new Date(b.purchasedAt || b.date || 0) - new Date(a.purchasedAt || a.date || 0))
+                .slice(0, 8);
 
-        if (!recentWins.length) {
-            wonEl.innerHTML = '<div class="empty-dash">No auctions won yet</div>';
-        } else {
-            wonEl.innerHTML = recentWins.map(w => `
-                <div class="dash-row">
-                    <div class="dr-left">
-                        <span>🏆</span>
-                        <span>
-                            <span style="font-weight:600;">${w.title || '—'}</span>
-                            <span class="dr-sub">Won by <a href="user-profile.html?id=${w.userId}" style="color:#555;text-decoration:none;">${w.userName}</a></span>
-                        </span>
-                    </div>
-                    <div class="dr-right">
-                        $${(w.amount || 0).toLocaleString()}
-                        <span class="dr-sub" style="text-align:right;">${w.purchasedAt || w.date ? new Date(w.purchasedAt || w.date).toLocaleDateString() : '—'}</span>
-                    </div>
-                </div>`).join('');
-        }
+            if (!recentWins.length) {
+                wonEl.innerHTML = '<div class="empty-dash">No auctions won yet</div>';
+            } else {
+                wonEl.innerHTML = recentWins.map(w => `
+                    <div class="dash-row">
+                        <div class="dr-left">
+                            <span>🏆</span>
+                            <span>
+                                <span style="font-weight:600;">${w.title || '—'}</span>
+                                <span class="dr-sub">Won by <a href="user-profile.html?id=${w.userId}" style="color:#555;text-decoration:none;">${w.userName}</a></span>
+                            </span>
+                        </div>
+                        <div class="dr-right">
+                            $${(w.amount || 0).toLocaleString()}
+                            <span class="dr-sub" style="text-align:right;">${w.purchasedAt || w.date ? new Date(w.purchasedAt || w.date).toLocaleDateString() : '—'}</span>
+                        </div>
+                    </div>`).join('');
+            }
 
-        // ── Time-ago helper ─────────────────────────────────────────────────
-        function timeAgo(date) {
-            const diff = Date.now() - date.getTime();
-            const mins = Math.floor(diff / 60000);
-            if (mins < 1) return 'Just now';
-            if (mins < 60) return mins + 'm ago';
-            const hrs = Math.floor(mins / 60);
-            if (hrs < 24) return hrs + 'h ago';
-            const days = Math.floor(hrs / 24);
-            if (days < 30) return days + 'd ago';
-            return date.toLocaleDateString();
-        }
+            // ── Time-ago helper ───────────────────────────────────────────────
+            function timeAgo(date) {
+                const diff = Date.now() - date.getTime();
+                const mins = Math.floor(diff / 60000);
+                if (mins < 1) return 'Just now';
+                if (mins < 60) return mins + 'm ago';
+                const hrs = Math.floor(mins / 60);
+                if (hrs < 24) return hrs + 'h ago';
+                const days = Math.floor(hrs / 24);
+                if (days < 30) return days + 'd ago';
+                return date.toLocaleDateString();
+            }
+        })();
     </script>
 </body>
 

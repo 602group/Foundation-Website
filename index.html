@@ -190,11 +190,23 @@
         AUTH.applyGatedNav('');
 
         // ── Render Dynamic Auctions ─────────────────────────────
-        function renderPublicAuctions() {
-            // Show all active auctions to all members
-            const list = loadSharedAuctions().filter(a => a.status === 'active');
-            const featured = list.slice(0, 4); // top 4 for best of best
-            const other = list.slice(4);
+        async function renderPublicAuctions() {
+            // Fetch fresh from DB so bidCount and currentBid are live
+            let auctions = [];
+            let bidCountMap = {};
+            if (typeof EPICDB !== 'undefined') {
+                const [freshAuctions, freshUsers] = await Promise.all([EPICDB.getAuctions(), EPICDB.getUsers()]);
+                auctions = (freshAuctions || []).filter(a => a.status === 'active');
+                // Build real bid count per auction from user bid arrays (source of truth)
+                (freshUsers || []).forEach(u => {
+                    (u.bids || []).forEach(b => {
+                        if (b && b.auctionId) bidCountMap[b.auctionId] = (bidCountMap[b.auctionId] || 0) + 1;
+                    });
+                });
+            } else {
+                auctions = loadSharedAuctions().filter(a => a.status === 'active');
+            }
+            const featured = auctions.slice(0, 4);
 
             function buildCardHtml(a) {
                 const thumb = a.images && a.images[0] ? a.images[0] : '';
@@ -203,6 +215,7 @@
                 const statusLabel = { active: 'Active', scheduled: 'Scheduled', pending: 'Pending', draft: 'Draft', ended: 'Ended', closed: 'Closed' }[a.status] || 'Active';
                 const fmtDate = d => d ? new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'TBD';
                 const linkUrl = 'auction-rounds/pebble-beach-round-2?id=' + a.id;
+                const liveBidCount = bidCountMap[a.id] || a.bidCount || 0;
                 return `
                 <a href="${linkUrl}" class="auction-card-link" style="text-decoration:none;color:inherit;">
                     <div class="auction-card">
@@ -220,7 +233,7 @@
                             <div class="card-footer">
                                 <div class="price-info">
                                     <span class="current-bid">$${a.currentBid ? a.currentBid.toLocaleString() : a.startBid.toLocaleString()}</span>
-                                    <span class="bid-label">${a.bidCount || 0} bids · Current Bid</span>
+                                    <span class="bid-label">${liveBidCount} bid${liveBidCount !== 1 ? 's' : ''} · Current Bid</span>
                                 </div>
                                 <span class="card-bid-cta">Place Bid →</span>
                             </div>
@@ -238,9 +251,8 @@
             const otherGrid = document.getElementById('other-auctions-grid');
             const otherSec = document.querySelector('.auction-section-secondary');
             if (otherGrid && otherSec) {
-                // Show the same active auctions — gives users a second way to browse
-                otherGrid.innerHTML = list.length
-                    ? list.map(buildCardHtml).join('')
+                otherGrid.innerHTML = auctions.length
+                    ? auctions.map(buildCardHtml).join('')
                     : '<p style="grid-column:1/-1;text-align:center;color:#888;">More auctions coming soon.</p>';
                 otherSec.style.display = '';
             }
