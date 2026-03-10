@@ -1,3 +1,6 @@
 {
+    "framework": "nextjs",
+    "buildCommand": "cd auction-app && npm install && npm run build",
+    "outputDirectory": "auction-app/.next",
     "cleanUrls": true
 }
