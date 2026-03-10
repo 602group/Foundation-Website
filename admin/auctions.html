@@ -1234,13 +1234,25 @@
     <!-- Toast notification -->
     <div class="toast" id="toast">✅ Auction saved successfully</div>
 
+    <script src="../db.js"></script>
+    <script src="../auth.js"></script>
     <script src="../shared-auctions.js"></script>
     <script>
-        let auctions = loadSharedAuctions();
+        let auctions = [];
         let currentFilter = 'all';
         let currentSort = 'created-desc';
         let editingId = null;
         let editImages = [];
+
+        // Load fresh auction data from the server before rendering
+        (async function initAdmin() {
+            if (typeof EPICDB !== 'undefined') {
+                auctions = await EPICDB.getAuctions();
+            } else {
+                auctions = loadSharedAuctions();
+            }
+            renderTable();
+        })();
 
         // ══════════════════════════════════════════════
         // TABLE RENDERING
