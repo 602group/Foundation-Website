@@ -25,6 +25,10 @@ function loadSharedAuctions() {
 
 function saveSharedAuctions(data) {
     localStorage.setItem(AUCTIONS_STORE_KEY, JSON.stringify(data));
+    // Persist to shared database
+    if (typeof EPICDB !== 'undefined') {
+        data.forEach(a => EPICDB.saveAuction(a).catch(console.warn));
+    }
 }
 
 function getDefaultAuctions() {

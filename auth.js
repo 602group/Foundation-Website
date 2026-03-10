@@ -51,6 +51,8 @@ const AUTH = (() => {
         users.push(user);
         saveUsers(users);
         setSession(user);
+        // Persist to shared database
+        if (typeof EPICDB !== 'undefined') EPICDB.createUser(user).catch(console.warn);
         return { ok: true, user };
     }
 
@@ -79,6 +81,8 @@ const AUTH = (() => {
         users[idx] = updated;
         saveUsers(users);
         setSession(updated);
+        // Persist to shared database
+        if (typeof EPICDB !== 'undefined') EPICDB.saveUser(updated).catch(console.warn);
         return updated;
     }
 
@@ -152,6 +156,8 @@ const AUTH = (() => {
         // If updating the current session user, refresh session too
         const session = getSession();
         if (session && session.id === userId) setSession(users[idx]);
+        // Persist to shared database
+        if (typeof EPICDB !== 'undefined') EPICDB.saveUser(users[idx]).catch(console.warn);
         return true;
     }
 
