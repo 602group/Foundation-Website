@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EPIC Foundation - Once-in-a-Lifetime Golf Experiences for Charity</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+    <!-- Hero Section -->
+    <section class="hero">
+        <!-- Navigation Header -->
+        <header class="hero-header">
+            <span class="logo">EPIC Foundation</span>
+            <nav class="nav-menu">
+                <a href="auctions.html" class="nav-link member-only-link" style="display:none;">Auction</a>
+                <a href="travel-events.html" class="nav-link member-only-link" style="display:none;">Travel &amp; Events</a>
+                <a href="about.html" class="nav-link">About Us</a>
+                <a href="contact.html" class="nav-link">Contact Us</a>
+                <button class="login-btn">Login</button>
+            </nav>
+        </header>
+
+        <!-- Hero Content -->
+        <div class="hero-content">
+            <div class="hero-text">
+                <h1 class="hero-title">
+                    SWING FOR CHARITY.
+                    <span class="hero-subtitle">PLAY LIKE A PRO.</span>
+                </h1>
+                <a href="auctions.html" style="text-decoration: none;"><button class="cta-button">View all
+                        Auctions</button></a>
+            </div>
+        </div>
+
+        <!-- Explore More Button -->
+        <a href="#auctions" class="explore-more">
+            <span class="explore-text">Explore More</span>
+            <svg class="arrow-down" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 5V19M12 19L19 12M12 19L5 12" stroke="white" stroke-width="2" stroke-linecap="round"
+                    stroke-linejoin="round" />
+            </svg>
+        </a>
+
+    </section>
+
+    <!-- Auction Cards Section (member-only) -->
+    <div class="member-only-section" style="display:none;">
+        <section class="auction-section" id="auctions">
+            <h2 class="section-title">The Best Of The Best</h2>
+            <div class="cards-grid" id="featured-auctions-grid">
+                <!-- Dynamically populated from shared-auctions.js -->
+            </div>
+        </section>
+
+        <section class="auction-section auction-section-secondary">
+            <h2 class="section-title">Other Auctions</h2>
+            <div class="cards-grid" id="other-auctions-grid">
+                <!-- Dynamically populated from shared-auctions.js -->
+            </div>
+            <div class="view-all-container">
+                <a href="auctions.html" style="text-decoration: none;"><button class="view-all-btn">View All
+                        Auctions</button></a>
+            </div>
+        </section>
+    </div>
+
+    <!-- Public teaser section (logged-out only) -->
+    <div class="public-only-section" style="display:none;">
+        <section class="auction-section" id="auctions" style="text-align:center; padding: 5rem 2rem;">
+            <h2 class="section-title">Member-Exclusive Auctions</h2>
+            <p style="color:#666; font-size:1.1rem; max-width:540px; margin: 1rem auto 2rem;">EPIC Foundation members
+                get exclusive access to once-in-a-lifetime charity golf auctions at the world's most prestigious
+                courses.</p>
+            <a href="login.html" style="text-decoration:none;"><button class="cta-button"
+                    style="background:#000; color:#fff; padding: 0.9rem 2.5rem; border-radius:8px; font-size:1rem; font-weight:700; border:none; cursor:pointer;">Login
+                    to View Auctions</button></a>
+        </section>
+    </div>
+
+    <!-- About Us Section -->
+    <section class="about-section">
+        <div class="about-container">
+            <h2 class="about-title">About EPIC Foundation</h2>
+            <p class="about-description">
+                We create once-in-a-lifetime golf experiences at the world's most exclusive courses while raising funds
+                for charitable causes.
+                Every auction supports our mission to make a meaningful impact through the game we love.
+            </p>
+            <div class="about-features">
+                <div class="feature-item">
+                    <h3 class="feature-title">Exclusive Access</h3>
+                    <p class="feature-text">Play legendary courses like Augusta National, Pebble Beach, and Pine Valley
+                    </p>
+                </div>
+                <div class="feature-item">
+                    <h3 class="feature-title">Charitable Impact</h3>
+                    <p class="feature-text">100% of proceeds support our partner charities and community programs</p>
+                </div>
+                <div class="feature-item">
+                    <h3 class="feature-title">Unforgettable Experiences</h3>
+                    <p class="feature-text">Create memories that last a lifetime with rounds at dream destinations</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Email Signup Section -->
+    <section class="email-signup-section">
+        <div class="email-signup-overlay">
+            <div class="email-signup-content">
+                <h2 class="email-signup-title">Sign up for our email list!</h2>
+                <p class="email-signup-description">Email subscribers get early access to all of our amazing charity
+                    golf auctions</p>
+                <form class="email-signup-form">
+                    <input type="email" class="email-input" placeholder="Your email address" required>
+                    <button type="submit" class="subscribe-btn">Subscribe</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-column">
+                <h3 class="footer-heading">EPIC Foundation</h3>
+                <p class="footer-description">Creating once-in-a-lifetime golf experiences while supporting charitable
+                    causes.</p>
+            </div>
+
+            <div class="footer-column">
+                <h4 class="footer-title">Quick Links</h4>
+                <ul class="footer-links">
+                    <li><a href="#home">Home</a></li>
+                    <li><a href="auctions.html" class="member-only-link" style="display:none;">Auctions</a></li>
+                    <li><a href="#about">About Us</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-column">
+                <h4 class="footer-title">Explore</h4>
+                <ul class="footer-links">
+                    <li><a href="travel-events.html" class="member-only-link" style="display:none;">Travel & Events</a></li>
+                    <li><a href="#content">Content</a></li>
+                    <li><a href="#faq">FAQ</a></li>
+                    <li><a href="#login">Login</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-column">
+                <h4 class="footer-title">Legal</h4>
+                <ul class="footer-links">
+                    <li><a href="#privacy">Privacy Policy</a></li>
+                    <li><a href="#terms">Terms of Service</a></li>
+                    <li><a href="#cookies">Cookie Policy</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <p>&copy; 2026 EPIC Foundation. All rights reserved.</p>
+        </div>
+
+        <div class="footer-admin-bar" style="display:none;">
+            <a href="admin/dashboard.html" class="admin-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                </svg>
+                Admin
+            </a>
+        </div>
+    </footer>
+
+    <script src="auction-data.js"></script>
+    <script src="auth.js"></script>
+    <script src="shared-auctions.js"></script>
+    <script>
+        AUTH.applyGatedNav('');
+
+        // ── Render Dynamic Auctions ─────────────────────────────
+        function renderPublicAuctions() {
+            // Show all active auctions to all members
+            const list = loadSharedAuctions().filter(a => a.status === 'active');
+            const featured = list.slice(0, 4); // top 4 for best of best
+            const other = list.slice(4);
+
+            function buildCardHtml(a) {
+                const thumb = a.images && a.images[0] ? a.images[0] : '';
+                const imgStyle = thumb ? `background-image:url(${thumb});background-size:cover;background-position:center;` : '';
+                const placeholderHtml = thumb ? '' : `<span style="font-size:2.5rem;opacity:0.25;z-index:1;">♟</span>`;
+                const statusLabel = { active: 'Active', scheduled: 'Scheduled', pending: 'Pending', draft: 'Draft', ended: 'Ended', closed: 'Closed' }[a.status] || 'Active';
+                const fmtDate = d => d ? new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'TBD';
+                const linkUrl = 'auction-rounds/pebble-beach-round-2?id=' + a.id;
+                return `
+                <a href="${linkUrl}" class="auction-card-link" style="text-decoration:none;color:inherit;">
+                    <div class="auction-card">
+                        <div class="card-image" style="${imgStyle}">
+                            ${placeholderHtml}
+                            <span class="card-status-badge ${(a.status || 'active').toLowerCase()}">${statusLabel}</span>
+                        </div>
+                        <div class="card-content">
+                            <h3 class="card-title">${a.title}</h3>
+                            <p class="card-location">${a.location}</p>
+                            <div class="card-dates">
+                                <span class="card-date-tag">Opens: ${fmtDate(a.startDate)}</span>
+                                <span class="card-date-tag">Closes: ${fmtDate(a.endDate)}</span>
+                            </div>
+                            <div class="card-footer">
+                                <div class="price-info">
+                                    <span class="current-bid">$${a.currentBid ? a.currentBid.toLocaleString() : a.startBid.toLocaleString()}</span>
+                                    <span class="bid-label">${a.bidCount || 0} bids · Current Bid</span>
+                                </div>
+                                <span class="card-bid-cta">Place Bid →</span>
+                            </div>
+                        </div>
+                    </div>
+                </a>`;
+            }
+
+            const featGrid = document.getElementById('featured-auctions-grid');
+            if (featGrid) {
+                if (featured.length) featGrid.innerHTML = featured.map(buildCardHtml).join('');
+                else featGrid.innerHTML = '<p style="grid-column:1/-1;text-align:center;color:#888;">No active auctions right now. Check back soon!</p>';
+            }
+
+            const otherGrid = document.getElementById('other-auctions-grid');
+            const otherSec = document.querySelector('.auction-section-secondary');
+            if (otherGrid && otherSec) {
+                // Show the same active auctions — gives users a second way to browse
+                otherGrid.innerHTML = list.length
+                    ? list.map(buildCardHtml).join('')
+                    : '<p style="grid-column:1/-1;text-align:center;color:#888;">More auctions coming soon.</p>';
+                otherSec.style.display = '';
+            }
+        }
+        renderPublicAuctions();
+
+        // Transparent → solid header on scroll
+        const heroHeader = document.querySelector('.hero-header');
+        if (heroHeader) {
+            window.addEventListener('scroll', () => {
+                heroHeader.classList.toggle('scrolled', window.scrollY > 80);
+            });
+        }
+    </script>
+
+    <script>
+        document.querySelector('.email-signup-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const emailInput = this.querySelector('input[type="email"]');
+            const email = emailInput.value.trim().toLowerCase();
+            if (!email) return;
+
+            // Check if this email belongs to a known member
+            let firstName = '', lastName = '', memberType = 'public';
+            try {
+                const users = JSON.parse(localStorage.getItem('epic_users') || '[]');
+                const match = users.find(u => u.email.toLowerCase() === email);
+                if (match) {
+                    firstName  = match.firstName || '';
+                    lastName   = match.lastName  || '';
+                    memberType = match.memberType || 'public';
+                }
+            } catch {}
+
+            // Save to epic_newsletter (deduplicate by email)
+            let list = [];
+            try { list = JSON.parse(localStorage.getItem('epic_newsletter') || '[]'); } catch {}
+            if (!list.find(s => s.email === email)) {
+                list.push({ email, firstName, lastName, memberType, subscribedAt: new Date().toISOString() });
+                localStorage.setItem('epic_newsletter', JSON.stringify(list));
+            }
+
+            emailInput.value = '';
+            const btn = this.querySelector('button[type="submit"]');
+            const orig = btn.textContent;
+            btn.textContent = '✅ Subscribed!';
+            setTimeout(() => btn.textContent = orig, 3000);
+        });
+    </script>
+
+</body>
+
+</html>

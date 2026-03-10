@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - EPIC Foundation</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="admin.css">
+    <style>
+        .dash-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .dash-panel {
+            background: #fff;
+            border-radius: 14px;
+            padding: 1.4rem 1.6rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .dash-panel-title {
+            font-size: 0.88rem;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 1rem;
+            padding-bottom: 0.6rem;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .dash-panel-title a {
+            font-size: 0.78rem;
+            font-weight: 500;
+            color: #888;
+            text-decoration: none;
+        }
+
+        .dash-panel-title a:hover {
+            color: #000;
+        }
+
+        .dash-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.6rem 0;
+            border-bottom: 1px solid #f8f8f8;
+            font-size: 0.85rem;
+        }
+
+        .dash-row:last-child {
+            border-bottom: none;
+        }
+
+        .dash-row .dr-left {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .dash-row .dr-right {
+            font-weight: 600;
+            color: #000;
+            font-size: 0.88rem;
+        }
+
+        .dash-row .dr-sub {
+            font-size: 0.75rem;
+            color: #aaa;
+            font-weight: 400;
+            display: block;
+        }
+
+        .badge {
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 10px;
+        }
+
+        .badge-active {
+            background: #e8f8f0;
+            color: #1a9e5c;
+        }
+
+        .badge-won {
+            background: #fff8e1;
+            color: #f57f17;
+        }
+
+        .badge-watch {
+            background: #e3f2fd;
+            color: #1565c0;
+        }
+
+        .badge-ended {
+            background: #f5f5f5;
+            color: #999;
+        }
+
+        .empty-dash {
+            text-align: center;
+            padding: 2rem 1rem;
+            color: #ccc;
+            font-size: 0.85rem;
+        }
+
+        .stat-change.neutral {
+            color: #888;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <a href="../index.html" class="logo">EPIC ADMIN</a>
+        </div>
+                <nav class="nav-links">
+            <a href="dashboard.html" class="nav-item active"><span class="nav-icon">📊</span> Dashboard</a>
+            <a href="auctions.html" class="nav-item"><span class="nav-icon">⛳</span> Auctions</a>
+            <a href="users.html" class="nav-item"><span class="nav-icon">👥</span> Users</a>
+            <a href="bids.html" class="nav-item"><span class="nav-icon">💰</span> Bids</a>
+            <a href="events.html" class="nav-item"><span class="nav-icon">✈️</span> Events &amp; Trips</a>
+            <a href="messages.html" class="nav-item"><span class="nav-icon">💬</span> Messages</a>
+            <a href="tasks.html" class="nav-item"><span class="nav-icon">✅</span> Tasks</a>
+            <a href="financials.html" class="nav-item"><span class="nav-icon">📈</span> Financials</a>
+            <a href="newsletter.html" class="nav-item"><span class="nav-icon">📧</span> Newsletter</a>
+            <a href="#" class="nav-item"><span class="nav-icon">⚙️</span> Settings</a>
+        </nav>
+        <div class="user-profile">
+            <div class="avatar"></div>
+            <div class="user-info">
+                <h4>Admin User</h4>
+                <p>admin@epic.org</p>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <header class="top-header">
+            <h2 class="page-title">Dashboard Overview</h2>
+            <div class="header-actions">
+                <button onclick="window.location.href='auctions.html'">+ New Auction</button>
+            </div>
+        </header>
+
+        <div class="content-wrapper">
+            <!-- Stats Cards -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <span class="stat-label">Total Raised</span>
+                    <span class="stat-value" id="dash-total-raised">$0</span>
+                    <span class="stat-change neutral" id="dash-raised-sub">From all won auctions</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label">Active Auctions</span>
+                    <span class="stat-value" id="dash-active-auctions">0</span>
+                    <span class="stat-change neutral" id="dash-auctions-sub">Currently live</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label">Total Bids Placed</span>
+                    <span class="stat-value" id="dash-total-bids">0</span>
+                    <span class="stat-change neutral" id="dash-bids-sub">Across all auctions</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label">Total Members</span>
+                    <span class="stat-value" id="dash-total-users">0</span>
+                    <span class="stat-change neutral" id="dash-users-sub">Registered accounts</span>
+                </div>
+            </div>
+
+            <!-- Two-column lower section -->
+            <div class="dash-grid">
+                <!-- Recent Bids -->
+                <div class="dash-panel">
+                    <div class="dash-panel-title">
+                        Recent Bids
+                        <a href="bids.html">View All →</a>
+                    </div>
+                    <div id="dash-recent-bids"></div>
+                </div>
+
+                <!-- Recent Signups -->
+                <div class="dash-panel">
+                    <div class="dash-panel-title">
+                        Recent Signups
+                        <a href="users.html">View All →</a>
+                    </div>
+                    <div id="dash-recent-users"></div>
+                </div>
+
+                <!-- Active Auctions -->
+                <div class="dash-panel">
+                    <div class="dash-panel-title">
+                        Live Auctions
+                        <a href="auctions.html">Manage →</a>
+                    </div>
+                    <div id="dash-live-auctions"></div>
+                </div>
+
+                <!-- Won Auctions / Revenue -->
+                <div class="dash-panel">
+                    <div class="dash-panel-title">
+                        Won Auctions
+                        <a href="financials.html">View Financials →</a>
+                    </div>
+                    <div id="dash-won-auctions"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../shared-auctions.js"></script>
+    <script>
+        const USERS_KEY = 'epic_users';
+
+        // ── Load data ───────────────────────────────────────────────────────
+        const allAuctions = loadSharedAuctions();
+        const allUsers = JSON.parse(localStorage.getItem(USERS_KEY) || '[]');
+
+        // ── Derived stats ───────────────────────────────────────────────────
+        const activeAuctions = allAuctions.filter(a => a.status === 'active' || a.status === 'scheduled');
+        const endedAuctions = allAuctions.filter(a => a.status === 'ended');
+
+        // Collect all bids across all users
+        const allBids = [];
+        allUsers.forEach(u => {
+            (u.bids || []).forEach(b => {
+                if (typeof b === 'object') allBids.push({ ...b, userName: u.firstName + ' ' + u.lastName, userId: u.id });
+            });
+        });
+
+        // Collect all purchases/wins
+        const allWins = [];
+        allUsers.forEach(u => {
+            (u.purchases || []).forEach(p => {
+                allWins.push({ ...p, userName: u.firstName + ' ' + u.lastName, userId: u.id });
+            });
+        });
+
+        const totalRaised = allWins.reduce((sum, w) => sum + (w.amount || 0), 0);
+        const totalBids = allBids.length;
+
+        // ── Stat Cards ──────────────────────────────────────────────────────
+        document.getElementById('dash-total-raised').textContent = '$' + totalRaised.toLocaleString();
+        document.getElementById('dash-raised-sub').textContent = allWins.length + ' auction' + (allWins.length !== 1 ? 's' : '') + ' won';
+        document.getElementById('dash-active-auctions').textContent = activeAuctions.length;
+        document.getElementById('dash-auctions-sub').textContent = endedAuctions.length + ' ended, ' + allAuctions.length + ' total';
+        document.getElementById('dash-total-bids').textContent = totalBids;
+        document.getElementById('dash-bids-sub').textContent = allUsers.filter(u => (u.bids || []).length > 0).length + ' active bidders';
+        document.getElementById('dash-total-users').textContent = allUsers.length;
+        document.getElementById('dash-users-sub').textContent = allUsers.filter(u => u.memberType === 'epic_member').length + ' Epic Members';
+
+        // ── Recent Bids ─────────────────────────────────────────────────────
+        const recentBids = allBids
+            .sort((a, b) => new Date(b.placedAt || 0) - new Date(a.placedAt || 0))
+            .slice(0, 8);
+
+        const bidsEl = document.getElementById('dash-recent-bids');
+        if (!recentBids.length) {
+            bidsEl.innerHTML = '<div class="empty-dash">No bids placed yet</div>';
+        } else {
+            bidsEl.innerHTML = recentBids.map(b => `
+                <div class="dash-row">
+                    <div class="dr-left">
+                        <span>🎫</span>
+                        <span>
+                            <a href="user-profile.html?id=${b.userId}" style="text-decoration:none;color:#333;font-weight:600;">${b.userName}</a>
+                            <span class="dr-sub">${b.title || b.auctionId || '—'}</span>
+                        </span>
+                    </div>
+                    <div class="dr-right">
+                        $${(b.amount || 0).toLocaleString()}
+                        <span class="dr-sub" style="font-weight:400;color:#aaa;text-align:right;">${b.placedAt ? timeAgo(new Date(b.placedAt)) : '—'}</span>
+                    </div>
+                </div>`).join('');
+        }
+
+        // ── Recent Signups ──────────────────────────────────────────────────
+        const recentUsers = allUsers
+            .slice()
+            .sort((a, b) => new Date(b.joinedAt || 0) - new Date(a.joinedAt || 0))
+            .slice(0, 8);
+
+        const usersEl = document.getElementById('dash-recent-users');
+        if (!recentUsers.length) {
+            usersEl.innerHTML = '<div class="empty-dash">No users yet</div>';
+        } else {
+            usersEl.innerHTML = recentUsers.map(u => `
+                <div class="dash-row">
+                    <div class="dr-left">
+                        <span style="width:30px;height:30px;border-radius:50%;background:#000;color:#fff;display:flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:700;flex-shrink:0;">
+                            ${(u.firstName[0] + (u.lastName[0] || '')).toUpperCase()}
+                        </span>
+                        <span>
+                            <a href="user-profile.html?id=${u.id}" style="text-decoration:none;color:#333;font-weight:600;">${u.firstName} ${u.lastName}</a>
+                            <span class="dr-sub">${u.email}</span>
+                        </span>
+                    </div>
+                    <div class="dr-right">
+                        <span class="badge ${u.memberType === 'epic_member' ? 'badge-active' : 'badge-ended'}">${u.memberType === 'epic_member' ? 'Epic' : 'Public'}</span>
+                        <span class="dr-sub" style="text-align:right;margin-top:2px;">${u.joinedAt ? timeAgo(new Date(u.joinedAt)) : '—'}</span>
+                    </div>
+                </div>`).join('');
+        }
+
+        // ── Live Auctions ───────────────────────────────────────────────────
+        const liveEl = document.getElementById('dash-live-auctions');
+        if (!activeAuctions.length) {
+            liveEl.innerHTML = '<div class="empty-dash">No active auctions</div>';
+        } else {
+            liveEl.innerHTML = activeAuctions.slice(0, 8).map(a => `
+                <div class="dash-row">
+                    <div class="dr-left">
+                        <span>⛳</span>
+                        <span>
+                            <span style="font-weight:600;">${a.title}</span>
+                            <span class="dr-sub">${a.bidCount || 0} bids · ends ${new Date(a.endDate).toLocaleDateString()}</span>
+                        </span>
+                    </div>
+                    <div class="dr-right">
+                        $${(a.currentBid || a.startBid || 0).toLocaleString()}
+                        <span class="dr-sub" style="text-align:right;">Current bid</span>
+                    </div>
+                </div>`).join('');
+        }
+
+        // ── Won Auctions ────────────────────────────────────────────────────
+        const wonEl = document.getElementById('dash-won-auctions');
+        const recentWins = allWins
+            .sort((a, b) => new Date(b.purchasedAt || b.date || 0) - new Date(a.purchasedAt || a.date || 0))
+            .slice(0, 8);
+
+        if (!recentWins.length) {
+            wonEl.innerHTML = '<div class="empty-dash">No auctions won yet</div>';
+        } else {
+            wonEl.innerHTML = recentWins.map(w => `
+                <div class="dash-row">
+                    <div class="dr-left">
+                        <span>🏆</span>
+                        <span>
+                            <span style="font-weight:600;">${w.title || '—'}</span>
+                            <span class="dr-sub">Won by <a href="user-profile.html?id=${w.userId}" style="color:#555;text-decoration:none;">${w.userName}</a></span>
+                        </span>
+                    </div>
+                    <div class="dr-right">
+                        $${(w.amount || 0).toLocaleString()}
+                        <span class="dr-sub" style="text-align:right;">${w.purchasedAt || w.date ? new Date(w.purchasedAt || w.date).toLocaleDateString() : '—'}</span>
+                    </div>
+                </div>`).join('');
+        }
+
+        // ── Time-ago helper ─────────────────────────────────────────────────
+        function timeAgo(date) {
+            const diff = Date.now() - date.getTime();
+            const mins = Math.floor(diff / 60000);
+            if (mins < 1) return 'Just now';
+            if (mins < 60) return mins + 'm ago';
+            const hrs = Math.floor(mins / 60);
+            if (hrs < 24) return hrs + 'h ago';
+            const days = Math.floor(hrs / 24);
+            if (days < 30) return days + 'd ago';
+            return date.toLocaleDateString();
+        }
+    </script>
+</body>
+
+</html>

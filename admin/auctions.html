@@ -1,0 +1,1900 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auctions - EPIC Admin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="admin.css">
+    <style>
+        /* ── AUCTIONS PAGE EXTRAS ── */
+        .toolbar {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-bottom: 1.5rem;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 220px;
+            position: relative;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 0.6rem 1rem 0.6rem 2.5rem;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.9rem;
+            background: white;
+            outline: none;
+            transition: border 0.2s;
+        }
+
+        .search-box input:focus {
+            border-color: #4A90E2;
+        }
+
+        .search-box .search-icon {
+            position: absolute;
+            left: 0.8rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #aaa;
+            pointer-events: none;
+        }
+
+        .toolbar select {
+            padding: 0.6rem 1rem;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.9rem;
+            background: white;
+            cursor: pointer;
+            outline: none;
+        }
+
+        .filter-tabs {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-bottom: 1.2rem;
+        }
+
+        .filter-tab {
+            padding: 0.35rem 1rem;
+            border-radius: 20px;
+            border: 1px solid #e0e0e0;
+            background: white;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.82rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #555;
+        }
+
+        .filter-tab:hover {
+            border-color: #4A90E2;
+            color: #4A90E2;
+        }
+
+        .filter-tab.active {
+            background: #000;
+            color: #fff;
+            border-color: #000;
+        }
+
+        /* ── AUCTION TABLE ── */
+        .auctions-table-wrap {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+        }
+
+        .auctions-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .auctions-table thead th {
+            background: #f8f9fa;
+            padding: 0.9rem 1rem;
+            text-align: left;
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            border-bottom: 1px solid #eee;
+            white-space: nowrap;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .auctions-table thead th:hover {
+            color: #333;
+        }
+
+        .auctions-table thead th.sorted {
+            color: #000;
+        }
+
+        .sort-arrow {
+            margin-left: 4px;
+            opacity: 0.4;
+        }
+
+        .sort-arrow.asc::after {
+            content: ' ▲';
+        }
+
+        .sort-arrow.desc::after {
+            content: ' ▼';
+        }
+
+        .auctions-table tbody td {
+            padding: 1rem;
+            font-size: 0.88rem;
+            color: #333;
+            border-bottom: 1px solid #f0f0f0;
+            vertical-align: middle;
+        }
+
+        .auctions-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .auctions-table tbody tr:hover {
+            background: #fafafa;
+            cursor: pointer;
+        }
+
+        .auctions-table tbody tr.selected {
+            background: #f0f4ff;
+        }
+
+        .auction-thumb {
+            width: 56px;
+            height: 42px;
+            border-radius: 6px;
+            object-fit: cover;
+            background: #eee;
+        }
+
+        .auction-title-cell strong {
+            display: block;
+            font-size: 0.9rem;
+            line-height: 1.3;
+        }
+
+        .auction-title-cell span {
+            font-size: 0.78rem;
+            color: #888;
+        }
+
+        /* Status badges */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .badge::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .badge-active {
+            background: #e8f8f0;
+            color: #1a9e5c;
+        }
+
+        .badge-active::before {
+            background: #1a9e5c;
+        }
+
+        .badge-scheduled {
+            background: #e8f0ff;
+            color: #4A90E2;
+        }
+
+        .badge-scheduled::before {
+            background: #4A90E2;
+        }
+
+        .badge-pending {
+            background: #fff8e1;
+            color: #f0a500;
+        }
+
+        .badge-pending::before {
+            background: #f0a500;
+        }
+
+        .badge-closed {
+            background: #f5f5f5;
+            color: #888;
+        }
+
+        .badge-closed::before {
+            background: #aaa;
+        }
+
+        .badge-draft {
+            background: #fdf0ff;
+            color: #9b59b6;
+        }
+
+        .badge-draft::before {
+            background: #9b59b6;
+        }
+
+        .badge-outbid {
+            background: #fff0f0;
+            color: #e74c3c;
+        }
+
+        .badge-sold {
+            background: #e8f5e9;
+            color: #1b5e20;
+        }
+
+        .badge-sold::before {
+            background: #2e7d32;
+        }
+
+        .badge-ended {
+            background: #f3e5f5;
+            color: #4a148c;
+        }
+
+        .badge-ended::before {
+            background: #6a1b9a;
+        }
+
+        .badge-won {
+            background: #e8f0ff;
+            color: #4A90E2;
+        }
+
+        .row-actions {
+            display: flex;
+            gap: 0.4rem;
+        }
+
+        .row-btn {
+            padding: 0.3rem 0.7rem;
+            border-radius: 6px;
+            border: 1px solid #e0e0e0;
+            background: white;
+            font-size: 0.78rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.15s;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .row-btn:hover {
+            background: #000;
+            color: #fff;
+            border-color: #000;
+        }
+
+        .row-btn.danger:hover {
+            background: #e74c3c;
+            border-color: #e74c3c;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 3rem;
+            color: #aaa;
+            font-size: 1rem;
+        }
+
+        /* ── EDIT DRAWER ── */
+        .drawer-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.4);
+            z-index: 1100;
+            backdrop-filter: blur(2px);
+        }
+
+        .drawer-overlay.open {
+            display: block;
+        }
+
+        .drawer {
+            position: fixed;
+            top: 0;
+            right: -700px;
+            width: 680px;
+            max-width: 95vw;
+            height: 100vh;
+            background: #fff;
+            z-index: 1200;
+            display: flex;
+            flex-direction: column;
+            transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: -8px 0 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .drawer.open {
+            right: 0;
+        }
+
+        .drawer-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1.2rem 1.5rem;
+            border-bottom: 1px solid #eee;
+            background: #000;
+            color: white;
+        }
+
+        .drawer-header h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .drawer-close {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 1.4rem;
+            line-height: 1;
+            padding: 0 0.3rem;
+            transition: opacity 0.2s;
+        }
+
+        .drawer-close:hover {
+            opacity: 0.7;
+        }
+
+        .drawer-tabs {
+            display: flex;
+            border-bottom: 1px solid #eee;
+            background: #f8f9fa;
+        }
+
+        .drawer-tab {
+            padding: 0.75rem 1.2rem;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-family: 'Poppins', sans-serif;
+            color: #888;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .drawer-tab.active {
+            color: #000;
+            border-bottom-color: #000;
+        }
+
+        .drawer-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1.5rem;
+        }
+
+        .drawer-panel {
+            display: none;
+        }
+
+        .drawer-panel.active {
+            display: block;
+        }
+
+        /* Form styles inside drawer */
+        .form-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-section-title {
+            font-size: 0.78rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            color: #888;
+            margin-bottom: 0.75rem;
+            padding-bottom: 0.4rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+            margin-bottom: 0.9rem;
+        }
+
+        .form-group label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #444;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: 0.6rem 0.8rem;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.88rem;
+            outline: none;
+            transition: border 0.2s;
+            background: white;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border-color: #4A90E2;
+            box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 90px;
+        }
+
+        /* Image preview strip */
+        .image-preview-strip {
+            display: flex;
+            gap: 0.6rem;
+            flex-wrap: wrap;
+            margin-top: 0.5rem;
+        }
+
+        .image-preview-item {
+            position: relative;
+            width: 90px;
+            height: 68px;
+        }
+
+        .image-preview-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 2px solid #eee;
+        }
+
+        .image-preview-item .remove-img {
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            width: 20px;
+            height: 20px;
+            background: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            font-size: 11px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .add-image-btn {
+            width: 90px;
+            height: 68px;
+            border: 2px dashed #ccc;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 0.7rem;
+            color: #aaa;
+            background: #fafafa;
+            transition: all 0.2s;
+        }
+
+        .add-image-btn:hover {
+            border-color: #4A90E2;
+            color: #4A90E2;
+        }
+
+        .add-image-btn .plus {
+            font-size: 1.4rem;
+            line-height: 1;
+        }
+
+        /* Auction preview card */
+        .preview-card {
+            border: 1px solid #e0e0e0;
+            border-radius: 16px;
+            overflow: hidden;
+            max-width: 360px;
+            margin: 0 auto;
+        }
+
+        .preview-card-img {
+            width: 100%;
+            height: 220px;
+            object-fit: cover;
+            background: #eee;
+        }
+
+        .preview-card-body {
+            padding: 1rem;
+        }
+
+        .preview-card-title {
+            font-weight: 700;
+            font-size: 0.95rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .preview-card-location {
+            font-size: 0.8rem;
+            color: #888;
+        }
+
+        .preview-card-bids {
+            font-size: 0.8rem;
+            color: #888;
+            margin-bottom: 0.8rem;
+        }
+
+        .preview-card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .preview-bid {
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+
+        .preview-buy-btn {
+            background: #fff;
+            color: #000;
+            border: 1.5px solid #000;
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            cursor: default;
+        }
+
+        .preview-section-label {
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 0.4rem;
+            display: block;
+        }
+
+        .drawer-footer {
+            padding: 1rem 1.5rem;
+            border-top: 1px solid #eee;
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.75rem;
+            background: #fafafa;
+        }
+
+        .btn-primary {
+            padding: 0.7rem 1.6rem;
+            background: #000;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        .btn-primary:hover {
+            opacity: 0.85;
+        }
+
+        .btn-secondary {
+            padding: 0.7rem 1.6rem;
+            background: white;
+            color: #333;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 500;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-secondary:hover {
+            background: #f5f5f5;
+        }
+
+        /* ── ADD NEW MODAL ── */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1300;
+            backdrop-filter: blur(3px);
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-overlay.open {
+            display: flex;
+        }
+
+        .modal-box {
+            background: white;
+            border-radius: 16px;
+            width: 560px;
+            max-width: 95vw;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: modalIn 0.25s ease;
+        }
+
+        @keyframes modalIn {
+            from {
+                transform: scale(0.95);
+                opacity: 0;
+            }
+
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            padding: 1.2rem 1.5rem;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.4rem;
+            cursor: pointer;
+            color: #666;
+            line-height: 1;
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        .modal-footer {
+            padding: 1rem 1.5rem;
+            border-top: 1px solid #eee;
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.75rem;
+        }
+
+        /* Save toast */
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            background: #1a9e5c;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 30px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            z-index: 9999;
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: #aaa;
+        }
+
+        .empty-state p {
+            margin-top: 0.5rem;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 0.75rem;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <a href="../index.html" class="logo">EPIC ADMIN</a>
+        </div>
+        <nav class="nav-links">
+            <a href="dashboard.html" class="nav-item"><span class="nav-icon">📊</span> Dashboard</a>
+            <a href="auctions.html" class="nav-item active"><span class="nav-icon">⛳</span> Auctions</a>
+            <a href="users.html" class="nav-item"><span class="nav-icon">👥</span> Users</a>
+            <a href="bids.html" class="nav-item"><span class="nav-icon">💰</span> Bids</a>
+            <a href="events.html" class="nav-item"><span class="nav-icon">✈️</span> Events &amp; Trips</a>
+            <a href="messages.html" class="nav-item"><span class="nav-icon">💬</span> Messages</a>
+            <a href="tasks.html" class="nav-item"><span class="nav-icon">✅</span> Tasks</a>
+            <a href="financials.html" class="nav-item"><span class="nav-icon">📈</span> Financials</a>
+            <a href="newsletter.html" class="nav-item"><span class="nav-icon">📧</span> Newsletter</a>
+            <a href="#" class="nav-item"><span class="nav-icon">⚙️</span> Settings</a>
+        </nav>
+        <div class="user-profile">
+            <div class="avatar"></div>
+            <div class="user-info">
+                <h4>Admin User</h4>
+                <p>admin@epic.org</p>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <header class="top-header">
+            <h2 class="page-title">Auctions</h2>
+            <div class="header-actions">
+                <button class="btn-primary" onclick="openAddModal()">+ New Auction</button>
+            </div>
+        </header>
+
+        <div class="content-wrapper">
+            <!-- Filter tabs -->
+            <div class="filter-tabs" id="filterTabs">
+                <button class="filter-tab active" data-filter="all" onclick="setFilter('all', this)">All</button>
+                <button class="filter-tab" data-filter="active" onclick="setFilter('active', this)">🟢 Active</button>
+                <button class="filter-tab" data-filter="scheduled" onclick="setFilter('scheduled', this)">🔵
+                    Scheduled</button>
+                <button class="filter-tab" data-filter="pending" onclick="setFilter('pending', this)">🟡
+                    Pending</button>
+                <button class="filter-tab" data-filter="draft" onclick="setFilter('draft', this)">🟣 Draft</button>
+                <button class="filter-tab" data-filter="closed" onclick="setFilter('closed', this)">⚫ Closed</button>
+            </div>
+
+            <!-- Toolbar: search + sort -->
+            <div class="toolbar">
+                <div class="search-box">
+                    <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8" />
+                        <path d="m21 21-4.35-4.35" />
+                    </svg>
+                    <input type="text" id="searchInput" placeholder="Search auctions by title or location…"
+                        oninput="renderTable()">
+                </div>
+                <select id="sortSelect" onchange="renderTable()">
+                    <option value="created-desc">Newest First</option>
+                    <option value="created-asc">Oldest First</option>
+                    <option value="end-asc">Ending Soonest</option>
+                    <option value="end-desc">Ending Latest</option>
+                    <option value="bid-desc">Highest Bid</option>
+                    <option value="bid-asc">Lowest Bid</option>
+                    <option value="title-asc">Title A–Z</option>
+                </select>
+            </div>
+
+            <!-- Auctions Table -->
+            <div class="auctions-table-wrap">
+                <table class="auctions-table" id="auctionsTable">
+                    <thead>
+                        <tr>
+                            <th style="width:60px">Photo</th>
+                            <th onclick="toggleSort('title')" id="th-title">Title <span class="sort-arrow"></span></th>
+                            <th onclick="toggleSort('location')" id="th-location">Location <span
+                                    class="sort-arrow"></span></th>
+                            <th onclick="toggleSort('status')" id="th-status">Status <span class="sort-arrow"></span>
+                            </th>
+                            <th onclick="toggleSort('currentBid')" id="th-currentBid">Current Bid <span
+                                    class="sort-arrow"></span></th>
+                            <th onclick="toggleSort('endDate')" id="th-endDate">Ends <span class="sort-arrow"></span>
+                            </th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="auctionsTbody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Drawer Overlay -->
+    <div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
+
+    <!-- Edit Drawer -->
+    <div class="drawer" id="editDrawer">
+        <div class="drawer-header">
+            <h3 id="drawerTitle">Edit Auction</h3>
+            <button class="drawer-close" onclick="closeDrawer()">✕</button>
+        </div>
+        <div class="drawer-tabs">
+            <button class="drawer-tab active" onclick="switchTab('details', this)">Details</button>
+            <button class="drawer-tab" onclick="switchTab('pricing', this)">Pricing</button>
+            <button class="drawer-tab" onclick="switchTab('images', this)">Images</button>
+            <button class="drawer-tab" onclick="switchTab('bids', this)">Bids</button>
+            <button class="drawer-tab" onclick="switchTab('preview', this)">Preview</button>
+        </div>
+        <div class="drawer-body">
+
+            <!-- DETAILS TAB -->
+            <div class="drawer-panel active" id="panel-details">
+                <div class="form-section">
+                    <div class="form-section-title">Basic Info</div>
+                    <div class="form-group">
+                        <label>Auction Title *</label>
+                        <input type="text" id="edit-title" placeholder="e.g. Pebble Beach Golf Links - Round for 2">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Course Name</label>
+                            <input type="text" id="edit-course" placeholder="Pebble Beach Golf Links">
+                        </div>
+                        <div class="form-group">
+                            <label>Location</label>
+                            <input type="text" id="edit-location" placeholder="Pebble Beach, CA">
+                        </div>
+                    </div>
+                    <div class="form-group"
+                        style="background:#fffbe6;border:1.5px solid #ffe082;border-radius:8px;padding:0.8rem 1rem;margin-top:0.2rem;">
+                        <label style="color:#b8860b;font-weight:700;">🔒 Donor (Admin Only — not visible to
+                            members)</label>
+                        <input type="text" id="edit-donor" placeholder="e.g. John Smith" style="margin-top:0.3rem;">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Status</label>
+                            <select id="edit-status">
+                                <option value="active">Active (Live)</option>
+                                <option value="scheduled">Scheduled</option>
+                                <option value="pending">Pending</option>
+                                <option value="draft">Draft</option>
+                                <option value="closed">Closed</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Visibility</label>
+                            <select id="edit-visibility">
+                                <option value="all">All Users</option>
+                                <option value="epic_only">Members Only</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Architect</label>
+                            <input type="text" id="edit-architect" placeholder="Jack Neville & Douglas Grant">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Course Type</label>
+                            <select id="edit-courseType">
+                                <option value="Parkland">Parkland</option>
+                                <option value="Links">Links</option>
+                                <option value="Desert">Desert</option>
+                                <option value="Mountain">Mountain</option>
+                                <option value="Resort">Resort</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Access</label>
+                            <select id="edit-access">
+                                <option value="Private">Private</option>
+                                <option value="Semi-Private">Semi-Private</option>
+                                <option value="Public">Public</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Year Opened</label>
+                            <input type="number" id="edit-yearOpened" placeholder="1919">
+                        </div>
+                        <div class="form-group">
+                            <label>Course Ranking</label>
+                            <input type="text" id="edit-ranking" placeholder="Top 10 Golf Digest">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Course Website</label>
+                        <input type="url" id="edit-courseUrl" placeholder="https://…">
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <div class="form-section-title">Item Details</div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Number of Guests</label>
+                            <input type="number" id="edit-guests" min="1" value="2">
+                        </div>
+                        <div class="form-group">
+                            <label>Number of Rounds</label>
+                            <input type="number" id="edit-rounds" min="1" value="1">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Attributes (cart, caddy, etc.)</label>
+                        <input type="text" id="edit-attributes" placeholder="Cart, Food & Drinks">
+                    </div>
+                    <div class="form-group">
+                        <label>Paid For By</label>
+                        <select id="edit-paidBy">
+                            <option value="Donor">Donor</option>
+                            <option value="Winner">Winner</option>
+                            <option value="Shared">Shared</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Booking Restrictions</label>
+                        <textarea id="edit-restrictions" placeholder="Date restrictions, scheduling notes…"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Item Description</label>
+                        <textarea id="edit-description" style="min-height:110px"
+                            placeholder="Full auction item description shown on the public page…"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Course Description</label>
+                        <textarea id="edit-courseDescription"
+                            placeholder="Course history and information shown on the public page…"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Charity Name</label>
+                        <input type="text" id="edit-charity" value="EPIC Foundation">
+                    </div>
+                    <div class="form-group">
+                        <label>Tax Deductible?</label>
+                        <select id="edit-taxDeductible">
+                            <option value="no">No</option>
+                            <option value="yes">Yes</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PRICING TAB -->
+            <div class="drawer-panel" id="panel-pricing">
+                <div class="form-section">
+                    <div class="form-section-title">Auction Pricing</div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Starting Bid ($)</label>
+                            <input type="number" id="edit-startBid" min="0" step="100" placeholder="1000">
+                        </div>
+                        <div class="form-group">
+                            <label>Current Bid ($)</label>
+                            <input type="number" id="edit-currentBid" min="0" step="100" placeholder="8000">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Bid Increment ($)</label>
+                            <input type="number" id="edit-increment" min="50" step="50" placeholder="200">
+                        </div>
+                        <div class="form-group">
+                            <label>Buy It Now ($) — 0 = disabled</label>
+                            <input type="number" id="edit-buyNow" min="0" step="100" placeholder="12000">
+                        </div>
+                    </div>
+                </div>
+                <div class="form-section">
+                    <div class="form-section-title">Auction Timing</div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Auction Start</label>
+                            <input type="datetime-local" id="edit-startDate">
+                        </div>
+                        <div class="form-group">
+                            <label>Auction End</label>
+                            <input type="datetime-local" id="edit-endDate">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Bid Extension (mins) — bids in final N mins extend by N</label>
+                        <input type="number" id="edit-extension" min="0" placeholder="2" value="2">
+                    </div>
+                </div>
+            </div>
+
+            <!-- IMAGES TAB -->
+            <div class="drawer-panel" id="panel-images">
+                <div class="form-section">
+                    <div class="form-section-title">Auction Images</div>
+                    <p style="font-size:0.83rem;color:#888;margin-bottom:1rem;">Upload images. The first image will be
+                        used as the thumbnail on listing pages.</p>
+                    <div class="image-preview-strip" id="imageStrip"></div>
+                    <div style="margin-top:1rem;">
+                        <div class="form-group">
+                            <label>Upload Image</label>
+                            <label
+                                style="display:flex;align-items:center;gap:0.6rem;padding:0.6rem 0.9rem;border:1.5px dashed #ccc;border-radius:6px;cursor:pointer;font-size:0.85rem;color:#666;">
+                                <input type="file" accept="image/*,.pdf" style="display:none"
+                                    onchange="addImageFile(this)">
+                                📁 Choose file (PNG, JPG, PDF)
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- BIDS TAB -->
+            <div class="drawer-panel" id="panel-bids">
+                <div class="form-section">
+                    <div class="form-section-title">Bid History & Activity</div>
+                    <p style="font-size:0.83rem;color:#888;margin-bottom:1rem;">All active and historical bids placed on
+                        this specific item.</p>
+
+                    <div style="background: white; border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden;">
+                        <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                            <thead style="background: #f8f9fa; border-bottom: 1px solid #eee;">
+                                <tr>
+                                    <th onclick="sortDrawerBids('date')"
+                                        style="padding: 0.8rem 1rem; font-size: 0.75rem; color: #888; text-transform: uppercase; cursor: pointer; user-select: none;">
+                                        Date <span id="sort-ind-date" style="font-size:0.85rem"></span>
+                                    </th>
+                                    <th onclick="sortDrawerBids('bidderName')"
+                                        style="padding: 0.8rem 1rem; font-size: 0.75rem; color: #888; text-transform: uppercase; cursor: pointer; user-select: none;">
+                                        Bidder Name <span id="sort-ind-bidderName" style="font-size:0.85rem"></span>
+                                    </th>
+                                    <th onclick="sortDrawerBids('amount')"
+                                        style="padding: 0.8rem 1rem; font-size: 0.75rem; color: #888; text-transform: uppercase; cursor: pointer; user-select: none;">
+                                        Amount <span id="sort-ind-amount" style="font-size:0.85rem"></span>
+                                    </th>
+                                    <th onclick="sortDrawerBids('status')"
+                                        style="padding: 0.8rem 1rem; font-size: 0.75rem; color: #888; text-transform: uppercase; cursor: pointer; user-select: none;">
+                                        Status <span id="sort-ind-status" style="font-size:0.85rem"></span>
+                                    </th>
+                                    <th style="padding: 0.8rem 1rem;"></th>
+                                </tr>
+                            </thead>
+                            <tbody id="drawerBidsTbody">
+                                <tr>
+                                    <td colspan="4"
+                                        style="padding: 2rem; text-align: center; color: #aaa; font-size: 0.85rem;">No
+                                        bid history loaded.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PREVIEW TAB -->
+            <div class="drawer-panel" id="panel-preview">
+                <div class="form-section">
+                    <div class="form-section-title">Listing Card Preview</div>
+                    <p style="font-size:0.83rem;color:#888;margin-bottom:1rem;">How this auction appears on the Auctions
+                        page.</p>
+                    <div class="preview-card" id="previewCard">
+                        <img src="" alt="" class="preview-card-img" id="previewImg">
+                        <div class="preview-card-body">
+                            <div class="preview-card-title" id="previewTitle">—</div>
+                            <div class="preview-card-location" id="previewLocation">—</div>
+                            <div class="preview-card-bids" id="previewBids">0 bids</div>
+                            <div class="preview-card-footer">
+                                <div>
+                                    <div class="preview-bid" id="previewBid">—</div>
+                                    <div style="font-size:0.72rem;color:#888">Current Bid</div>
+                                </div>
+                                <div class="preview-buy-btn" id="previewBuyNow">$— Buy it Now</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-section" style="margin-top:1.5rem">
+                    <div class="form-section-title">Public Page URL</div>
+                    <p style="font-size:0.85rem;color:#444;">Once saved, this auction will be accessible at:</p>
+                    <div style="margin-top:0.4rem;padding:0.6rem 1rem;background:#f5f5f5;border-radius:8px;font-size:0.82rem;font-family:monospace;color:#333;"
+                        id="previewUrl">—</div>
+                    <a id="previewPageLink" href="#" target="_blank"
+                        style="font-size:0.82rem;color:#4A90E2;display:inline-block;margin-top:0.5rem;text-decoration:none;">Open
+                        public page →</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="drawer-footer">
+            <button class="btn-secondary" onclick="closeDrawer()">Cancel</button>
+            <button class="btn-primary" onclick="saveAuction()">💾 Save Auction</button>
+        </div>
+    </div>
+
+    <!-- Add New Auction Modal -->
+    <div class="modal-overlay" id="addModal">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3>New Auction</h3>
+                <button class="modal-close" onclick="closeAddModal()">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Auction Title *</label>
+                    <input type="text" id="new-title" placeholder="e.g. Augusta National - Round for 2 w/ a member">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Course Name *</label>
+                        <input type="text" id="new-course" placeholder="Augusta National">
+                    </div>
+                    <div class="form-group">
+                        <label>Location *</label>
+                        <input type="text" id="new-location" placeholder="Augusta, GA">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Starting Bid ($)</label>
+                        <input type="number" id="new-startBid" value="1000" min="0" step="100">
+                    </div>
+                    <div class="form-group">
+                        <label>Buy It Now ($)</label>
+                        <input type="number" id="new-buyNow" value="0" min="0" step="100">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Auction Start</label>
+                        <input type="datetime-local" id="new-startDate">
+                    </div>
+                    <div class="form-group">
+                        <label>Auction End</label>
+                        <input type="datetime-local" id="new-endDate">
+                    </div>
+                </div>
+                <div class="form-group"
+                    style="background:#fffbe6;border:1.5px solid #ffe082;border-radius:8px;padding:0.8rem 1rem;">
+                    <label style="color:#b8860b;font-weight:700;">🔒 Donor (Admin Only)</label>
+                    <input type="text" id="new-donor" placeholder="e.g. John Smith" style="margin-top:0.3rem;">
+                </div>
+                <div class="form-group">
+                    <label>Initial Status</label>
+                    <select id="new-status">
+                        <option value="draft">Draft (not live yet)</option>
+                        <option value="scheduled">Scheduled</option>
+                        <option value="active">Active (go live now)</option>
+                        <option value="pending">Pending</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Primary Image (optional)</label>
+                    <label
+                        style="display:flex;align-items:center;gap:0.6rem;padding:0.6rem 0.9rem;border:1.5px dashed #ccc;border-radius:6px;cursor:pointer;font-size:0.85rem;color:#666;">
+                        <input type="file" accept="image/*,.pdf" style="display:none"
+                            onchange="handleNewAuctionImage(this)">
+                        📁 Choose file (PNG, JPG, PDF)
+                    </label>
+                    <input type="hidden" id="new-imageUrl">
+                    <img id="new-image-preview"
+                        style="width:100%;max-height:140px;object-fit:cover;border-radius:6px;margin-top:0.5rem;display:none;"
+                        alt="preview">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeAddModal()">Cancel</button>
+                <button class="btn-primary" onclick="createAuction()">Create & Edit →</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast notification -->
+    <div class="toast" id="toast">✅ Auction saved successfully</div>
+
+    <script src="../shared-auctions.js"></script>
+    <script>
+        let auctions = loadSharedAuctions();
+        let currentFilter = 'all';
+        let currentSort = 'created-desc';
+        let editingId = null;
+        let editImages = [];
+
+        // ══════════════════════════════════════════════
+        // TABLE RENDERING
+        // ══════════════════════════════════════════════
+        function getFilteredSorted() {
+            let list = [...auctions];
+            const q = document.getElementById('searchInput').value.toLowerCase().trim();
+            if (q) {
+                list = list.filter(a =>
+                    a.title.toLowerCase().includes(q) ||
+                    a.location.toLowerCase().includes(q) ||
+                    a.course.toLowerCase().includes(q)
+                );
+            }
+            if (currentFilter !== 'all') {
+                list = list.filter(a => a.status === currentFilter);
+            }
+            const sort = document.getElementById('sortSelect').value;
+            list.sort((a, b) => {
+                if (sort === 'created-desc') return new Date(b.createdAt) - new Date(a.createdAt);
+                if (sort === 'created-asc') return new Date(a.createdAt) - new Date(b.createdAt);
+                if (sort === 'end-asc') return new Date(a.endDate) - new Date(b.endDate);
+                if (sort === 'end-desc') return new Date(b.endDate) - new Date(a.endDate);
+                if (sort === 'bid-desc') return (b.currentBid || 0) - (a.currentBid || 0);
+                if (sort === 'bid-asc') return (a.currentBid || 0) - (b.currentBid || 0);
+                if (sort === 'title-asc') return a.title.localeCompare(b.title);
+                return 0;
+            });
+            return list;
+        }
+
+        function statusBadge(status) {
+            const map = {
+                active: ['Active', 'badge-active'],
+                scheduled: ['Scheduled', 'badge-scheduled'],
+                pending: ['Pending', 'badge-pending'],
+                draft: ['Draft', 'badge-draft'],
+                closed: ['Closed', 'badge-closed'],
+                sold: ['Sold', 'badge-sold'],
+                ended: ['Ended', 'badge-ended'],
+            };
+            const [label, cls] = map[status] || ['Unknown', 'badge-closed'];
+            return `<span class="badge ${cls}">${label}</span>`;
+        }
+
+        function renderTable() {
+            const list = getFilteredSorted();
+            const tbody = document.getElementById('auctionsTbody');
+            if (!list.length) {
+                tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state">No auctions found.<br><p>Try a different search or add a new auction.</p></div></td></tr>`;
+                return;
+            }
+            tbody.innerHTML = list.map(a => {
+                const thumb = a.images && a.images[0]
+                    ? `<img src="${a.images[0]}" class="auction-thumb" onerror="this.style.background='#eee';this.src=''">`
+                    : `<div class="auction-thumb" style="background:#eee;display:inline-block;"></div>`;
+                const endFmt = a.endDate ? new Date(a.endDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '—';
+                const bid = a.currentBid ? `$${a.currentBid.toLocaleString()}` : '—';
+                return `
+                <tr onclick="openEditDrawer('${a.id}')" title="Click to edit">
+                    <td>${thumb}</td>
+                    <td class="auction-title-cell">
+                        <strong>${a.title}</strong>
+                        <span>${a.course}</span>
+                    </td>
+                    <td>${a.location}</td>
+                    <td>${statusBadge(a.status)}</td>
+                    <td><strong>${bid}</strong></td>
+                    <td>${endFmt}</td>
+                    <td onclick="event.stopPropagation()" class="row-actions">
+                        <button class="row-btn" onclick="openEditDrawer('${a.id}')">Edit</button>
+                        <button class="row-btn danger" onclick="deleteAuction('${a.id}')">Delete</button>
+                    </td>
+                </tr>`;
+            }).join('');
+        }
+
+        function setFilter(f, btn) {
+            currentFilter = f;
+            document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+            btn.classList.add('active');
+            renderTable();
+        }
+
+        // ══════════════════════════════════════════════
+        // EDIT DRAWER
+        // ══════════════════════════════════════════════
+        function openEditDrawer(id) {
+            const a = auctions.find(x => x.id === id);
+            if (!a) return;
+            editingId = id;
+            editImages = [...(a.images || [])];
+
+            document.getElementById('drawerTitle').textContent = 'Edit: ' + a.title.substring(0, 40) + (a.title.length > 40 ? '…' : '');
+
+            // Fill in all fields
+            setVal('edit-title', a.title);
+            setVal('edit-course', a.course);
+            setVal('edit-location', a.location);
+            setVal('edit-status', a.status);
+            setVal('edit-visibility', a.visibility || 'all');
+            setVal('edit-architect', a.architect);
+            setVal('edit-courseType', a.courseType);
+            setVal('edit-access', a.access);
+            setVal('edit-yearOpened', a.yearOpened);
+            setVal('edit-ranking', a.ranking);
+            setVal('edit-courseUrl', a.courseUrl);
+            setVal('edit-guests', a.guests);
+            setVal('edit-rounds', a.rounds);
+            setVal('edit-attributes', a.attributes);
+            setVal('edit-paidBy', a.paidBy);
+            setVal('edit-restrictions', a.restrictions);
+            setVal('edit-description', a.description);
+            setVal('edit-courseDescription', a.courseDescription);
+            setVal('edit-charity', a.charity);
+            setVal('edit-taxDeductible', a.taxDeductible);
+            setVal('edit-startBid', a.startBid);
+            setVal('edit-currentBid', a.currentBid);
+            setVal('edit-increment', a.increment);
+            setVal('edit-donor', a.donor);
+            setVal('edit-buyNow', a.buyNow);
+            setVal('edit-startDate', a.startDate);
+            setVal('edit-endDate', a.endDate);
+            setVal('edit-extension', a.extension);
+
+            renderImageStrip();
+            populateDrawerBids(a.title);
+            switchTab('details', document.querySelector('.drawer-tab'));
+            document.getElementById('drawerOverlay').classList.add('open');
+            document.getElementById('editDrawer').classList.add('open');
+        }
+
+        let drawerBidSortCol = null;
+        let drawerBidSortDir = null; // 'asc', 'desc', or null
+
+        function sortDrawerBids(col) {
+            if (drawerBidSortCol === col) {
+                if (drawerBidSortDir === 'asc') drawerBidSortDir = 'desc';
+                else if (drawerBidSortDir === 'desc') { drawerBidSortDir = null; drawerBidSortCol = null; }
+            } else {
+                drawerBidSortCol = col;
+                drawerBidSortDir = 'asc';
+            }
+            const a = auctions.find(x => x.id === editingId);
+            if (a) populateDrawerBids(a.title);
+        }
+
+        function populateDrawerBids(auctionTitle) {
+            if (!auctionTitle && editingId) {
+                const au = auctions.find(x => x.id === editingId);
+                if (au) auctionTitle = au.title;
+            }
+            if (!auctionTitle) return;
+
+            const tbody = document.getElementById('drawerBidsTbody');
+            try {
+                const users = JSON.parse(localStorage.getItem('epic_users')) || [];
+                let itemBids = [];
+
+                users.forEach(u => {
+                    (u.bids || []).forEach(b => {
+                        if (typeof b === 'object' && b.title === auctionTitle) {
+                            itemBids.push({ ...b, bidderName: u.firstName + ' ' + (u.lastName || ''), userId: u.id });
+                        }
+                    });
+                    (u.purchases || []).forEach(p => {
+                        if (typeof p === 'object' && p.title === auctionTitle) {
+                            itemBids.push({ ...p, status: 'won', bidderName: u.firstName + ' ' + (u.lastName || ''), userId: u.id });
+                        }
+                    });
+                });
+
+                // Apply Sorting Logic
+                if (!drawerBidSortCol) {
+                    itemBids.sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0)); // default
+                } else {
+                    itemBids.sort((a, b) => {
+                        let va = a[drawerBidSortCol];
+                        let vb = b[drawerBidSortCol];
+
+                        // normalize
+                        if (drawerBidSortCol === 'date') {
+                            va = new Date(va).getTime();
+                            vb = new Date(vb).getTime();
+                        } else if (drawerBidSortCol === 'amount') {
+                            va = Number(va) || 0;
+                            vb = Number(vb) || 0;
+                        } else {
+                            va = (va || '').toLowerCase();
+                            vb = (vb || '').toLowerCase();
+                        }
+
+                        if (va < vb) return drawerBidSortDir === 'asc' ? -1 : 1;
+                        if (va > vb) return drawerBidSortDir === 'asc' ? 1 : -1;
+                        return 0;
+                    });
+                }
+
+                // Update UI Indicators
+                ['date', 'bidderName', 'amount', 'status'].forEach(col => {
+                    const el = document.getElementById('sort-ind-' + col);
+                    if (el) {
+                        if (drawerBidSortCol === col) {
+                            el.innerHTML = drawerBidSortDir === 'asc' ? '↑' : '↓';
+                            el.style.color = '#000';
+                        } else {
+                            el.innerHTML = '↕';
+                            el.style.color = '#ccc';
+                        }
+                    }
+                });
+
+                if (!itemBids.length) {
+                    tbody.innerHTML = `<tr><td colspan="4" style="padding: 2rem; text-align: center; color: #aaa; font-size: 0.85rem;">No bid history found for this item.</td></tr>`;
+                    return;
+                }
+
+                tbody.innerHTML = itemBids.map(b => {
+                    const dateStr = b.date ? new Date(b.date).toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' }) : '—';
+                    let badgeCls = 'badge-active';
+                    if (b.status === 'outbid') badgeCls = 'badge-outbid';
+                    if (b.status === 'won') badgeCls = 'badge-won';
+
+                    return `
+                        <tr>
+                            <td style="color:#888; font-size:0.75rem;">${dateStr}</td>
+                            <td><strong><a href="user-profile?id=${b.userId}" style="color:#000;text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='#4A90E2'" onmouseout="this.style.color='#000'">${b.bidderName}</a></strong></td>
+                            <td style="font-family:monospace; font-weight:700; font-size:0.9rem;">$${(b.amount || 0).toLocaleString()}</td>
+                            <td><span class="badge ${badgeCls}">${(b.status || 'Active').toUpperCase()}</span></td>
+                            <td style="text-align:right;">
+                                <button class="row-btn danger" onclick="removeBid('${b.userId}', ${b.amount}, '${b.date}')" style="padding:0.2rem 0.6rem;font-size:0.75rem;">Remove</button>
+                            </td>
+                        </tr>`;
+                }).join('');
+            } catch (e) {
+                console.error("Error populating drawer bids", e);
+                tbody.innerHTML = `<tr><td colspan="4" style="padding: 2rem; text-align: center; color: #e74c3c; font-size: 0.85rem;">Error loading bid history.</td></tr>`;
+            }
+        }
+
+        function closeDrawer() {
+            document.getElementById('drawerOverlay').classList.remove('open');
+            document.getElementById('editDrawer').classList.remove('open');
+            editingId = null;
+        }
+
+        function switchTab(tab, btn) {
+            document.querySelectorAll('.drawer-panel').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.drawer-tab').forEach(b => b.classList.remove('active'));
+            document.getElementById('panel-' + tab).classList.add('active');
+            btn.classList.add('active');
+            if (tab === 'preview') updatePreview();
+        }
+
+        function setVal(id, val) {
+            const el = document.getElementById(id);
+            if (el && val !== undefined && val !== null) el.value = val;
+        }
+
+        // Backend Bid Deletion & Recalculation
+        function removeBid(userId, amount, timestamp) {
+            const users = JSON.parse(localStorage.getItem('epic_users')) || [];
+            const au = loadSharedAuctions().find(a => a.id === editingId);
+            if (!au) return;
+            const auctionTitle = au.title;
+
+            const uIdx = users.findIndex(u => u.id === userId);
+            if (uIdx === -1) return;
+
+            let removed = false;
+            // Filter out from bids array using exact match logic
+            const u = users[uIdx];
+            if (u.bids) {
+                const initialLen = u.bids.length;
+                u.bids = u.bids.filter(b => {
+                    if (typeof b !== 'object') return true;
+                    return !(b.title === auctionTitle && b.amount === amount && b.date === timestamp);
+                });
+                if (u.bids.length < initialLen) removed = true;
+            }
+
+            if (removed) {
+                // Must recalculate auction totals, which also mutates 'users' to fix active/outbid flags
+                recalculateAuctionTotals(editingId, users);
+                // Save users with updated statuses
+                localStorage.setItem('epic_users', JSON.stringify(users));
+
+                populateDrawerBids(auctionTitle);
+                renderTable(); // visual update for background table
+            }
+        }
+
+        function recalculateAuctionTotals(auctionId, allUsers) {
+            const acts = loadSharedAuctions();
+            const auIdx = acts.findIndex(a => a.id === auctionId);
+            if (auIdx === -1) return;
+            const au = acts[auIdx];
+
+            let maxBid = 0;
+            let topBidder = null;
+            let count = 0;
+
+            // 1. Find the highest bid globally across all users for this specific auction title
+            allUsers.forEach(user => {
+                (user.bids || []).forEach(b => {
+                    if (typeof b === 'object' && b.title === au.title) {
+                        count++;
+                        if (b.amount > maxBid) {
+                            maxBid = b.amount;
+                            topBidder = user.id;
+                        }
+                    }
+                });
+                (user.purchases || []).forEach(p => {
+                    if (typeof p === 'object' && p.title === au.title) {
+                        count++;
+                        if (p.amount > maxBid) {
+                            maxBid = p.amount;
+                            topBidder = user.id;
+                        }
+                    }
+                });
+            });
+
+            // 2. Adjust the specific auction data
+            au.bidCount = count;
+            if (count === 0 && au.startBid) {
+                au.currentBid = au.startBid;
+            } else if (count > 0) {
+                au.currentBid = maxBid;
+            } else {
+                au.currentBid = 0;
+            }
+            au.highestBidder = topBidder;
+
+            // 3. Mark outbid/active natively so we don't have dangling active bids in user profiles
+            allUsers.forEach(user => {
+                (user.bids || []).forEach(b => {
+                    if (typeof b === 'object' && b.title === au.title) {
+                        b.status = (b.amount === maxBid && user.id === topBidder) ? 'active' : 'outbid';
+                    }
+                });
+            });
+
+            // Update persistent storage and global context
+            saveSharedAuctions(acts);
+            window.auctions = acts; // Sync active context 
+
+            // Fix drawer overlay value immediately if open
+            setVal('edit-currentBid', au.currentBid);
+        }
+
+        function getVal(id) {
+            const el = document.getElementById(id);
+            return el ? el.value : '';
+        }
+
+        function saveAuction() {
+            if (!editingId) return;
+            const idx = auctions.findIndex(x => x.id === editingId);
+            if (idx === -1) return;
+
+            // Re-fetch the absolute latest auctions from localStorage right before saving
+            // This prevents an admin from accidentally overwriting a bid that was 
+            // placed while the edit drawer was open!
+            const latestAuctions = loadSharedAuctions();
+            const latestIdx = latestAuctions.findIndex(x => x.id === editingId);
+            if (latestIdx === -1) return;
+
+            // Preserve live bidding data from the latest fetch
+            const currentLiveBid = latestAuctions[latestIdx].currentBid;
+            const currentLiveCount = latestAuctions[latestIdx].bidCount;
+            const currentLiveBidder = latestAuctions[latestIdx].highestBidder;
+
+            // Notice we use latestAuctions[latestIdx] as the base, not the stale 'auctions' array
+            auctions[idx] = {
+                ...latestAuctions[latestIdx],
+                title: getVal('edit-title'),
+                course: getVal('edit-course'),
+                location: getVal('edit-location'),
+                status: getVal('edit-status'),
+                visibility: getVal('edit-visibility') || 'all',
+                architect: getVal('edit-architect'),
+                courseType: getVal('edit-courseType'),
+                access: getVal('edit-access'),
+                yearOpened: parseInt(getVal('edit-yearOpened')) || null,
+                ranking: getVal('edit-ranking'),
+                courseUrl: getVal('edit-courseUrl'),
+                guests: parseInt(getVal('edit-guests')) || 2,
+                rounds: parseInt(getVal('edit-rounds')) || 1,
+                attributes: getVal('edit-attributes'),
+                paidBy: getVal('edit-paidBy'),
+                restrictions: getVal('edit-restrictions'),
+                description: getVal('edit-description'),
+                courseDescription: getVal('edit-courseDescription'),
+                charity: getVal('edit-charity'),
+                taxDeductible: getVal('edit-taxDeductible'),
+                startBid: parseFloat(getVal('edit-startBid')) || 0,
+
+                // Keep the live bids unless the admin EXPLICITLY changed the input to something different
+                currentBid: (parseFloat(getVal('edit-currentBid')) !== auctions[idx].currentBid)
+                    ? parseFloat(getVal('edit-currentBid'))
+                    : currentLiveBid,
+                bidCount: currentLiveCount,
+                highestBidder: currentLiveBidder,
+
+                increment: parseFloat(getVal('edit-increment')) || 200,
+                donor: getVal('edit-donor').trim(),
+                buyNow: parseFloat(getVal('edit-buyNow')) || 0,
+                startDate: getVal('edit-startDate'),
+                endDate: getVal('edit-endDate'),
+                extension: parseInt(getVal('edit-extension')) || 2,
+                images: [...editImages],
+            };
+
+            saveSharedAuctions(auctions);
+            showToast('✅ Auction saved!');
+            closeDrawer();
+            renderTable();
+        }
+
+        // ══════════════════════════════════════════════
+        // IMAGE MANAGEMENT
+        // ══════════════════════════════════════════════
+        function renderImageStrip() {
+            const strip = document.getElementById('imageStrip');
+            strip.innerHTML = editImages.map((url, i) => `
+            <div class="image-preview-item">
+                <img src="${url}" onerror="this.src='';this.parentElement.style.background='#eee'">
+                <button class="remove-img" onclick="removeImage(${i})">✕</button>
+            </div>
+        `).join('') + (editImages.length < 10 ? '' : '');
+        }
+
+        function addImageFile(fileInput) {
+            const file = fileInput.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = e => {
+                editImages.push(e.target.result);
+                renderImageStrip();
+                // Reset label text back
+                fileInput.closest('label').childNodes.forEach(n => {
+                    if (n.nodeType === Node.TEXT_NODE) n.textContent = ' 📁 Choose file (PNG, JPG, PDF)';
+                });
+                fileInput.value = '';
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function handleNewAuctionImage(fileInput) {
+            const file = fileInput.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = e => {
+                document.getElementById('new-imageUrl').value = e.target.result;
+                const preview = document.getElementById('new-image-preview');
+                if (preview && file.type.startsWith('image/')) {
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                }
+                fileInput.closest('label').childNodes.forEach(n => {
+                    if (n.nodeType === Node.TEXT_NODE) n.textContent = ' ' + file.name;
+                });
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function removeImage(i) {
+            editImages.splice(i, 1);
+            renderImageStrip();
+        }
+
+        // ══════════════════════════════════════════════
+        // PREVIEW
+        // ══════════════════════════════════════════════
+        function updatePreview() {
+            const title = getVal('edit-title') || '—';
+            const loc = getVal('edit-location') || '—';
+            const bid = parseFloat(getVal('edit-currentBid')) || 0;
+            const buy = parseFloat(getVal('edit-buyNow')) || 0;
+            const img = editImages[0] || '';
+            const id = editingId || '';
+
+            document.getElementById('previewImg').src = img;
+            document.getElementById('previewTitle').textContent = title;
+            document.getElementById('previewLocation').textContent = loc;
+            document.getElementById('previewBid').textContent = bid ? '$' + bid.toLocaleString() : '—';
+            document.getElementById('previewBuyNow').textContent = buy ? '$' + buy.toLocaleString() + ' Buy it Now' : 'No Buy Now';
+
+            const urlPath = `../auction-rounds/${id}.html`;
+            document.getElementById('previewUrl').textContent = urlPath;
+            document.getElementById('previewPageLink').href = urlPath;
+        }
+
+        // ══════════════════════════════════════════════
+        // ADD NEW AUCTION
+        // ══════════════════════════════════════════════
+        function openAddModal() {
+            const now = new Date();
+            const fmt = d => d.toISOString().slice(0, 16);
+            const end = new Date(now); end.setDate(end.getDate() + 30);
+            document.getElementById('new-startDate').value = fmt(now);
+            document.getElementById('new-endDate').value = fmt(end);
+            document.getElementById('addModal').classList.add('open');
+        }
+
+        function closeAddModal() {
+            document.getElementById('addModal').classList.remove('open');
+        }
+
+        function slugify(str) {
+            return str.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+        }
+
+        function createAuction() {
+            const title = document.getElementById('new-title').value.trim();
+            const course = document.getElementById('new-course').value.trim();
+            const loc = document.getElementById('new-location').value.trim();
+            if (!title || !course || !loc) {
+                alert('Please fill in Title, Course, and Location.');
+                return;
+            }
+            const rawId = slugify(course) || slugify(title);
+            let id = rawId;
+            let n = 2;
+            while (auctions.find(a => a.id === id)) { id = rawId + '-' + n++; }
+
+            const imgUrl = document.getElementById('new-imageUrl').value.trim();
+            const newA = {
+                id,
+                title,
+                course,
+                location: loc,
+                status: document.getElementById('new-status').value,
+                architect: '',
+                courseType: 'Parkland',
+                access: 'Private',
+                yearOpened: null,
+                ranking: '',
+                courseUrl: '',
+                guests: 2,
+                rounds: 1,
+                attributes: '',
+                paidBy: 'Donor',
+                restrictions: '',
+                description: '',
+                courseDescription: '',
+                charity: 'EPIC Foundation',
+                taxDeductible: 'no',
+                startBid: parseFloat(document.getElementById('new-startBid').value) || 1000,
+                currentBid: parseFloat(document.getElementById('new-startBid').value) || 1000,
+                increment: 200,
+                buyNow: parseFloat(document.getElementById('new-buyNow').value) || 0,
+                bidCount: 0,
+                startDate: document.getElementById('new-startDate').value,
+                endDate: document.getElementById('new-endDate').value,
+                extension: 2,
+                images: imgUrl ? [imgUrl] : [],
+                donor: document.getElementById('new-donor').value.trim(),
+                createdAt: new Date().toISOString(),
+            };
+
+            auctions.unshift(newA);
+            saveSharedAuctions(auctions);
+            closeAddModal();
+            renderTable();
+            showToast('🎉 Auction created!');
+            // Open the edit drawer so they can fill in all details
+            setTimeout(() => openEditDrawer(id), 300);
+        }
+
+        // ══════════════════════════════════════════════
+        // DELETE
+        // ══════════════════════════════════════════════
+        function deleteAuction(id) {
+            const a = auctions.find(x => x.id === id);
+            if (!a) return;
+            if (!confirm(`Delete "${a.title}"? This cannot be undone.`)) return;
+
+            try {
+                const users = JSON.parse(localStorage.getItem('epic_users') || '[]');
+                let changed = false;
+                users.forEach(u => {
+                    if (u.bids) {
+                        const initLen = u.bids.length;
+                        u.bids = u.bids.filter(b => typeof b !== 'object' || b === null || b.title !== a.title);
+                        if (u.bids.length !== initLen) changed = true;
+                    }
+                    if (u.purchases) {
+                        const initLen = u.purchases.length;
+                        u.purchases = u.purchases.filter(p => typeof p !== 'object' || p === null || p.title !== a.title);
+                        if (u.purchases.length !== initLen) changed = true;
+                    }
+                });
+                if (changed) localStorage.setItem('epic_users', JSON.stringify(users));
+            } catch (e) { console.error('Error cascading auction delete to users:', e); }
+
+            auctions = auctions.filter(x => x.id !== id);
+            saveSharedAuctions(auctions);
+            renderTable();
+            showToast('🗑️ Auction deleted');
+        }
+
+        // ══════════════════════════════════════════════
+        // SORT (column headers)
+        // ══════════════════════════════════════════════
+        const sortMap = {
+            title: ['title-asc', 'created-desc'],
+            location: ['location-asc', 'created-desc'],
+            status: ['status-asc', 'created-desc'],
+            currentBid: ['bid-desc', 'bid-asc'],
+            endDate: ['end-asc', 'end-desc'],
+        };
+        let colSortState = {};
+        function toggleSort(col) {
+            const states = sortMap[col];
+            if (!states) return;
+            const cur = colSortState[col] || 0;
+            colSortState[col] = (cur + 1) % states.length;
+            document.getElementById('sortSelect').value = states[colSortState[col]];
+            renderTable();
+        }
+
+        // ══════════════════════════════════════════════
+        // TOAST
+        // ══════════════════════════════════════════════
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 2800);
+        }
+
+        // ══════════════════════════════════════════════
+        // INIT
+        // ══════════════════════════════════════════════
+
+        // One-time cleanup: wipe all stale/fake bids from epic_users.
+        // These accumulated during development. Real bids go forward from here.
+        (function cleanupStaleBids() {
+            const CLEANUP_KEY = 'epic_bids_cleanup_v1';
+            if (localStorage.getItem(CLEANUP_KEY)) return; // already done
+            try {
+                const users = JSON.parse(localStorage.getItem('epic_users') || '[]');
+                users.forEach(u => { u.bids = []; u.purchases = []; });
+                localStorage.setItem('epic_users', JSON.stringify(users));
+                localStorage.setItem(CLEANUP_KEY, '1');
+            } catch (e) { }
+        })();
+
+        document.getElementById('sortSelect').addEventListener('change', renderTable);
+        renderTable();
+    </script>
+</body>
+
+</html>
