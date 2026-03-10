@@ -390,10 +390,10 @@
         </div>
     </div>
 
-    <script src="../shared-auctions.js"></script>
-    <script src="../auction-gallery.js"></script>
     <script src="../db.js"></script>
     <script src="../auth.js"></script>
+    <script src="../shared-auctions.js"></script>
+    <script src="../auction-gallery.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             AUTH.requireLogin('../login.html');
@@ -557,13 +557,17 @@
                                                 image: (auc.images && auc.images[0]) || ''
                                             });
                                             localStorage.setItem('epic_users', JSON.stringify(users));
+                                            // Persist winner's updated purchases to server
+                                            if (typeof EPICDB !== 'undefined') EPICDB.saveUser(users[winnerIdx]).catch(console.warn);
                                         }
                                     }
                                 }
 
                                 localStorage.setItem('epic_auctions', JSON.stringify(auctions));
+                                // Persist sold auction to server
+                                if (typeof EPICDB !== 'undefined') EPICDB.saveAuction(auc).catch(console.warn);
                             }
-                        } catch(e) { console.error('Auction close error:', e); }
+                        } catch (e) { console.error('Auction close error:', e); }
 
                         clearInterval(countdownInterval);
                         return;
