@@ -328,10 +328,11 @@
         .drawer-overlay {
             display: none;
             position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.4);
+            top: 0; bottom: 0;
+            left: var(--sidebar-width, 260px);
+            right: 0;
+            background: rgba(0, 0, 0, 0.25);
             z-index: 1100;
-            backdrop-filter: blur(2px);
         }
 
         .drawer-overlay.open {
@@ -341,24 +342,23 @@
         .drawer {
             position: fixed;
             top: 0;
-            left: 0;
+            left: var(--sidebar-width, 260px);
             right: 0;
             bottom: 0;
-            width: 100vw;
-            height: 100vh;
             background: #fff;
             z-index: 1200;
             display: flex;
             flex-direction: column;
-            transition: opacity 0.25s ease, transform 0.25s ease;
+            transition: opacity 0.2s ease, transform 0.2s ease;
             opacity: 0;
-            transform: scale(0.98);
+            transform: translateX(12px);
             pointer-events: none;
+            box-shadow: -4px 0 24px rgba(0,0,0,0.12);
         }
 
         .drawer.open {
             opacity: 1;
-            transform: scale(1);
+            transform: translateX(0);
             pointer-events: all;
         }
 
@@ -801,7 +801,151 @@
             display: flex;
             gap: 0.75rem;
         }
-    </style>
+    
+        /* ── Status filter dropdown ── */
+        .status-filter-wrap {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+        .status-filter-wrap label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #666;
+            white-space: nowrap;
+        }
+        .status-filter-select {
+            appearance: none;
+            -webkit-appearance: none;
+            padding: 0.5rem 2.2rem 0.5rem 0.9rem;
+            border: 1.5px solid #e0e0e0;
+            border-radius: 8px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.84rem;
+            font-weight: 600;
+            color: #222;
+            background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23555' stroke-width='1.8' fill='none' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat right 0.75rem center;
+            cursor: pointer;
+            min-width: 190px;
+            outline: none;
+            transition: border-color 0.15s, box-shadow 0.15s;
+        }
+        .status-filter-select:hover { border-color: #aaa; }
+        .status-filter-select:focus { border-color: #000; box-shadow: 0 0 0 3px rgba(0,0,0,0.07); }
+
+        /* ── User search field used for buyer/donor ── */
+        .user-search-wrap { position: relative; }
+        .user-search-input {
+            width: 100%;
+            padding: 0.6rem 0.9rem;
+            border: 1.5px solid #e0e0e0;
+            border-radius: 10px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.88rem;
+            color: #222;
+            outline: none;
+            transition: border-color 0.15s;
+        }
+        .user-search-input:focus { border-color: #000; }
+        .user-search-dropdown {
+            display: none;
+            position: absolute;
+            top: calc(100% + 4px);
+            left: 0; right: 0;
+            background: #fff;
+            border: 1.5px solid #e0e0e0;
+            border-radius: 10px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+            z-index: 9999;
+            max-height: 220px;
+            overflow-y: auto;
+        }
+        .user-search-dropdown.open { display: block; }
+        .user-search-option {
+            padding: 0.65rem 1rem;
+            font-size: 0.84rem;
+            cursor: pointer;
+            border-bottom: 1px solid #f3f3f3;
+            transition: background 0.1s;
+        }
+        .user-search-option:last-child { border-bottom: none; }
+        .user-search-option:hover { background: #f8f9fa; }
+        .user-search-option .uop-name { font-weight: 600; color: #111; }
+        .user-search-option .uop-email { font-size: 0.76rem; color: #888; }
+        .user-search-option.selected { background: #f0fdf4; }
+
+        /* ── Status filter dropdown ── */
+        .status-filter-wrap {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+        .status-filter-wrap label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #666;
+            white-space: nowrap;
+        }
+        .status-filter-select {
+            appearance: none;
+            -webkit-appearance: none;
+            padding: 0.5rem 2.2rem 0.5rem 0.9rem;
+            border: 1.5px solid #e0e0e0;
+            border-radius: 8px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.84rem;
+            font-weight: 600;
+            color: #222;
+            background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23555' stroke-width='1.8' fill='none' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat right 0.75rem center;
+            cursor: pointer;
+            min-width: 190px;
+            outline: none;
+            transition: border-color 0.15s, box-shadow 0.15s;
+        }
+        .status-filter-select:hover { border-color: #aaa; }
+        .status-filter-select:focus { border-color: #000; box-shadow: 0 0 0 3px rgba(0,0,0,0.07); }
+
+        /* ── User search field used for buyer/donor ── */
+        .user-search-wrap { position: relative; }
+        .user-search-input {
+            width: 100%;
+            padding: 0.6rem 0.9rem;
+            border: 1.5px solid #e0e0e0;
+            border-radius: 10px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.88rem;
+            color: #222;
+            outline: none;
+            transition: border-color 0.15s;
+        }
+        .user-search-input:focus { border-color: #000; }
+        .user-search-dropdown {
+            display: none;
+            position: absolute;
+            top: calc(100% + 4px);
+            left: 0; right: 0;
+            background: #fff;
+            border: 1.5px solid #e0e0e0;
+            border-radius: 10px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+            z-index: 9999;
+            max-height: 220px;
+            overflow-y: auto;
+        }
+        .user-search-dropdown.open { display: block; }
+        .user-search-option {
+            padding: 0.65rem 1rem;
+            font-size: 0.84rem;
+            cursor: pointer;
+            border-bottom: 1px solid #f3f3f3;
+            transition: background 0.1s;
+        }
+        .user-search-option:last-child { border-bottom: none; }
+        .user-search-option:hover { background: #f8f9fa; }
+        .user-search-option .uop-name { font-weight: 600; color: #111; }
+        .user-search-option .uop-email { font-size: 0.76rem; color: #888; }
+        .user-search-option.selected { background: #f0fdf4; }
+</style>
 </head>
 
 <body>
@@ -842,20 +986,17 @@
 
         <div class="content-wrapper">
             <!-- Filter tabs -->
-            <div style="display:flex;align-items:center;gap:0.75rem;">
-                <label style="font-size:0.82rem;font-weight:600;color:#555;white-space:nowrap;">Filter by Status</label>
-                <select id="statusFilter" onchange="setFilter(this.value, null)"
-                    style="padding:0.5rem 0.9rem;border:1.5px solid #ddd;border-radius:8px;font-family:'Poppins',sans-serif;font-size:0.85rem;font-weight:500;color:#222;background:#fff;cursor:pointer;min-width:200px;outline:none;">
+            <div class="status-filter-wrap">
+                <label>Filter by Status</label>
+                <select id="statusFilter" class="status-filter-select" onchange="setFilter(this.value, null)">
                     <option value="all">All Auctions</option>
                     <option value="open">All Open Requests</option>
-                    <option value="active">Active</option>
-                    <option value="scheduled">Scheduled</option>
-                    <option value="pending">Pending</option>
+                    <option value="new">New</option>
                     <option value="draft">Draft</option>
-                    <option value="closed">Closed</option>
+                    <option value="live">Live</option>
                     <option value="sold">Sold</option>
-                    <option value="fulfilled">Fulfilled</option>
-                    <option value="expired">Expired</option>
+                    <option value="booked">Booked</option>
+                    <option value="closed_other">Closed - Other</option>
                     <option value="cancelled">Cancelled</option>
                 </select>
             </div>
@@ -948,14 +1089,12 @@
                             <div class="form-group">
                                 <label>Status</label>
                                 <select id="admin-status">
-                                    <option value="active">Active (Live)</option>
-                                    <option value="scheduled">Scheduled</option>
-                                    <option value="pending">Pending — Awaiting Approval</option>
+                                    <option value="new">New</option>
                                     <option value="draft">Draft</option>
-                                    <option value="closed">Closed — Bidding Ended</option>
-                                    <option value="sold">Sold — Winner Confirmed</option>
-                                    <option value="fulfilled">Fulfilled — Round Played</option>
-                                    <option value="expired">Expired — Past Due</option>
+                                    <option value="live">Live</option>
+                                    <option value="sold">Sold</option>
+                                    <option value="booked">Booked</option>
+                                    <option value="closed_other">Closed - Other</option>
                                     <option value="cancelled">Cancelled</option>
                                 </select>
                             </div>
@@ -965,11 +1104,19 @@
                             </div>
                             <div class="form-group">
                                 <label>Donor</label>
-                                <input type="text" id="admin-donor" placeholder="Who donated this round">
+                                <div class="user-search-wrap">
+                                    <input type="text" class="user-search-input" id="admin-donor-input" placeholder="Search members by name or email…" autocomplete="off" oninput="userSearch('donor', this.value)" onfocus="userSearch('donor', this.value)">
+                                    <input type="hidden" id="admin-donor">
+                                    <div class="user-search-dropdown" id="donor-dropdown"></div>
+                                </div>
                             </div>
                             <div class="form-group">
                                 <label>Buyer / Winner</label>
-                                <input type="text" id="admin-buyer" placeholder="Who purchased / won this round">
+                                <div class="user-search-wrap">
+                                    <input type="text" class="user-search-input" id="admin-buyer-input" placeholder="Search members by name or email…" autocomplete="off" oninput="userSearch('buyer', this.value)" onfocus="userSearch('buyer', this.value)">
+                                    <input type="hidden" id="admin-buyer">
+                                    <div class="user-search-dropdown" id="buyer-dropdown"></div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -1033,14 +1180,12 @@
                         <div class="form-group">
                             <label>Status</label>
                             <select id="edit-status">
-                                <option value="active">Active (Live)</option>
-                                <option value="scheduled">Scheduled</option>
-                                <option value="pending">Pending — Awaiting Approval</option>
+                                <option value="new">New</option>
                                 <option value="draft">Draft</option>
-                                <option value="closed">Closed — Bidding Ended</option>
-                                <option value="sold">Sold — Winner Confirmed</option>
-                                <option value="fulfilled">Fulfilled — Round Played</option>
-                                <option value="expired">Expired — Past Due</option>
+                                <option value="live">Live</option>
+                                <option value="sold">Sold</option>
+                                <option value="booked">Booked</option>
+                                <option value="closed_other">Closed - Other</option>
                                 <option value="cancelled">Cancelled</option>
                             </select>
                         </div>
@@ -1342,14 +1487,12 @@
                 <div class="form-group">
                     <label>Initial Status</label>
                     <select id="new-status">
-                        <option value="active">Active (Live)</option>
-                        <option value="scheduled">Scheduled</option>
-                        <option value="pending">Pending — Awaiting Approval</option>
+                        <option value="new">New</option>
                         <option value="draft">Draft</option>
-                        <option value="closed">Closed — Bidding Ended</option>
-                        <option value="sold">Sold — Winner Confirmed</option>
-                        <option value="fulfilled">Fulfilled — Round Played</option>
-                        <option value="expired">Expired — Past Due</option>
+                        <option value="live">Live</option>
+                        <option value="sold">Sold</option>
+                        <option value="booked">Booked</option>
+                        <option value="closed_other">Closed - Other</option>
                         <option value="cancelled">Cancelled</option>
                     </select>
                 </div>
@@ -1411,7 +1554,7 @@
                 );
             }
             if (currentFilter === 'open') {
-                list = list.filter(a => ['active', 'scheduled', 'pending', 'draft'].includes(a.status));
+                list = list.filter(a => ['new', 'draft', 'live', 'sold', 'active', 'scheduled', 'pending'].includes(a.status));
             } else if (currentFilter !== 'all') {
                 list = list.filter(a => a.status === currentFilter);
             }
@@ -1431,16 +1574,21 @@
 
         function statusBadge(status) {
             const map = {
-                active:      ['Active',      'badge-active'],
-                scheduled:   ['Scheduled',   'badge-scheduled'],
-                pending:     ['Pending',     'badge-pending'],
-                draft:       ['Draft',       'badge-draft'],
-                closed:      ['Closed',      'badge-closed'],
-                sold:        ['Sold',        'badge-sold'],
-                ended:       ['Ended',       'badge-ended'],
-                fulfilled:   ['Fulfilled',   'badge-fulfilled'],
-                expired:     ['Expired',     'badge-expired'],
-                cancelled:   ['Cancelled',   'badge-cancelled'],
+                new:          ['New',          'badge-active'],
+                draft:        ['Draft',        'badge-draft'],
+                live:         ['Live',         'badge-scheduled'],
+                sold:         ['Sold',         'badge-sold'],
+                booked:       ['Booked',       'badge-fulfilled'],
+                closed_other: ['Closed - Other','badge-closed'],
+                cancelled:    ['Cancelled',    'badge-cancelled'],
+                // legacy
+                active:       ['Active',       'badge-active'],
+                scheduled:    ['Scheduled',    'badge-scheduled'],
+                pending:      ['Pending',      'badge-pending'],
+                closed:       ['Closed',       'badge-closed'],
+                ended:        ['Ended',        'badge-closed'],
+                fulfilled:    ['Fulfilled',    'badge-fulfilled'],
+                expired:      ['Expired',      'badge-expired'],
             };
             const [label, cls] = map[status] || ['Unknown', 'badge-closed'];
             return `<span class="badge ${cls}">${label}</span>`;
@@ -1559,6 +1707,7 @@
             switchTab('admin', document.querySelector('.drawer-tab'));
             // Load admin fields
             setVal('admin-status', a.status);
+            populateUserSearchDisplay(a);
             setVal('admin-course', a.course || a.location || '');
             setVal('admin-donor', a.donor || a.donorName || '');
             setVal('admin-buyer', a.winner || a.winnerName || '');
@@ -1819,8 +1968,12 @@
                 location: getVal('edit-location'),
                 // Admin tab fields override edit-status if admin-status was touched
                 status: getVal('admin-status') || getVal('edit-status'),
-                winner: getVal('admin-buyer') || getVal('edit-winner'),
-                donor: getVal('admin-donor') || getVal('edit-donor'),
+                winner: document.getElementById('admin-buyer-input') ? document.getElementById('admin-buyer-input').value.split('  (')[0].trim() || getVal('edit-winner') : getVal('edit-winner'),
+                winnerUserId: getVal('admin-buyer') || '',
+                winnerEmail: (() => { const inp = document.getElementById('admin-buyer-input'); if (!inp) return ''; const m = inp.value.match(/\(([^)]+)\)$/); return m ? m[1] : ''; })(),
+                donor: document.getElementById('admin-donor-input') ? document.getElementById('admin-donor-input').value.split('  (')[0].trim() || getVal('edit-donor') : getVal('edit-donor'),
+                donorUserId: getVal('admin-donor') || '',
+                donorEmail: (() => { const inp = document.getElementById('admin-donor-input'); if (!inp) return ''; const m = inp.value.match(/\(([^)]+)\)$/); return m ? m[1] : ''; })(),
                 course: getVal('admin-course') || getVal('edit-course'),
                 billed: document.getElementById('admin-billed') ? document.getElementById('admin-billed').checked : false,
                 billingNotes: getVal('admin-billingNotes'),
@@ -2124,6 +2277,91 @@
             document.getElementById('editDrawer').classList.remove('open');
             renderTable();
             showToast('Donation submission removed.', 'warning');
+        }
+
+
+        // ══════════════════════════════════════════════════════════════
+        // USER SEARCH — buyer and donor live lookup
+        // ══════════════════════════════════════════════════════════════
+        let _allUsers = null;
+        async function loadAllUsers() {
+            if (_allUsers) return _allUsers;
+            try {
+                if (typeof EPICDB !== 'undefined') {
+                    _allUsers = (await EPICDB.getUsers()) || [];
+                } else {
+                    _allUsers = JSON.parse(localStorage.getItem('epic_users') || '[]');
+                }
+            } catch(e) {
+                _allUsers = JSON.parse(localStorage.getItem('epic_users') || '[]');
+            }
+            return _allUsers;
+        }
+
+        async function userSearch(role, query) {
+            const ddId   = role === 'donor' ? 'donor-dropdown' : 'buyer-dropdown';
+            const hidId  = role === 'donor' ? 'admin-donor'    : 'admin-buyer';
+            const dd     = document.getElementById(ddId);
+            if (!dd) return;
+            const users  = await loadAllUsers();
+            const q      = (query || '').trim().toLowerCase();
+            const results = q.length < 1
+                ? users.slice(0, 8)
+                : users.filter(u =>
+                    (u.firstName + ' ' + u.lastName).toLowerCase().includes(q) ||
+                    (u.email || '').toLowerCase().includes(q)
+                  ).slice(0, 10);
+
+            if (!results.length) { dd.classList.remove('open'); return; }
+
+            dd.innerHTML = results.map(u => {
+                const name  = (u.firstName || '') + ' ' + (u.lastName || '');
+                const email = u.email || '';
+                return `<div class="user-search-option" data-id="${u.id}" data-name="${name.trim()}" data-email="${email}"
+                    onmousedown="selectUser('${role}', '${u.id}', '${name.trim().replace(/'/g,"\\'")}', '${email}')">
+                    <div class="uop-name">${name.trim()}</div>
+                    <div class="uop-email">${email}</div>
+                </div>`;
+            }).join('');
+            dd.classList.add('open');
+        }
+
+        async function selectUser(role, userId, name, email) {
+            const inputId = role === 'donor' ? 'admin-donor-input' : 'admin-buyer-input';
+            const hidId   = role === 'donor' ? 'admin-donor'       : 'admin-buyer';
+            const ddId    = role === 'donor' ? 'donor-dropdown'     : 'buyer-dropdown';
+            document.getElementById(inputId).value = name + (email ? '  (' + email + ')' : '');
+            document.getElementById(hidId).value   = userId;
+            document.getElementById(ddId).classList.remove('open');
+
+            // Also cascade: update the auction object immediately for save
+            if (editingId) {
+                const a = auctions.find(x => x.id === editingId);
+                if (a) {
+                    if (role === 'donor') { a.donorUserId = userId; a.donorName = name; a.donorEmail = email; }
+                    if (role === 'buyer') { a.winnerUserId = userId; a.winnerName = name; a.winnerEmail = email; }
+                }
+            }
+        }
+
+        // Close dropdowns when clicking elsewhere
+        document.addEventListener('click', e => {
+            if (!e.target.closest('.user-search-wrap')) {
+                document.querySelectorAll('.user-search-dropdown').forEach(d => d.classList.remove('open'));
+            }
+        });
+
+        // When the drawer opens for an auction, pre-populate donor/buyer display text
+        function populateUserSearchDisplay(a) {
+            const donorInput = document.getElementById('admin-donor-input');
+            const buyerInput = document.getElementById('admin-buyer-input');
+            if (!donorInput || !buyerInput) return;
+            const donorLabel = a.donorName || a.donor || '';
+            const buyerLabel = a.winnerName || a.winner || '';
+            donorInput.value = donorLabel + (a.donorEmail && donorLabel ? '  (' + a.donorEmail + ')' : '');
+            buyerInput.value = buyerLabel + (a.winnerEmail && buyerLabel ? '  (' + a.winnerEmail + ')' : '');
+            document.getElementById('admin-donor').value = a.donorUserId || '';
+            document.getElementById('admin-buyer').value = a.winnerUserId || '';
         }
 
 </script>
