@@ -198,7 +198,10 @@
         </div>
 
         <div class="section-card" id="donated-section">
-            <h3>🎁 Rounds I've Donated</h3>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.2rem;padding-bottom:0.6rem;border-bottom:1px solid #f0f0f0;">
+                <h3 style="margin:0;border:none;padding:0;">🎁 Rounds I've Donated</h3>
+                <a href="../donate.html" style="display:inline-flex;align-items:center;gap:0.4rem;background:#000;color:#fff;padding:0.45rem 1rem;border-radius:20px;font-size:0.78rem;font-weight:700;text-decoration:none;transition:opacity 0.2s;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">+ Donate a Round</a>
+            </div>
             <div id="donated-container">
                 <div class="empty-state">
                     <div class="em-icon">🎁</div>
@@ -280,7 +283,8 @@
                     <div class="empty-state">
                         <div class="em-icon">🎁</div>
                         <p style="color:#888;">No donated rounds on your profile yet.</p>
-                        <p style="font-size:0.78rem;color:#bbb;">When your donated rounds are entered by the EPIC team, they will appear here.</p>
+                        <p style="font-size:0.78rem;color:#bbb;margin-bottom:1.2rem;">When your donated rounds are recorded by the EPIC team, they'll appear here.</p>
+                        <a href="../donate.html" class="browse-btn" style="background:#1a9e5c;">Donate a Round ⛳</a>
                     </div>`;
             } else {
                 donatedEl.innerHTML = donated.map(d => `

@@ -536,7 +536,7 @@
                 title.textContent = 'My Donated Rounds';
                 const donated = user.donatedRounds || [];
                 if (donated.length === 0) {
-                    body.innerHTML = `<div class="empty-state"><div class="em-icon">🎁</div><div>No donated rounds on your profile yet.</div><p style="font-size:0.78rem;color:#bbb;margin-top:0.5rem;">When your donated rounds are recorded by the EPIC team, they'll appear here.</p></div>`;
+                    body.innerHTML = `<div class="empty-state"><div class="em-icon">🎁</div><div>No donated rounds on your profile yet.</div><p style="font-size:0.78rem;color:#bbb;margin-top:0.5rem;margin-bottom:1.2rem;">When your donated rounds are recorded by the EPIC team, they'll appear here.</p><a href="../donate.html" style="display:inline-flex;align-items:center;gap:0.4rem;background:#1a9e5c;color:#fff;padding:0.6rem 1.4rem;border-radius:20px;font-size:0.82rem;font-weight:700;text-decoration:none;">Donate a Round ⛳</a></div>`;
                 } else {
                     body.innerHTML = donated.map(d => {
                         const sub = (d.course ? d.course + ' · ' : '') + 'Won by ' + (d.winnerName || d.winnerEmail || 'a member') + (d.date ? ' · ' + d.date : '');
