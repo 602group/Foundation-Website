@@ -338,7 +338,7 @@
         </div>
 
         <div class="stats-grid">
-            <div class="stat-card" style="cursor:pointer;" onclick="showPanel('bids')">
+            <div class="stat-card" style="cursor:pointer;display:none;" onclick="showPanel('bids')">
                 <div class="icon">💰</div>
                 <div class="label">Active Bids</div>
                 <div class="value" id="activeBidsCount">0</div>
@@ -379,7 +379,7 @@
                     <a href="../auctions.html" class="action-card">
                         Browse Auctions
                     </a>
-                    <button class="action-card" onclick="showPanel('bids')">
+                    <button class="action-card" onclick="showPanel('bids')" style="display:none;">
                         Current Bids
                     </button>
                     <button class="action-card" onclick="showPanel('watchlist')">
@@ -416,22 +416,48 @@
         if (!session) { window.location.href = '../login.html'; }
         AUTH.applyHeader('../');
 
-        const allUsers = JSON.parse(localStorage.getItem('epic_users') || '[]');
-        const user = (session && allUsers.find(u => u.id === session.id)) || session;
+        // Always fetch freshest user data from EPICDB so admin changes appear immediately
+        let user = session;
+        async function loadFreshUser() {
+            try {
+                if (typeof EPICDB !== 'undefined' && EPICDB.getUsers) {
+                    const allUsers = await EPICDB.getUsers();
+                    const fresh = allUsers && allUsers.find(u => u.id === session.id);
+                    if (fresh) {
+                        user = fresh;
+                        // Keep localStorage in sync
+                        const ls = JSON.parse(localStorage.getItem('epic_users') || '[]');
+                        const li = ls.findIndex(u => u.id === fresh.id);
+                        if (li > -1) ls[li] = fresh; else ls.push(fresh);
+                        localStorage.setItem('epic_users', JSON.stringify(ls));
+                    }
+                } else {
+                    const allUsers = JSON.parse(localStorage.getItem('epic_users') || '[]');
+                    user = allUsers.find(u => u.id === session.id) || session;
+                }
+            } catch(e) {
+                const allUsers = JSON.parse(localStorage.getItem('epic_users') || '[]');
+                user = allUsers.find(u => u.id === session.id) || session;
+            }
+            renderStats();
+        }
 
-        document.getElementById('welcomeMsg').textContent = `Welcome back, ${user.firstName}!`;
-        document.getElementById('welcomeSub').textContent = `${user.email} · Member since ${new Date(user.joinedAt).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}`;
-
-        const isEpic = user.memberType === 'epic_member';
-        const pill = document.getElementById('tierPill');
-        pill.textContent = isEpic ? 'Epic Member' : 'Public Member';
-        pill.classList.add(isEpic ? 'epic' : 'public');
-
-        document.getElementById('activeBidsCount').textContent = (user.bids || []).length;
-        document.getElementById('watchlistCount').textContent = (user.watchlist || []).length;
-        document.getElementById('wonCount').textContent = (user.purchases || []).length;
-        document.getElementById('tripsCount').textContent = (user.trips || []).length;
-        document.getElementById('donatedCount').textContent = (user.donatedRounds || []).length;
+        function renderStats() {
+            document.getElementById('welcomeMsg').textContent = 'Welcome back, ' + (user.firstName || 'Member') + '!';
+            document.getElementById('welcomeSub').textContent = user.email + ' · Member since ' + new Date(user.joinedAt || Date.now()).toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+            const isEpic = user.memberType === 'epic_member';
+            const pill = document.getElementById('tierPill');
+            pill.textContent = isEpic ? 'Epic Member' : 'Public Member';
+            pill.classList.remove('epic', 'public');
+            pill.classList.add(isEpic ? 'epic' : 'public');
+            document.getElementById('activeBidsCount').textContent = (user.bids || []).length;
+            document.getElementById('watchlistCount').textContent = (user.watchlist || []).length;
+            document.getElementById('wonCount').textContent = (user.purchases || []).length;
+            document.getElementById('tripsCount').textContent = (user.trips || []).length;
+            document.getElementById('donatedCount').textContent = (user.donatedRounds || []).length;
+        }
+        renderStats(); // render immediately with session data
+        loadFreshUser(); // then update from EPICDB
 
         // ── Panel Renderer ──────────────────────────────────────────────
         function showPanel(view) {
@@ -618,8 +644,8 @@
             }
         }
 
-        // Default: show current bids on load
-        showPanel('bids');
+        // Default: show auctions won on load
+        showPanel('won');
     </script>
 </body>
 

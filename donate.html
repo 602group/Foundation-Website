@@ -559,30 +559,29 @@
 
     <!-- Two donation paths -->
     <div class="choose-section">
-        <div class="choose-card"
+        <div class="choose-card" style="border-left:4px solid #000;"
             onclick="document.getElementById('auction-form-section').scrollIntoView({behavior:'smooth'})">
-            <div class="card-icon">⛳</div>
+            
             <h2>Donate a Round or Item</h2>
             <p>Submit a golf outing, exclusive experience, signed memorabilia, or any auction-worthy item. Our team
                 reviews every submission before it goes live.</p>
             <button class="btn-next" style="margin-top:auto;"
-                onclick="event.stopPropagation();document.getElementById('auction-form-section').scrollIntoView({behavior:'smooth'})">Start
-                Donation Form →</button>
+                onclick="event.stopPropagation();document.getElementById('auction-form-section').scrollIntoView({behavior:'smooth'})">Start Donation Form</button>
         </div>
-        <div class="choose-card" onclick="document.getElementById('money-section').scrollIntoView({behavior:'smooth'})">
-            <div class="card-icon">💳</div>
+        <div class="choose-card" style="border-left:4px solid #1a9e5c;"
+            onclick="document.getElementById('money-section').scrollIntoView({behavior:'smooth'})">
+            
             <h2>Make a Monetary Donation</h2>
             <p>Give directly to EPIC Foundation through our secure GiveSmart giving portal. Every dollar funds golf
                 programs, youth initiatives, and charitable events.</p>
             <button class="btn-next" style="margin-top:auto;background:#1a9e5c;"
-                onclick="event.stopPropagation();document.getElementById('money-section').scrollIntoView({behavior:'smooth'})">Donate
-                Money →</button>
+                onclick="event.stopPropagation();document.getElementById('money-section').scrollIntoView({behavior:'smooth'})">Give Now</button>
         </div>
     </div>
 
     <!-- ── AUCTION DONATION FORM ─────────────────────────────── -->
     <div class="form-wrapper" id="auction-form-section">
-        <div class="form-anchor">⛳ Donate an Auction Round or Item</div>
+        <div class="form-anchor">Donate an Auction Round or Item</div>
 
         <!-- Step indicators -->
         <div class="step-indicator">
@@ -600,33 +599,29 @@
             <div class="type-tiles">
                 <label class="type-tile selected" id="tile-round">
                     <input type="radio" name="donationType" value="round" checked>
-                    <span class="tt-icon">⛳</span>
-                    <span class="tt-label">Golf Round</span>
+                                        <span class="tt-label">Golf Round</span>
                     <span class="tt-desc">A tee time or exclusive round at your club or course</span>
                 </label>
                 <label class="type-tile" id="tile-outing">
                     <input type="radio" name="donationType" value="outing">
-                    <span class="tt-icon">🏌️</span>
-                    <span class="tt-label">Golf Outing / Event</span>
+                                        <span class="tt-label">Golf Outing / Event</span>
                     <span class="tt-desc">A private outing, tournament, or curated golf experience</span>
                 </label>
                 <label class="type-tile" id="tile-item">
                     <input type="radio" name="donationType" value="item">
-                    <span class="tt-icon">🎁</span>
-                    <span class="tt-label">Auction Item</span>
+                                        <span class="tt-label">Auction Item</span>
                     <span class="tt-desc">Signed memorabilia, equipment, gift packages, etc.</span>
                 </label>
                 <label class="type-tile" id="tile-experience">
                     <input type="radio" name="donationType" value="experience">
-                    <span class="tt-icon">✈️</span>
-                    <span class="tt-label">Experience</span>
+                                        <span class="tt-label">Experience</span>
                     <span class="tt-desc">Travel package, VIP experience, pro-am access, etc.</span>
                 </label>
             </div>
 
             <div class="btn-row">
                 <span></span>
-                <button class="btn-next" onclick="goStep(2)">Next → Details</button>
+                <button class="btn-next" onclick="goStep(2)">Continue to Details</button>
             </div>
         </div>
 
@@ -679,7 +674,7 @@
                         style="color:#bbb;font-weight:400;">(optional)</span></label>
                 <label class="file-zone" for="f-files">
                     <input type="file" id="f-files" accept="image/*,.pdf" multiple>
-                    <div class="fz-icon">📷</div>
+                    <div class="fz-icon" style="font-size:1.4rem;color:#aaa;">↑</div>
                     <span id="fileLabel">Click to upload or drag & drop</span>
                     <p>JPG, PNG, or PDF · up to 10MB each</p>
                 </label>
@@ -693,7 +688,7 @@
 
             <div class="btn-row">
                 <button class="btn-back" onclick="goStep(1)">← Back</button>
-                <button class="btn-next" onclick="validateStep2()">Next → Your Info</button>
+                <button class="btn-next" onclick="validateStep2()">Continue to Your Info</button>
             </div>
         </div>
 
@@ -741,7 +736,7 @@
 
             <div class="btn-row">
                 <button class="btn-back" onclick="goStep(2)">← Back</button>
-                <button class="btn-next" onclick="validateStep3()">Review Submission →</button>
+                <button class="btn-next" onclick="validateStep3()">Review Submission</button>
             </div>
         </div>
 
@@ -755,20 +750,20 @@
 
             <div
                 style="background:#f8f9fa;border-radius:10px;padding:1rem 1.2rem;font-size:0.82rem;color:#666;margin-top:1.5rem;line-height:1.65;">
-                ✅ By submitting you agree that the EPIC Foundation team may contact you to confirm details. Your
+                By submitting you agree that the EPIC Foundation team may contact you to confirm details. Your
                 donation will appear on the site only after admin review and approval.
             </div>
 
             <div class="btn-row">
                 <button class="btn-back" onclick="goStep(3)">← Back</button>
-                <button class="btn-next" id="submitBtn" onclick="submitDonation()">Submit Donation ✓</button>
+                <button class="btn-next" id="submitBtn" onclick="submitDonation()">Submit Donation</button>
             </div>
         </div>
 
         <!-- Success -->
-        <div class="success-card" id="successCard">
-            <div class="sc-icon">🎉</div>
-            <h3>Thank You for Your Donation!</h3>
+        <div class="success-card" id="successCard" style="border-top:4px solid #1a9e5c;">
+            
+            <div style="width:48px;height:48px;background:#1a9e5c;border-radius:50%;margin:0 auto 1.2rem;display:flex;align-items:center;justify-content:center;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><h3>Thank You for Your Donation!</h3>
             <p>Your submission has been received and is pending review by the EPIC Foundation team. We'll reach out
                 within 2–3 business days to confirm the details.</p>
             <a href="index.html" class="btn-next" style="display:inline-flex;text-decoration:none;margin:0 auto;">Return
@@ -788,7 +783,7 @@
             <div style="display:flex;flex-direction:column;gap:1rem;align-items:center;">
                 <!-- ⬇ Replace YOUR-GIVESMART-URL with your actual GiveSmart donation link -->
                 <a href="https://givesmart.com/YOUR-GIVESMART-URL" target="_blank" rel="noopener" class="btn-givesmart">
-                    💚 Donate on GiveSmart
+                    Donate on GiveSmart
                 </a>
                 <span style="font-size:0.75rem;color:rgba(255,255,255,0.35);">Secure · Tax-deductible · 501(c)(3)</span>
             </div>
