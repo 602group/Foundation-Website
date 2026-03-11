@@ -341,36 +341,66 @@
         .drawer {
             position: fixed;
             top: 0;
-            right: -700px;
-            width: 680px;
-            max-width: 95vw;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            width: 100vw;
             height: 100vh;
             background: #fff;
             z-index: 1200;
             display: flex;
             flex-direction: column;
-            transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: -8px 0 30px rgba(0, 0, 0, 0.15);
+            transition: opacity 0.25s ease, transform 0.25s ease;
+            opacity: 0;
+            transform: scale(0.98);
+            pointer-events: none;
         }
 
         .drawer.open {
-            right: 0;
+            opacity: 1;
+            transform: scale(1);
+            pointer-events: all;
         }
 
         .drawer-header {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 1.2rem 1.5rem;
-            border-bottom: 1px solid #eee;
+            padding: 0.9rem 1.5rem;
+            border-bottom: 1px solid #222;
             background: #000;
             color: white;
+            flex-shrink: 0;
+            gap: 1rem;
         }
 
         .drawer-header h3 {
-            font-size: 1.1rem;
+            font-size: 1.05rem;
             font-weight: 600;
+            flex: 1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
+
+        .drawer-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            background: rgba(255,255,255,0.12);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: white;
+            cursor: pointer;
+            font-size: 0.82rem;
+            font-weight: 600;
+            padding: 0.4rem 0.9rem;
+            border-radius: 6px;
+            font-family: 'Poppins', sans-serif;
+            white-space: nowrap;
+            transition: background 0.15s;
+            flex-shrink: 0;
+        }
+        .drawer-back:hover { background: rgba(255,255,255,0.22); }
 
         .drawer-close {
             background: none;
@@ -381,6 +411,7 @@
             line-height: 1;
             padding: 0 0.3rem;
             transition: opacity 0.2s;
+            flex-shrink: 0;
         }
 
         .drawer-close:hover {
@@ -874,8 +905,9 @@
     <!-- Edit Drawer -->
     <div class="drawer" id="editDrawer">
         <div class="drawer-header">
+            <button class="drawer-back" onclick="closeDrawer()">← All Auctions</button>
             <h3 id="drawerTitle">Edit Auction</h3>
-            <button class="drawer-close" onclick="closeDrawer()">✕</button>
+            <button class="drawer-close" onclick="closeDrawer()" title="Close">✕</button>
         </div>
 
         <!-- Approval banner — shown only for pending donor submissions from donate.html -->
@@ -892,7 +924,8 @@
         </div>
 
         <div class="drawer-tabs">
-            <button class="drawer-tab active" onclick="switchTab('details', this)">Details</button>
+            <button class="drawer-tab active" onclick="switchTab('admin', this)" style="font-weight:700;color:#000;">⚙️ Admin</button>
+            <button class="drawer-tab" onclick="switchTab('details', this)">Details</button>
             <button class="drawer-tab" onclick="switchTab('pricing', this)">Pricing</button>
             <button class="drawer-tab" onclick="switchTab('images', this)">Images</button>
             <button class="drawer-tab" onclick="switchTab('bids', this)">Bids</button>
@@ -900,8 +933,72 @@
         </div>
         <div class="drawer-body">
 
+            <!-- ═══════ ADMIN TAB ═══════ -->
+            <div class="drawer-panel active" id="panel-admin">
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:1.5rem;">
+
+                    <!-- Left column -->
+                    <div>
+                        <div class="form-section">
+                            <div class="form-section-title" style="display:flex;align-items:center;gap:0.5rem;">⚙️ Ticket Status &amp; Assignment</div>
+                            <div class="form-group">
+                                <label>Status</label>
+                                <select id="admin-status">
+                                    <option value="active">Active (Live)</option>
+                                    <option value="scheduled">Scheduled</option>
+                                    <option value="pending">Pending — Awaiting Approval</option>
+                                    <option value="draft">Draft</option>
+                                    <option value="closed">Closed — Bidding Ended</option>
+                                    <option value="sold">Sold — Winner Confirmed</option>
+                                    <option value="fulfilled">Fulfilled — Round Played</option>
+                                    <option value="expired">Expired — Past Due</option>
+                                    <option value="cancelled">Cancelled</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Course / Venue</label>
+                                <input type="text" id="admin-course" placeholder="e.g. Pebble Beach Golf Links">
+                            </div>
+                            <div class="form-group">
+                                <label>Donor</label>
+                                <input type="text" id="admin-donor" placeholder="Who donated this round">
+                            </div>
+                            <div class="form-group">
+                                <label>Buyer / Winner</label>
+                                <input type="text" id="admin-buyer" placeholder="Who purchased / won this round">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right column -->
+                    <div>
+                        <div class="form-section">
+                            <div class="form-section-title" style="display:flex;align-items:center;gap:0.5rem;">💳 Billing</div>
+                            <div class="form-group" style="background:#f0fdf4;border:1.5px solid #86efac;border-radius:10px;padding:1rem;display:flex;align-items:flex-start;gap:0.7rem;">
+                                <input type="checkbox" id="admin-billed" style="width:20px;height:20px;margin-top:2px;accent-color:#16a34a;cursor:pointer;flex-shrink:0;">
+                                <label for="admin-billed" style="cursor:pointer;font-weight:700;font-size:0.88rem;color:#15803d;line-height:1.4;">
+                                    Billed<br><span style="font-weight:400;color:#555;font-size:0.78rem;">Check when payment has been collected from the buyer</span>
+                                </label>
+                            </div>
+                            <div class="form-group" style="margin-top:0.8rem;">
+                                <label>Billing Notes</label>
+                                <textarea id="admin-billingNotes" placeholder="Invoice #, payment method, partial payments, etc." style="min-height:80px;"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- General Notes — full width -->
+                <div class="form-section">
+                    <div class="form-section-title" style="display:flex;align-items:center;gap:0.5rem;">📝 General Notes</div>
+                    <div class="form-group">
+                        <textarea id="admin-notes" placeholder="Internal notes about this auction, scheduling, coordinator contacts, special requirements, etc." style="min-height:140px;"></textarea>
+                    </div>
+                </div>
+            </div>
+
             <!-- DETAILS TAB -->
-            <div class="drawer-panel active" id="panel-details">
+            <div class="drawer-panel" id="panel-details">
                 <div class="form-section">
                     <div class="form-section-title">Basic Info</div>
                     <div class="form-group">
@@ -1453,7 +1550,15 @@
 
             renderImageStrip();
             populateDrawerBids(a.title);
-            switchTab('details', document.querySelector('.drawer-tab'));
+            switchTab('admin', document.querySelector('.drawer-tab'));
+            // Load admin fields
+            setVal('admin-status', a.status);
+            setVal('admin-course', a.course || a.location || '');
+            setVal('admin-donor', a.donor || a.donorName || '');
+            setVal('admin-buyer', a.winner || a.winnerName || '');
+            document.getElementById('admin-billed').checked = !!(a.billed);
+            setVal('admin-billingNotes', a.billingNotes || '');
+            setVal('admin-notes', a.adminNotes || '');
             document.getElementById('drawerOverlay').classList.add('open');
             document.getElementById('editDrawer').classList.add('open');
         }
@@ -1706,8 +1811,14 @@
                 title: getVal('edit-title'),
                 course: getVal('edit-course'),
                 location: getVal('edit-location'),
-                status: getVal('edit-status'),
-                winner: getVal('edit-winner'),
+                // Admin tab fields override edit-status if admin-status was touched
+                status: getVal('admin-status') || getVal('edit-status'),
+                winner: getVal('admin-buyer') || getVal('edit-winner'),
+                donor: getVal('admin-donor') || getVal('edit-donor'),
+                course: getVal('admin-course') || getVal('edit-course'),
+                billed: document.getElementById('admin-billed') ? document.getElementById('admin-billed').checked : false,
+                billingNotes: getVal('admin-billingNotes'),
+                adminNotes: getVal('admin-notes'),
                 visibility: getVal('edit-visibility') || 'all',
                 architect: getVal('edit-architect'),
                 courseType: getVal('edit-courseType'),
