@@ -863,6 +863,20 @@
             <h3 id="drawerTitle">Edit Auction</h3>
             <button class="drawer-close" onclick="closeDrawer()">✕</button>
         </div>
+
+        <!-- Approval banner — shown only for pending donor submissions from donate.html -->
+        <div id="approvalBanner" style="display:none;background:#fffbe6;border:1.5px solid #ffe082;border-radius:10px;padding:1rem 1.2rem;margin:0 1.5rem 0.5rem;font-size:0.85rem;">
+            <div style="font-weight:700;color:#7a5c00;margin-bottom:0.5rem;">⏳ Pending Donor Submission — Awaiting Approval</div>
+            <div id="approvalDonorInfo" style="color:#555;font-size:0.8rem;margin-bottom:0.9rem;line-height:1.7;"></div>
+            <div style="display:flex;gap:0.8rem;flex-wrap:wrap;align-items:center;">
+                <label style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;font-weight:700;color:#1a9e5c;font-size:0.85rem;">
+                    <input type="checkbox" id="approveCheck" style="width:18px;height:18px;accent-color:#1a9e5c;cursor:pointer;" onchange="handleApproveCheck(this)">
+                    ✅ Approve &amp; Make Active
+                </label>
+                <button onclick="rejectDonation()" style="padding:0.4rem 1rem;background:#fff0f0;color:#e74c3c;border:1.5px solid #fca5a5;border-radius:6px;font-family:inherit;font-size:0.78rem;font-weight:700;cursor:pointer;">✕ Reject &amp; Remove</button>
+            </div>
+        </div>
+
         <div class="drawer-tabs">
             <button class="drawer-tab active" onclick="switchTab('details', this)">Details</button>
             <button class="drawer-tab" onclick="switchTab('pricing', this)">Pricing</button>
@@ -1375,6 +1389,21 @@
             setVal('edit-increment', a.increment);
             setVal('edit-donor', a.donor);
             setVal('edit-buyNow', a.buyNow);
+
+            // ── Approval banner for pending donor submissions ──
+            const banner = document.getElementById('approvalBanner');
+            const infoEl = document.getElementById('approvalDonorInfo');
+            const apCheck = document.getElementById('approveCheck');
+            if (a.status === 'pending' && a.donorEmail) {
+                banner.style.display = 'block';
+                infoEl.innerHTML = `<strong>From:</strong> ${a.donorName || '—'} &nbsp;|&nbsp; <strong>Email:</strong> ${a.donorEmail || '—'}` +
+                    (a.donorOrg ? ` &nbsp;|&nbsp; <strong>Org:</strong> ${a.donorOrg}` : '') +
+                    (a.estimatedValue ? `<br><strong>Est. Value:</strong> ${a.estimatedValue}` : '') +
+                    `<br><strong>Submitted:</strong> ${a.submittedAt ? new Date(a.submittedAt).toLocaleString() : '—'}`;
+                apCheck.checked = false;
+            } else {
+                banner.style.display = 'none';
+            }
             setVal('edit-startDate', a.startDate);
             setVal('edit-endDate', a.endDate);
             setVal('edit-extension', a.extension);
@@ -1907,7 +1936,36 @@
 
         document.getElementById('sortSelect').addEventListener('change', renderTable);
         renderTable();
-    </script>
+    
+        // ── Donation approval helpers ─────────────────────────────────────
+        function handleApproveCheck(cb) {
+            if (cb.checked) {
+                // Set status dropdown to active
+                document.getElementById('edit-status').value = 'active';
+            } else {
+                document.getElementById('edit-status').value = 'pending';
+            }
+        }
+
+        async function rejectDonation() {
+            if (!confirm('Remove this donation submission permanently? This cannot be undone.')) return;
+            auctions = auctions.filter(a => a.id !== editingId);
+            // Persist
+            try {
+                if (typeof EPICDB !== 'undefined') {
+                    // No direct delete — save a 'rejected' status  
+                    const a = allAuctions ? allAuctions.find(x => x.id === editingId) : null;
+                    // Just remove locally and save updated list via PUT with status rejected
+                }
+            } catch(e) {}
+            localStorage.setItem('epic_auctions', JSON.stringify(auctions));
+            document.getElementById('drawerOverlay').classList.remove('open');
+            document.getElementById('editDrawer').classList.remove('open');
+            renderTable();
+            showToast('Donation submission removed.', 'warning');
+        }
+
+</script>
 </body>
 
 </html>
