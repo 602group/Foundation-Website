@@ -174,8 +174,8 @@
 
     <div class="portal-wrapper">
         <a href="index.html" class="back-link">← Back to Dashboard</a>
-        <h1 class="page-heading">My Bids</h1>
-        <p class="page-sub">Track your active bids and auctions you've won.</p>
+        <h1 class="page-heading">My Bids &amp; Rounds</h1>
+        <p class="page-sub">Track your active bids, auctions you've won, and rounds you've donated.</p>
 
         <div class="section-card" id="active-bids-section">
             <h3>🎫 Active Bids</h3>
@@ -196,61 +196,107 @@
                 </div>
             </div>
         </div>
+
+        <div class="section-card" id="donated-section">
+            <h3>🎁 Rounds I've Donated</h3>
+            <div id="donated-container">
+                <div class="empty-state">
+                    <div class="em-icon">🎁</div>
+                    <p>Loading...</p>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script src="../db.js"></script>
     <script src="../auth.js"></script>
     <script>
-        const session = AUTH.currentUser();
-        if (!session) { window.location.href = '../login.html'; }
+        (async () => {
+            const session = AUTH.currentUser();
+            if (!session) { window.location.href = '../login.html'; return; }
+            AUTH.applyHeader('../');
 
-        AUTH.applyHeader('../');
+            // Fetch fresh user from DB so donated rounds are current
+            let user = session;
+            if (typeof EPICDB !== 'undefined') {
+                const allUsers = await EPICDB.getUsers() || [];
+                user = allUsers.find(u => u.id === session.id) || session;
+            } else {
+                const allUsers = JSON.parse(localStorage.getItem('epic_users') || '[]');
+                user = allUsers.find(u => u.id === session.id) || session;
+            }
 
-        const allUsers = JSON.parse(localStorage.getItem('epic_users') || '[]');
-        const user = (session && allUsers.find(u => u.id === session.id)) || session;
+            // ── Active Bids ────────────────────────────────────────────────
+            const bids = user.bids || [];
+            const activeBidsEl = document.getElementById('active-bids-container');
+            if (bids.length === 0) {
+                activeBidsEl.innerHTML = `
+                    <div class="empty-state">
+                        <div class="em-icon">🎫</div>
+                        <p>You haven't placed any bids yet.</p>
+                        <a href="../auctions.html" class="browse-btn">Browse Auctions</a>
+                    </div>`;
+            } else {
+                activeBidsEl.innerHTML = bids.slice().reverse().map(b => `
+                    <a href="../auction-rounds/pebble-beach-round-2.html?id=${b.auctionId}" class="bid-row">
+                        <div class="bid-title">
+                            <span>⛳</span>
+                            <span>${b.title || b.auctionId}</span>
+                            <span class="bid-status status-active">Active</span>
+                        </div>
+                        <span class="bid-amount">$${b.amount.toLocaleString()}</span>
+                    </a>`).join('');
+            }
 
-        // Render Active Bids
-        const bids = user.bids || [];
-        const activeBidsEl = document.getElementById('active-bids-container');
-        if (bids.length === 0) {
-            activeBidsEl.innerHTML = `
-                <div class="empty-state">
-                    <div class="em-icon">🎫</div>
-                    <p>You haven't placed any bids yet.</p>
-                    <a href="../auctions.html" class="browse-btn">Browse Auctions</a>
-                </div>`;
-        } else {
-            activeBidsEl.innerHTML = bids.slice().reverse().map(b => `
-                <a href="../auction-rounds/pebble-beach-round-2.html?id=${b.auctionId}" class="bid-row">
-                    <div class="bid-title">
-                        <span>⛳</span>
-                        <span>${b.title || b.auctionId}</span>
-                        <span class="bid-status status-active">Active</span>
-                    </div>
-                    <span class="bid-amount">$${b.amount.toLocaleString()}</span>
-                </a>`).join('');
-        }
+            // ── Auctions Won ───────────────────────────────────────────────
+            const purchases = user.purchases || [];
+            const wonEl = document.getElementById('won-container');
+            if (purchases.length === 0) {
+                wonEl.innerHTML = `
+                    <div class="empty-state">
+                        <div class="em-icon">🏆</div>
+                        <p>You haven't won any auctions yet. Keep bidding!</p>
+                    </div>`;
+            } else {
+                wonEl.innerHTML = purchases.map(p => `
+                    <div class="bid-row" style="cursor:default;">
+                        <div class="bid-title">
+                            <span>🏆</span>
+                            <div>
+                                <span style="display:block;font-weight:600;">${p.title || p.auctionId}</span>
+                                <span style="font-size:0.76rem;color:#888;">${p.course ? p.course + ' · ' : ''}${p.date || ''}</span>
+                            </div>
+                            <span class="bid-status status-won">Won</span>
+                        </div>
+                        <span class="bid-amount">$${(p.amount || 0).toLocaleString()}</span>
+                    </div>`).join('');
+            }
 
-        // Render Won Auctions
-        const purchases = user.purchases || [];
-        const wonEl = document.getElementById('won-container');
-        if (purchases.length === 0) {
-            wonEl.innerHTML = `
-                <div class="empty-state">
-                    <div class="em-icon">🏆</div>
-                    <p>You haven't won any auctions yet. Keep bidding!</p>
-                </div>`;
-        } else {
-            wonEl.innerHTML = purchases.map(p => `
-                <a href="../auction-rounds/pebble-beach-round-2.html?id=${p.auctionId}" class="bid-row">
-                    <div class="bid-title">
-                        <span>🏆</span>
-                        <span>${p.title || p.auctionId}</span>
-                        <span class="bid-status status-won">Won</span>
-                    </div>
-                    <span class="bid-amount">$${p.amount.toLocaleString()}</span>
-                </a>`).join('');
-        }
+            // ── Donated Rounds ─────────────────────────────────────────────
+            const donated = user.donatedRounds || [];
+            const donatedEl = document.getElementById('donated-container');
+            if (donated.length === 0) {
+                donatedEl.innerHTML = `
+                    <div class="empty-state">
+                        <div class="em-icon">🎁</div>
+                        <p style="color:#888;">No donated rounds on your profile yet.</p>
+                        <p style="font-size:0.78rem;color:#bbb;">When your donated rounds are entered by the EPIC team, they will appear here.</p>
+                    </div>`;
+            } else {
+                donatedEl.innerHTML = donated.map(d => `
+                    <div class="bid-row" style="cursor:default; background:#fafff7;">
+                        <div class="bid-title">
+                            <span>🎁</span>
+                            <div>
+                                <span style="display:block;font-weight:600;">${d.title || d.auctionId}</span>
+                                <span style="font-size:0.76rem;color:#888;">${d.course ? d.course + ' · ' : ''}Won by ${d.winnerName || d.winnerEmail || 'a member'} · ${d.date || ''}</span>
+                            </div>
+                            <span class="bid-status" style="background:#e8f8f0;color:#1a9e5c;">Donated</span>
+                        </div>
+                        <span class="bid-amount" style="color:#1a9e5c;">$${(d.amount || 0).toLocaleString()}</span>
+                    </div>`).join('');
+            }
+        })();
     </script>
 </body>
 
