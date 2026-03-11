@@ -269,6 +269,21 @@
             background: #6a1b9a;
         }
 
+        .badge-fulfilled {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        .badge-fulfilled::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: #065f46; display: inline-block; margin-right: 5px; }
+        .badge-expired {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        .badge-expired::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: #991b1b; display: inline-block; margin-right: 5px; }
+        .badge-cancelled {
+            background: #f3f4f6;
+            color: #6b7280;
+        }
+        .badge-cancelled::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: #9ca3af; display: inline-block; margin-right: 5px; }
         .badge-won {
             background: #e8f0ff;
             color: #4A90E2;
@@ -800,12 +815,14 @@
             <div class="filter-tabs" id="filterTabs">
                 <button class="filter-tab active" data-filter="all" onclick="setFilter('all', this)">All</button>
                 <button class="filter-tab" data-filter="active" onclick="setFilter('active', this)">🟢 Active</button>
-                <button class="filter-tab" data-filter="scheduled" onclick="setFilter('scheduled', this)">🔵
-                    Scheduled</button>
-                <button class="filter-tab" data-filter="pending" onclick="setFilter('pending', this)">🟡
-                    Pending</button>
+                <button class="filter-tab" data-filter="scheduled" onclick="setFilter('scheduled', this)">🔵 Scheduled</button>
+                <button class="filter-tab" data-filter="pending" onclick="setFilter('pending', this)">🟡 Pending</button>
                 <button class="filter-tab" data-filter="draft" onclick="setFilter('draft', this)">🟣 Draft</button>
                 <button class="filter-tab" data-filter="closed" onclick="setFilter('closed', this)">⚫ Closed</button>
+                <button class="filter-tab" data-filter="sold" onclick="setFilter('sold', this)">💚 Sold</button>
+                <button class="filter-tab" data-filter="fulfilled" onclick="setFilter('fulfilled', this)">✅ Fulfilled</button>
+                <button class="filter-tab" data-filter="expired" onclick="setFilter('expired', this)">🔴 Expired</button>
+                <button class="filter-tab" data-filter="cancelled" onclick="setFilter('cancelled', this)">🚫 Cancelled</button>
             </div>
 
             <!-- Toolbar: search + sort -->
@@ -837,14 +854,11 @@
                         <tr>
                             <th style="width:60px">Photo</th>
                             <th onclick="toggleSort('title')" id="th-title">Title <span class="sort-arrow"></span></th>
-                            <th onclick="toggleSort('location')" id="th-location">Location <span
-                                    class="sort-arrow"></span></th>
-                            <th onclick="toggleSort('status')" id="th-status">Status <span class="sort-arrow"></span>
-                            </th>
-                            <th onclick="toggleSort('currentBid')" id="th-currentBid">Current Bid <span
-                                    class="sort-arrow"></span></th>
-                            <th onclick="toggleSort('endDate')" id="th-endDate">Ends <span class="sort-arrow"></span>
-                            </th>
+                            <th onclick="toggleSort('status')" id="th-status">Status <span class="sort-arrow"></span></th>
+                            <th>Buyer</th>
+                            <th>Donor</th>
+                            <th onclick="toggleSort('endDate')" id="th-endDate">Closed <span class="sort-arrow"></span></th>
+                            <th>Due By</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -910,15 +924,23 @@
                             members)</label>
                         <input type="text" id="edit-donor" placeholder="e.g. John Smith" style="margin-top:0.3rem;">
                     </div>
+                    <div class="form-group" style="background:#e8f8f0;border:1.5px solid #a8d5be;border-radius:8px;padding:0.8rem 1rem;margin-top:0.2rem;">
+                        <label style="color:#065f46;font-weight:700;">🏆 Buyer / Winner (Admin Only)</label>
+                        <input type="text" id="edit-winner" placeholder="e.g. Jane Doe" style="margin-top:0.3rem;">
+                    </div>
                     <div class="form-row">
                         <div class="form-group">
                             <label>Status</label>
                             <select id="edit-status">
                                 <option value="active">Active (Live)</option>
                                 <option value="scheduled">Scheduled</option>
-                                <option value="pending">Pending</option>
+                                <option value="pending">Pending — Awaiting Approval</option>
                                 <option value="draft">Draft</option>
-                                <option value="closed">Closed</option>
+                                <option value="closed">Closed — Bidding Ended</option>
+                                <option value="sold">Sold — Winner Confirmed</option>
+                                <option value="fulfilled">Fulfilled — Round Played</option>
+                                <option value="expired">Expired — Past Due</option>
+                                <option value="cancelled">Cancelled</option>
                             </select>
                         </div>
                         <div class="form-group">
@@ -1219,10 +1241,15 @@
                 <div class="form-group">
                     <label>Initial Status</label>
                     <select id="new-status">
-                        <option value="draft">Draft (not live yet)</option>
+                        <option value="active">Active (Live)</option>
                         <option value="scheduled">Scheduled</option>
-                        <option value="active">Active (go live now)</option>
-                        <option value="pending">Pending</option>
+                        <option value="pending">Pending — Awaiting Approval</option>
+                        <option value="draft">Draft</option>
+                        <option value="closed">Closed — Bidding Ended</option>
+                        <option value="sold">Sold — Winner Confirmed</option>
+                        <option value="fulfilled">Fulfilled — Round Played</option>
+                        <option value="expired">Expired — Past Due</option>
+                        <option value="cancelled">Cancelled</option>
                     </select>
                 </div>
                 <div class="form-group">
@@ -1301,13 +1328,16 @@
 
         function statusBadge(status) {
             const map = {
-                active: ['Active', 'badge-active'],
-                scheduled: ['Scheduled', 'badge-scheduled'],
-                pending: ['Pending', 'badge-pending'],
-                draft: ['Draft', 'badge-draft'],
-                closed: ['Closed', 'badge-closed'],
-                sold: ['Sold', 'badge-sold'],
-                ended: ['Ended', 'badge-ended'],
+                active:      ['Active',      'badge-active'],
+                scheduled:   ['Scheduled',   'badge-scheduled'],
+                pending:     ['Pending',     'badge-pending'],
+                draft:       ['Draft',       'badge-draft'],
+                closed:      ['Closed',      'badge-closed'],
+                sold:        ['Sold',        'badge-sold'],
+                ended:       ['Ended',       'badge-ended'],
+                fulfilled:   ['Fulfilled',   'badge-fulfilled'],
+                expired:     ['Expired',     'badge-expired'],
+                cancelled:   ['Cancelled',   'badge-cancelled'],
             };
             const [label, cls] = map[status] || ['Unknown', 'badge-closed'];
             return `<span class="badge ${cls}">${label}</span>`;
@@ -1317,26 +1347,38 @@
             const list = getFilteredSorted();
             const tbody = document.getElementById('auctionsTbody');
             if (!list.length) {
-                tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state">No auctions found.<br><p>Try a different search or add a new auction.</p></div></td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state">No auctions found.<br><p>Try a different search or add a new auction.</p></div></td></tr>`;
                 return;
             }
             tbody.innerHTML = list.map(a => {
                 const thumb = a.images && a.images[0]
                     ? `<img src="${a.images[0]}" class="auction-thumb" onerror="this.style.background='#eee';this.src=''">`
                     : `<div class="auction-thumb" style="background:#eee;display:inline-block;"></div>`;
-                const endFmt = a.endDate ? new Date(a.endDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '—';
-                const bid = a.currentBid ? `$${a.currentBid.toLocaleString()}` : '—';
+                const closedFmt = a.endDate ? new Date(a.endDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '—';
+                // Due date = 12 months after close date
+                let dueFmt = '—';
+                let dueOverdue = false;
+                if (a.endDate && (a.status === 'sold' || a.status === 'fulfilled' || a.status === 'closed')) {
+                    const dueDate = new Date(a.endDate);
+                    dueDate.setFullYear(dueDate.getFullYear() + 1);
+                    dueFmt = dueDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+                    dueOverdue = new Date() > dueDate;
+                }
+                // Buyer: find winning user from all users
+                const buyerDisplay = a.winner || a.winnerName || (a.donorEmail ? '—' : '—');
+                const donorDisplay = a.donorName || a.donor || '—';
                 return `
                 <tr onclick="openEditDrawer('${a.id}')" title="Click to edit">
                     <td>${thumb}</td>
                     <td class="auction-title-cell">
                         <strong>${a.title}</strong>
-                        <span>${a.course}</span>
+                        <span>${a.location || a.course || ''}</span>
                     </td>
-                    <td>${a.location}</td>
                     <td>${statusBadge(a.status)}</td>
-                    <td><strong>${bid}</strong></td>
-                    <td>${endFmt}</td>
+                    <td style="font-size:0.82rem;">${buyerDisplay}</td>
+                    <td style="font-size:0.82rem;color:#888;">${donorDisplay}</td>
+                    <td style="font-size:0.82rem;">${closedFmt}</td>
+                    <td style="font-size:0.82rem;${dueOverdue ? 'color:#e74c3c;font-weight:700;' : ''}">${dueFmt}${dueOverdue ? ' ⚠️' : ''}</td>
                     <td onclick="event.stopPropagation()" class="row-actions">
                         <button class="row-btn" onclick="openEditDrawer('${a.id}')">Edit</button>
                         <button class="row-btn danger" onclick="deleteAuction('${a.id}')">Delete</button>
@@ -1388,6 +1430,7 @@
             setVal('edit-currentBid', a.currentBid);
             setVal('edit-increment', a.increment);
             setVal('edit-donor', a.donor);
+            setVal('edit-winner', a.winner || a.winnerName || '');
             setVal('edit-buyNow', a.buyNow);
 
             // ── Approval banner for pending donor submissions ──
@@ -1664,6 +1707,7 @@
                 course: getVal('edit-course'),
                 location: getVal('edit-location'),
                 status: getVal('edit-status'),
+                winner: getVal('edit-winner'),
                 visibility: getVal('edit-visibility') || 'all',
                 architect: getVal('edit-architect'),
                 courseType: getVal('edit-courseType'),
