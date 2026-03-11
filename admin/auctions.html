@@ -273,17 +273,47 @@
             background: #d1fae5;
             color: #065f46;
         }
-        .badge-fulfilled::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: #065f46; display: inline-block; margin-right: 5px; }
+
+        .badge-fulfilled::before {
+            content: '';
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #065f46;
+            display: inline-block;
+            margin-right: 5px;
+        }
+
         .badge-expired {
             background: #fee2e2;
             color: #991b1b;
         }
-        .badge-expired::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: #991b1b; display: inline-block; margin-right: 5px; }
+
+        .badge-expired::before {
+            content: '';
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #991b1b;
+            display: inline-block;
+            margin-right: 5px;
+        }
+
         .badge-cancelled {
             background: #f3f4f6;
             color: #6b7280;
         }
-        .badge-cancelled::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: #9ca3af; display: inline-block; margin-right: 5px; }
+
+        .badge-cancelled::before {
+            content: '';
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #9ca3af;
+            display: inline-block;
+            margin-right: 5px;
+        }
+
         .badge-won {
             background: #e8f0ff;
             color: #4A90E2;
@@ -328,7 +358,8 @@
         .drawer-overlay {
             display: none;
             position: fixed;
-            top: 0; bottom: 0;
+            top: 0;
+            bottom: 0;
             left: var(--sidebar-width, 260px);
             right: 0;
             background: rgba(0, 0, 0, 0.25);
@@ -353,7 +384,7 @@
             opacity: 0;
             transform: translateX(12px);
             pointer-events: none;
-            box-shadow: -4px 0 24px rgba(0,0,0,0.12);
+            box-shadow: -4px 0 24px rgba(0, 0, 0, 0.12);
         }
 
         .drawer.open {
@@ -387,8 +418,8 @@
             display: inline-flex;
             align-items: center;
             gap: 0.4rem;
-            background: rgba(255,255,255,0.12);
-            border: 1px solid rgba(255,255,255,0.2);
+            background: rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.2);
             color: white;
             cursor: pointer;
             font-size: 0.82rem;
@@ -400,7 +431,10 @@
             transition: background 0.15s;
             flex-shrink: 0;
         }
-        .drawer-back:hover { background: rgba(255,255,255,0.22); }
+
+        .drawer-back:hover {
+            background: rgba(255, 255, 255, 0.22);
+        }
 
         .drawer-close {
             background: none;
@@ -801,19 +835,21 @@
             display: flex;
             gap: 0.75rem;
         }
-    
+
         /* ── Status filter dropdown ── */
         .status-filter-wrap {
             display: flex;
             align-items: center;
             gap: 0.6rem;
         }
+
         .status-filter-wrap label {
             font-size: 0.8rem;
             font-weight: 600;
             color: #666;
             white-space: nowrap;
         }
+
         .status-filter-select {
             appearance: none;
             -webkit-appearance: none;
@@ -830,11 +866,21 @@
             outline: none;
             transition: border-color 0.15s, box-shadow 0.15s;
         }
-        .status-filter-select:hover { border-color: #aaa; }
-        .status-filter-select:focus { border-color: #000; box-shadow: 0 0 0 3px rgba(0,0,0,0.07); }
+
+        .status-filter-select:hover {
+            border-color: #aaa;
+        }
+
+        .status-filter-select:focus {
+            border-color: #000;
+            box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.07);
+        }
 
         /* ── User search field used for buyer/donor ── */
-        .user-search-wrap { position: relative; }
+        .user-search-wrap {
+            position: relative;
+        }
+
         .user-search-input {
             width: 100%;
             padding: 0.6rem 0.9rem;
@@ -846,21 +892,30 @@
             outline: none;
             transition: border-color 0.15s;
         }
-        .user-search-input:focus { border-color: #000; }
+
+        .user-search-input:focus {
+            border-color: #000;
+        }
+
         .user-search-dropdown {
             display: none;
             position: absolute;
             top: calc(100% + 4px);
-            left: 0; right: 0;
+            left: 0;
+            right: 0;
             background: #fff;
             border: 1.5px solid #e0e0e0;
             border-radius: 10px;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
             z-index: 9999;
             max-height: 220px;
             overflow-y: auto;
         }
-        .user-search-dropdown.open { display: block; }
+
+        .user-search-dropdown.open {
+            display: block;
+        }
+
         .user-search-option {
             padding: 0.65rem 1rem;
             font-size: 0.84rem;
@@ -868,11 +923,28 @@
             border-bottom: 1px solid #f3f3f3;
             transition: background 0.1s;
         }
-        .user-search-option:last-child { border-bottom: none; }
-        .user-search-option:hover { background: #f8f9fa; }
-        .user-search-option .uop-name { font-weight: 600; color: #111; }
-        .user-search-option .uop-email { font-size: 0.76rem; color: #888; }
-        .user-search-option.selected { background: #f0fdf4; }
+
+        .user-search-option:last-child {
+            border-bottom: none;
+        }
+
+        .user-search-option:hover {
+            background: #f8f9fa;
+        }
+
+        .user-search-option .uop-name {
+            font-weight: 600;
+            color: #111;
+        }
+
+        .user-search-option .uop-email {
+            font-size: 0.76rem;
+            color: #888;
+        }
+
+        .user-search-option.selected {
+            background: #f0fdf4;
+        }
 
         /* ── Status filter dropdown ── */
         .status-filter-wrap {
@@ -880,12 +952,14 @@
             align-items: center;
             gap: 0.6rem;
         }
+
         .status-filter-wrap label {
             font-size: 0.8rem;
             font-weight: 600;
             color: #666;
             white-space: nowrap;
         }
+
         .status-filter-select {
             appearance: none;
             -webkit-appearance: none;
@@ -902,11 +976,21 @@
             outline: none;
             transition: border-color 0.15s, box-shadow 0.15s;
         }
-        .status-filter-select:hover { border-color: #aaa; }
-        .status-filter-select:focus { border-color: #000; box-shadow: 0 0 0 3px rgba(0,0,0,0.07); }
+
+        .status-filter-select:hover {
+            border-color: #aaa;
+        }
+
+        .status-filter-select:focus {
+            border-color: #000;
+            box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.07);
+        }
 
         /* ── User search field used for buyer/donor ── */
-        .user-search-wrap { position: relative; }
+        .user-search-wrap {
+            position: relative;
+        }
+
         .user-search-input {
             width: 100%;
             padding: 0.6rem 0.9rem;
@@ -918,21 +1002,30 @@
             outline: none;
             transition: border-color 0.15s;
         }
-        .user-search-input:focus { border-color: #000; }
+
+        .user-search-input:focus {
+            border-color: #000;
+        }
+
         .user-search-dropdown {
             display: none;
             position: absolute;
             top: calc(100% + 4px);
-            left: 0; right: 0;
+            left: 0;
+            right: 0;
             background: #fff;
             border: 1.5px solid #e0e0e0;
             border-radius: 10px;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
             z-index: 9999;
             max-height: 220px;
             overflow-y: auto;
         }
-        .user-search-dropdown.open { display: block; }
+
+        .user-search-dropdown.open {
+            display: block;
+        }
+
         .user-search-option {
             padding: 0.65rem 1rem;
             font-size: 0.84rem;
@@ -940,17 +1033,34 @@
             border-bottom: 1px solid #f3f3f3;
             transition: background 0.1s;
         }
-        .user-search-option:last-child { border-bottom: none; }
-        .user-search-option:hover { background: #f8f9fa; }
-        .user-search-option .uop-name { font-weight: 600; color: #111; }
-        .user-search-option .uop-email { font-size: 0.76rem; color: #888; }
-        .user-search-option.selected { background: #f0fdf4; }
-</style>
+
+        .user-search-option:last-child {
+            border-bottom: none;
+        }
+
+        .user-search-option:hover {
+            background: #f8f9fa;
+        }
+
+        .user-search-option .uop-name {
+            font-weight: 600;
+            color: #111;
+        }
+
+        .user-search-option .uop-email {
+            font-size: 0.76rem;
+            color: #888;
+        }
+
+        .user-search-option.selected {
+            background: #f0fdf4;
+        }
+    </style>
 </head>
 
 <body>
     <!-- Sidebar -->
-            <aside class="sidebar">
+    <aside class="sidebar">
         <div class="sidebar-header">
             <a href="../index.html" class="logo">EPIC ADMIN</a>
         </div>
@@ -1030,10 +1140,12 @@
                         <tr>
                             <th style="width:60px">Photo</th>
                             <th onclick="toggleSort('title')" id="th-title">Title <span class="sort-arrow"></span></th>
-                            <th onclick="toggleSort('status')" id="th-status">Status <span class="sort-arrow"></span></th>
+                            <th onclick="toggleSort('status')" id="th-status">Status <span class="sort-arrow"></span>
+                            </th>
                             <th>Buyer</th>
                             <th>Donor</th>
-                            <th onclick="toggleSort('endDate')" id="th-endDate">Closed <span class="sort-arrow"></span></th>
+                            <th onclick="toggleSort('endDate')" id="th-endDate">Closed <span class="sort-arrow"></span>
+                            </th>
                             <th>Due By</th>
                             <th>Actions</th>
                         </tr>
@@ -1056,20 +1168,28 @@
         </div>
 
         <!-- Approval banner — shown only for pending donor submissions from donate.html -->
-        <div id="approvalBanner" style="display:none;background:#fffbe6;border:1.5px solid #ffe082;border-radius:10px;padding:1rem 1.2rem;margin:0 1.5rem 0.5rem;font-size:0.85rem;">
-            <div style="font-weight:700;color:#7a5c00;margin-bottom:0.5rem;">⏳ Pending Donor Submission — Awaiting Approval</div>
+        <div id="approvalBanner"
+            style="display:none;background:#fffbe6;border:1.5px solid #ffe082;border-radius:10px;padding:1rem 1.2rem;margin:0 1.5rem 0.5rem;font-size:0.85rem;">
+            <div style="font-weight:700;color:#7a5c00;margin-bottom:0.5rem;">⏳ Pending Donor Submission — Awaiting
+                Approval</div>
             <div id="approvalDonorInfo" style="color:#555;font-size:0.8rem;margin-bottom:0.9rem;line-height:1.7;"></div>
             <div style="display:flex;gap:0.8rem;flex-wrap:wrap;align-items:center;">
-                <label style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;font-weight:700;color:#1a9e5c;font-size:0.85rem;">
-                    <input type="checkbox" id="approveCheck" style="width:18px;height:18px;accent-color:#1a9e5c;cursor:pointer;" onchange="handleApproveCheck(this)">
+                <label
+                    style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;font-weight:700;color:#1a9e5c;font-size:0.85rem;">
+                    <input type="checkbox" id="approveCheck"
+                        style="width:18px;height:18px;accent-color:#1a9e5c;cursor:pointer;"
+                        onchange="handleApproveCheck(this)">
                     ✅ Approve &amp; Make Active
                 </label>
-                <button onclick="rejectDonation()" style="padding:0.4rem 1rem;background:#fff0f0;color:#e74c3c;border:1.5px solid #fca5a5;border-radius:6px;font-family:inherit;font-size:0.78rem;font-weight:700;cursor:pointer;">✕ Reject &amp; Remove</button>
+                <button onclick="rejectDonation()"
+                    style="padding:0.4rem 1rem;background:#fff0f0;color:#e74c3c;border:1.5px solid #fca5a5;border-radius:6px;font-family:inherit;font-size:0.78rem;font-weight:700;cursor:pointer;">✕
+                    Reject &amp; Remove</button>
             </div>
         </div>
 
         <div class="drawer-tabs">
-            <button class="drawer-tab active" onclick="switchTab('admin', this)" style="font-weight:700;color:#000;">⚙️ Admin</button>
+            <button class="drawer-tab active" onclick="switchTab('admin', this)" style="font-weight:700;color:#000;">⚙️
+                Admin</button>
             <button class="drawer-tab" onclick="switchTab('details', this)">Details</button>
             <button class="drawer-tab" onclick="switchTab('pricing', this)">Pricing</button>
             <button class="drawer-tab" onclick="switchTab('images', this)">Images</button>
@@ -1085,7 +1205,8 @@
                     <!-- Left column -->
                     <div>
                         <div class="form-section">
-                            <div class="form-section-title" style="display:flex;align-items:center;gap:0.5rem;">⚙️ Ticket Status &amp; Assignment</div>
+                            <div class="form-section-title" style="display:flex;align-items:center;gap:0.5rem;">⚙️
+                                Ticket Status &amp; Assignment</div>
                             <div class="form-group">
                                 <label>Status</label>
                                 <select id="admin-status">
@@ -1105,7 +1226,10 @@
                             <div class="form-group">
                                 <label>Donor</label>
                                 <div class="user-search-wrap">
-                                    <input type="text" class="user-search-input" id="admin-donor-input" placeholder="Search members by name or email…" autocomplete="off" oninput="userSearch('donor', this.value)" onfocus="userSearch('donor', this.value)">
+                                    <input type="text" class="user-search-input" id="admin-donor-input"
+                                        placeholder="Search members by name or email…" autocomplete="off"
+                                        oninput="userSearch('donor', this.value)"
+                                        onfocus="userSearch('donor', this.value)">
                                     <input type="hidden" id="admin-donor">
                                     <div class="user-search-dropdown" id="donor-dropdown"></div>
                                 </div>
@@ -1113,7 +1237,10 @@
                             <div class="form-group">
                                 <label>Buyer / Winner</label>
                                 <div class="user-search-wrap">
-                                    <input type="text" class="user-search-input" id="admin-buyer-input" placeholder="Search members by name or email…" autocomplete="off" oninput="userSearch('buyer', this.value)" onfocus="userSearch('buyer', this.value)">
+                                    <input type="text" class="user-search-input" id="admin-buyer-input"
+                                        placeholder="Search members by name or email…" autocomplete="off"
+                                        oninput="userSearch('buyer', this.value)"
+                                        onfocus="userSearch('buyer', this.value)">
                                     <input type="hidden" id="admin-buyer">
                                     <div class="user-search-dropdown" id="buyer-dropdown"></div>
                                 </div>
@@ -1124,16 +1251,23 @@
                     <!-- Right column -->
                     <div>
                         <div class="form-section">
-                            <div class="form-section-title" style="display:flex;align-items:center;gap:0.5rem;">💳 Billing</div>
-                            <div class="form-group" style="background:#f0fdf4;border:1.5px solid #86efac;border-radius:10px;padding:1rem;display:flex;align-items:flex-start;gap:0.7rem;">
-                                <input type="checkbox" id="admin-billed" style="width:20px;height:20px;margin-top:2px;accent-color:#16a34a;cursor:pointer;flex-shrink:0;">
-                                <label for="admin-billed" style="cursor:pointer;font-weight:700;font-size:0.88rem;color:#15803d;line-height:1.4;">
-                                    Billed<br><span style="font-weight:400;color:#555;font-size:0.78rem;">Check when payment has been collected from the buyer</span>
+                            <div class="form-section-title" style="display:flex;align-items:center;gap:0.5rem;">💳
+                                Billing</div>
+                            <div class="form-group"
+                                style="background:#f0fdf4;border:1.5px solid #86efac;border-radius:10px;padding:1rem;display:flex;align-items:flex-start;gap:0.7rem;">
+                                <input type="checkbox" id="admin-billed"
+                                    style="width:20px;height:20px;margin-top:2px;accent-color:#16a34a;cursor:pointer;flex-shrink:0;">
+                                <label for="admin-billed"
+                                    style="cursor:pointer;font-weight:700;font-size:0.88rem;color:#15803d;line-height:1.4;">
+                                    Billed<br><span style="font-weight:400;color:#555;font-size:0.78rem;">Check when
+                                        payment has been collected from the buyer</span>
                                 </label>
                             </div>
                             <div class="form-group" style="margin-top:0.8rem;">
                                 <label>Billing Notes</label>
-                                <textarea id="admin-billingNotes" placeholder="Invoice #, payment method, partial payments, etc." style="min-height:80px;"></textarea>
+                                <textarea id="admin-billingNotes"
+                                    placeholder="Invoice #, payment method, partial payments, etc."
+                                    style="min-height:80px;"></textarea>
                             </div>
                         </div>
                     </div>
@@ -1141,9 +1275,12 @@
 
                 <!-- General Notes — full width -->
                 <div class="form-section">
-                    <div class="form-section-title" style="display:flex;align-items:center;gap:0.5rem;">📝 General Notes</div>
+                    <div class="form-section-title" style="display:flex;align-items:center;gap:0.5rem;">📝 General Notes
+                    </div>
                     <div class="form-group">
-                        <textarea id="admin-notes" placeholder="Internal notes about this auction, scheduling, coordinator contacts, special requirements, etc." style="min-height:140px;"></textarea>
+                        <textarea id="admin-notes"
+                            placeholder="Internal notes about this auction, scheduling, coordinator contacts, special requirements, etc."
+                            style="min-height:140px;"></textarea>
                     </div>
                 </div>
             </div>
@@ -1172,7 +1309,8 @@
                             members)</label>
                         <input type="text" id="edit-donor" placeholder="e.g. John Smith" style="margin-top:0.3rem;">
                     </div>
-                    <div class="form-group" style="background:#e8f8f0;border:1.5px solid #a8d5be;border-radius:8px;padding:0.8rem 1rem;margin-top:0.2rem;">
+                    <div class="form-group"
+                        style="background:#e8f8f0;border:1.5px solid #a8d5be;border-radius:8px;padding:0.8rem 1rem;margin-top:0.2rem;">
                         <label style="color:#065f46;font-weight:700;">🏆 Buyer / Winner (Admin Only)</label>
                         <input type="text" id="edit-winner" placeholder="e.g. Jane Doe" style="margin-top:0.3rem;">
                     </div>
@@ -1574,21 +1712,21 @@
 
         function statusBadge(status) {
             const map = {
-                new:          ['New',          'badge-active'],
-                draft:        ['Draft',        'badge-draft'],
-                live:         ['Live',         'badge-scheduled'],
-                sold:         ['Sold',         'badge-sold'],
-                booked:       ['Booked',       'badge-fulfilled'],
-                closed_other: ['Closed - Other','badge-closed'],
-                cancelled:    ['Cancelled',    'badge-cancelled'],
+                new: ['New', 'badge-active'],
+                draft: ['Draft', 'badge-draft'],
+                live: ['Live', 'badge-scheduled'],
+                sold: ['Sold', 'badge-sold'],
+                booked: ['Booked', 'badge-fulfilled'],
+                closed_other: ['Closed - Other', 'badge-closed'],
+                cancelled: ['Cancelled', 'badge-cancelled'],
                 // legacy
-                active:       ['Active',       'badge-active'],
-                scheduled:    ['Scheduled',    'badge-scheduled'],
-                pending:      ['Pending',      'badge-pending'],
-                closed:       ['Closed',       'badge-closed'],
-                ended:        ['Ended',        'badge-closed'],
-                fulfilled:    ['Fulfilled',    'badge-fulfilled'],
-                expired:      ['Expired',      'badge-expired'],
+                active: ['Active', 'badge-active'],
+                scheduled: ['Scheduled', 'badge-scheduled'],
+                pending: ['Pending', 'badge-pending'],
+                closed: ['Closed', 'badge-closed'],
+                ended: ['Ended', 'badge-closed'],
+                fulfilled: ['Fulfilled', 'badge-fulfilled'],
+                expired: ['Expired', 'badge-expired'],
             };
             const [label, cls] = map[status] || ['Unknown', 'badge-closed'];
             return `<span class="badge ${cls}">${label}</span>`;
@@ -1943,41 +2081,54 @@
             return el ? el.value : '';
         }
 
-        function saveAuction() {
+        async function saveAuction() {
             if (!editingId) return;
             const idx = auctions.findIndex(x => x.id === editingId);
             if (idx === -1) return;
 
-            // Re-fetch the absolute latest auctions from localStorage right before saving
-            // This prevents an admin from accidentally overwriting a bid that was 
-            // placed while the edit drawer was open!
             const latestAuctions = loadSharedAuctions();
             const latestIdx = latestAuctions.findIndex(x => x.id === editingId);
             if (latestIdx === -1) return;
 
-            // Preserve live bidding data from the latest fetch
             const currentLiveBid = latestAuctions[latestIdx].currentBid;
             const currentLiveCount = latestAuctions[latestIdx].bidCount;
             const currentLiveBidder = latestAuctions[latestIdx].highestBidder;
 
-            // Notice we use latestAuctions[latestIdx] as the base, not the stale 'auctions' array
+            // ── Read admin-tab donor / buyer values ──────────────────────
+            const donorInputEl = document.getElementById('admin-donor-input');
+            const buyerInputEl = document.getElementById('admin-buyer-input');
+            const donorUserId = getVal('admin-donor') || '';
+            const buyerUserId = getVal('admin-buyer') || '';
+            const donorName = donorInputEl ? donorInputEl.value.split('  (')[0].trim() : (getVal('edit-donor') || '');
+            const buyerName = buyerInputEl ? buyerInputEl.value.split('  (')[0].trim() : (getVal('edit-winner') || '');
+            const donorEmailM = donorInputEl && donorInputEl.value.match(/\(([^)]+)\)$/);
+            const buyerEmailM = buyerInputEl && buyerInputEl.value.match(/\(([^)]+)\)$/);
+            const donorEmail = donorEmailM ? donorEmailM[1] : '';
+            const buyerEmail = buyerEmailM ? buyerEmailM[1] : '';
+
+            const adminCourse = getVal('admin-course') || getVal('edit-course');
+
             auctions[idx] = {
                 ...latestAuctions[latestIdx],
                 title: getVal('edit-title'),
-                course: getVal('edit-course'),
+                course: adminCourse,
                 location: getVal('edit-location'),
-                // Admin tab fields override edit-status if admin-status was touched
                 status: getVal('admin-status') || getVal('edit-status'),
-                winner: document.getElementById('admin-buyer-input') ? document.getElementById('admin-buyer-input').value.split('  (')[0].trim() || getVal('edit-winner') : getVal('edit-winner'),
-                winnerUserId: getVal('admin-buyer') || '',
-                winnerEmail: (() => { const inp = document.getElementById('admin-buyer-input'); if (!inp) return ''; const m = inp.value.match(/\(([^)]+)\)$/); return m ? m[1] : ''; })(),
-                donor: document.getElementById('admin-donor-input') ? document.getElementById('admin-donor-input').value.split('  (')[0].trim() || getVal('edit-donor') : getVal('edit-donor'),
-                donorUserId: getVal('admin-donor') || '',
-                donorEmail: (() => { const inp = document.getElementById('admin-donor-input'); if (!inp) return ''; const m = inp.value.match(/\(([^)]+)\)$/); return m ? m[1] : ''; })(),
-                course: getVal('admin-course') || getVal('edit-course'),
+                // Donor
+                donor: donorName,
+                donorName: donorName,
+                donorUserId: donorUserId,
+                donorEmail: donorEmail,
+                // Buyer / Winner
+                winner: buyerName,
+                winnerName: buyerName,
+                winnerUserId: buyerUserId,
+                winnerEmail: buyerEmail,
+                // Admin tab
                 billed: document.getElementById('admin-billed') ? document.getElementById('admin-billed').checked : false,
                 billingNotes: getVal('admin-billingNotes'),
                 adminNotes: getVal('admin-notes'),
+                // Details tab
                 visibility: getVal('edit-visibility') || 'all',
                 architect: getVal('edit-architect'),
                 courseType: getVal('edit-courseType'),
@@ -1995,16 +2146,11 @@
                 charity: getVal('edit-charity'),
                 taxDeductible: getVal('edit-taxDeductible'),
                 startBid: parseFloat(getVal('edit-startBid')) || 0,
-
-                // Keep the live bids unless the admin EXPLICITLY changed the input to something different
                 currentBid: (parseFloat(getVal('edit-currentBid')) !== auctions[idx].currentBid)
-                    ? parseFloat(getVal('edit-currentBid'))
-                    : currentLiveBid,
+                    ? parseFloat(getVal('edit-currentBid')) : currentLiveBid,
                 bidCount: currentLiveCount,
                 highestBidder: currentLiveBidder,
-
                 increment: parseFloat(getVal('edit-increment')) || 200,
-                donor: getVal('edit-donor').trim(),
                 buyNow: parseFloat(getVal('edit-buyNow')) || 0,
                 startDate: getVal('edit-startDate'),
                 endDate: getVal('edit-endDate'),
@@ -2012,10 +2158,80 @@
                 images: [...editImages],
             };
 
+            const savedAuction = auctions[idx];
+
+            // ── Persist auction ──────────────────────────────────────────
             saveSharedAuctions(auctions);
+            if (typeof EPICDB !== 'undefined' && EPICDB.saveAuction) {
+                try { await EPICDB.saveAuction(savedAuction); } catch (e) { console.warn('EPICDB.saveAuction failed', e); }
+            }
+
+            // ── Sync buyer → user purchases[] ────────────────────────────
+            if (buyerUserId) { await syncUserPurchase(buyerUserId, savedAuction); }
+
+            // ── Sync donor → user donatedRounds[] ───────────────────────
+            if (donorUserId) { await syncUserDonatedRound(donorUserId, savedAuction); }
+
             showToast('✅ Auction saved!');
             closeDrawer();
             renderTable();
+        }
+
+        // ── Profile sync helpers ──────────────────────────────────────────
+        async function getUsers() {
+            try {
+                if (typeof EPICDB !== 'undefined' && EPICDB.getUsers) return (await EPICDB.getUsers()) || [];
+            } catch (e) { }
+            return JSON.parse(localStorage.getItem('epic_users') || '[]');
+        }
+        async function saveUser(u) {
+            try {
+                if (typeof EPICDB !== 'undefined' && EPICDB.saveUser) { await EPICDB.saveUser(u); return; }
+            } catch (e) { }
+            const users = JSON.parse(localStorage.getItem('epic_users') || '[]');
+            const i = users.findIndex(x => x.id === u.id);
+            if (i > -1) users[i] = u; else users.push(u);
+            localStorage.setItem('epic_users', JSON.stringify(users));
+        }
+
+        async function syncUserPurchase(userId, auction) {
+            const users = await getUsers();
+            const u = users.find(x => x.id === userId);
+            if (!u) return;
+            const purchases = u.purchases || [];
+            const existing = purchases.findIndex(p => p.auctionId === auction.id);
+            const entry = {
+                auctionId: auction.id,
+                title: auction.title,
+                course: auction.course || auction.location || '',
+                amount: auction.currentBid || auction.startBid || 0,
+                date: auction.endDate || new Date().toISOString().slice(0, 10),
+                status: auction.status,
+            };
+            if (existing > -1) purchases[existing] = entry;
+            else purchases.push(entry);
+            await saveUser({ ...u, purchases });
+        }
+
+        async function syncUserDonatedRound(userId, auction) {
+            const users = await getUsers();
+            const u = users.find(x => x.id === userId);
+            if (!u) return;
+            const donated = u.donatedRounds || [];
+            const existing = donated.findIndex(d => d.auctionId === auction.id);
+            const entry = {
+                auctionId: auction.id,
+                title: auction.title,
+                course: auction.course || auction.location || '',
+                amount: auction.currentBid || auction.startBid || 0,
+                date: auction.endDate || new Date().toISOString().slice(0, 10),
+                winnerName: auction.winnerName || auction.winner || '',
+                winnerEmail: auction.winnerEmail || '',
+                notes: auction.adminNotes || '',
+            };
+            if (existing > -1) donated[existing] = entry;
+            else donated.push(entry);
+            await saveUser({ ...u, donatedRounds: donated });
         }
 
         // ══════════════════════════════════════════════
@@ -2250,7 +2466,7 @@
 
         document.getElementById('sortSelect').addEventListener('change', renderTable);
         renderTable();
-    
+
         // ── Donation approval helpers ─────────────────────────────────────
         function handleApproveCheck(cb) {
             if (cb.checked) {
@@ -2271,7 +2487,7 @@
                     const a = allAuctions ? allAuctions.find(x => x.id === editingId) : null;
                     // Just remove locally and save updated list via PUT with status rejected
                 }
-            } catch(e) {}
+            } catch (e) { }
             localStorage.setItem('epic_auctions', JSON.stringify(auctions));
             document.getElementById('drawerOverlay').classList.remove('open');
             document.getElementById('editDrawer').classList.remove('open');
@@ -2292,33 +2508,33 @@
                 } else {
                     _allUsers = JSON.parse(localStorage.getItem('epic_users') || '[]');
                 }
-            } catch(e) {
+            } catch (e) {
                 _allUsers = JSON.parse(localStorage.getItem('epic_users') || '[]');
             }
             return _allUsers;
         }
 
         async function userSearch(role, query) {
-            const ddId   = role === 'donor' ? 'donor-dropdown' : 'buyer-dropdown';
-            const hidId  = role === 'donor' ? 'admin-donor'    : 'admin-buyer';
-            const dd     = document.getElementById(ddId);
+            const ddId = role === 'donor' ? 'donor-dropdown' : 'buyer-dropdown';
+            const hidId = role === 'donor' ? 'admin-donor' : 'admin-buyer';
+            const dd = document.getElementById(ddId);
             if (!dd) return;
-            const users  = await loadAllUsers();
-            const q      = (query || '').trim().toLowerCase();
+            const users = await loadAllUsers();
+            const q = (query || '').trim().toLowerCase();
             const results = q.length < 1
                 ? users.slice(0, 8)
                 : users.filter(u =>
                     (u.firstName + ' ' + u.lastName).toLowerCase().includes(q) ||
                     (u.email || '').toLowerCase().includes(q)
-                  ).slice(0, 10);
+                ).slice(0, 10);
 
             if (!results.length) { dd.classList.remove('open'); return; }
 
             dd.innerHTML = results.map(u => {
-                const name  = (u.firstName || '') + ' ' + (u.lastName || '');
+                const name = (u.firstName || '') + ' ' + (u.lastName || '');
                 const email = u.email || '';
                 return `<div class="user-search-option" data-id="${u.id}" data-name="${name.trim()}" data-email="${email}"
-                    onmousedown="selectUser('${role}', '${u.id}', '${name.trim().replace(/'/g,"\\'")}', '${email}')">
+                    onmousedown="selectUser('${role}', '${u.id}', '${name.trim().replace(/'/g, "\\'")}', '${email}')">
                     <div class="uop-name">${name.trim()}</div>
                     <div class="uop-email">${email}</div>
                 </div>`;
@@ -2328,10 +2544,10 @@
 
         async function selectUser(role, userId, name, email) {
             const inputId = role === 'donor' ? 'admin-donor-input' : 'admin-buyer-input';
-            const hidId   = role === 'donor' ? 'admin-donor'       : 'admin-buyer';
-            const ddId    = role === 'donor' ? 'donor-dropdown'     : 'buyer-dropdown';
+            const hidId = role === 'donor' ? 'admin-donor' : 'admin-buyer';
+            const ddId = role === 'donor' ? 'donor-dropdown' : 'buyer-dropdown';
             document.getElementById(inputId).value = name + (email ? '  (' + email + ')' : '');
-            document.getElementById(hidId).value   = userId;
+            document.getElementById(hidId).value = userId;
             document.getElementById(ddId).classList.remove('open');
 
             // Also cascade: update the auction object immediately for save
@@ -2364,7 +2580,7 @@
             document.getElementById('admin-buyer').value = a.winnerUserId || '';
         }
 
-</script>
+    </script>
 </body>
 
 </html>

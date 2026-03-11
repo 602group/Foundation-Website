@@ -377,31 +377,31 @@
                 <h3>Quick Actions</h3>
                 <div class="action-grid">
                     <a href="../auctions.html" class="action-card">
-                        <span class="action-icon">⛳</span> Browse Auctions
+                        Browse Auctions
                     </a>
                     <button class="action-card" onclick="showPanel('bids')">
-                        <span class="action-icon">🎫</span> Current Bids
+                        Current Bids
                     </button>
                     <button class="action-card" onclick="showPanel('watchlist')">
-                        <span class="action-icon">👁️</span> My Watchlist
+                        My Watchlist
                     </button>
                     <button class="action-card" onclick="showPanel('won')">
-                        <span class="action-icon">🏆</span> Auctions Won
+                        Auctions Won
                     </button>
                     <button class="action-card" onclick="showPanel('trips')">
-                        <span class="action-icon">✈️</span> My Trips &amp; Events
+                        My Trips &amp; Events
                     </button>
                     <button class="action-card" onclick="showPanel('profile')">
-                        <span class="action-icon">👤</span> Edit Profile
+                        Edit Profile
                     </button>
                     <button class="action-card" onclick="showPanel('donated')">
-                        <span class="action-icon">🎁</span> My Donated Rounds
+                        My Donated Rounds
                     </button>
                     <button class="action-card" onclick="showPanel('settings')">
-                        <span class="action-icon">⚙️</span> Settings
+                        Settings
                     </button>
                     <a href="../contact.html" class="action-card">
-                        <span class="action-icon">💬</span> Contact Support
+                        Contact Support
                     </a>
                 </div>
             </div>
@@ -549,7 +549,7 @@
                                 </div>
                                 <span style="font-size:0.7rem;font-weight:700;padding:2px 8px;border-radius:10px;background:#e8f8f0;color:#1a9e5c;">Donated</span>
                             </div>
-                            <span style="font-weight:700;color:#1a9e5c;white-space:nowrap;">$${(d.amount||0).toLocaleString()}</span>
+                            <span style="font-weight:700;color:#1a9e5c;white-space:nowrap;">$${(d.amount || 0).toLocaleString()}</span>
                         </div>`;
                     }).join('');
                 }
