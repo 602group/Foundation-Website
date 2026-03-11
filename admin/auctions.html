@@ -2172,6 +2172,9 @@
             // ── Sync donor → user donatedRounds[] ───────────────────────
             if (donorUserId) { await syncUserDonatedRound(donorUserId, savedAuction); }
 
+            const _a = auctions[idx];
+            logActivity('auction', 'Auction updated: ' + (_a.title || 'Untitled'),
+                [_a.status ? 'Status: ' + _a.status : '', _a.winner ? 'Winner: ' + _a.winner : ''].filter(Boolean).join(' · '));
             showToast('✅ Auction saved!');
             closeDrawer();
             renderTable();
@@ -2580,7 +2583,18 @@
             document.getElementById('admin-buyer').value = a.winnerUserId || '';
         }
 
-    </script>
+    
+        // ── Activity Logger ──────────────────────────────────────────
+        function logActivity(type, msg, detail) {
+            const ACTIVITY_KEY = 'epic_activity_log';
+            const MAX_EVENTS = 200;
+            let log = [];
+            try { log = JSON.parse(localStorage.getItem(ACTIVITY_KEY) || '[]'); } catch {}
+            log.unshift({ type, msg, detail: detail || '', ts: new Date().toISOString() });
+            if (log.length > MAX_EVENTS) log = log.slice(0, MAX_EVENTS);
+            localStorage.setItem(ACTIVITY_KEY, JSON.stringify(log));
+        }
+</script>
 </body>
 
 </html>

@@ -220,6 +220,15 @@
                     <div id="dash-won-auctions"></div>
                 </div>
             </div>
+
+            <!-- ── Recent Activity ─────────────────────────────────── -->
+            <div class="dash-panel" style="margin-top:2rem;grid-column:1/-1;">
+                <div class="dash-panel-title">
+                    Recent Activity
+                    <button onclick="clearActivity()" style="background:none;border:none;font-size:0.75rem;color:#aaa;cursor:pointer;font-family:inherit;">Clear</button>
+                </div>
+                <div id="dash-activity-feed" style="max-height:400px;overflow-y:auto;"></div>
+            </div>
         </div>
     </div>
 
@@ -388,6 +397,48 @@
                 return date.toLocaleDateString();
             }
         })();
+
+        // ── Recent Activity Feed ──────────────────────────────────────
+        const ACTIVITY_KEY = 'epic_activity_log';
+        const MAX_EVENTS = 200;
+
+        function getActivity() {
+            try { return JSON.parse(localStorage.getItem(ACTIVITY_KEY) || '[]'); } catch { return []; }
+        }
+
+        function renderActivity() {
+            const feed = document.getElementById('dash-activity-feed');
+            if (!feed) return;
+            const events = getActivity();
+            if (!events.length) {
+                feed.innerHTML = '<div class="empty-dash">No activity recorded yet. Changes made by admins and members will appear here.</div>';
+                return;
+            }
+            feed.innerHTML = events.slice(0, 60).map(ev => {
+                const ago = timeAgo(new Date(ev.ts));
+                const colorMap = { auction: '#000', user: '#1a9e5c', bid: '#f57f17', donate: '#1a9e5c', system: '#888' };
+                const dot = colorMap[ev.type] || '#888';
+                return `<div class="dash-row">
+                    <div class="dr-left">
+                        <span style="width:8px;height:8px;border-radius:50%;background:${dot};flex-shrink:0;margin-top:4px;"></span>
+                        <span>
+                            <span style="font-weight:600;font-size:0.84rem;">${ev.msg}</span>
+                            ${ev.detail ? `<span class="dr-sub">${ev.detail}</span>` : ''}
+                        </span>
+                    </div>
+                    <div class="dr-right" style="font-size:0.76rem;color:#aaa;white-space:nowrap;">${ago}</div>
+                </div>`;
+            }).join('');
+        }
+
+        function clearActivity() {
+            if (confirm('Clear all activity history?')) {
+                localStorage.removeItem(ACTIVITY_KEY);
+                renderActivity();
+            }
+        }
+
+        renderActivity();
     </script>
 </body>
 

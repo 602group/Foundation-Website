@@ -458,6 +458,7 @@
         }
         renderStats(); // render immediately with session data
         loadFreshUser(); // then update from EPICDB
+        logActivity('user', 'Member portal viewed', ((session.firstName||'')+' '+(session.lastName||'')).trim() + ' · ' + (session.email||'')).trimEnd();
 
         // ── Panel Renderer ──────────────────────────────────────────────
         function showPanel(view) {
@@ -646,7 +647,17 @@
 
         // Default: show auctions won on load
         showPanel('won');
-    </script>
+    
+        // Log user login activity
+        function logActivity(type, msg, detail) {
+            const ACTIVITY_KEY = 'epic_activity_log';
+            let log = [];
+            try { log = JSON.parse(localStorage.getItem(ACTIVITY_KEY) || '[]'); } catch {}
+            log.unshift({ type, msg, detail: detail || '', ts: new Date().toISOString() });
+            if (log.length > 200) log = log.slice(0, 200);
+            localStorage.setItem(ACTIVITY_KEY, JSON.stringify(log));
+        }
+</script>
 </body>
 
 </html>

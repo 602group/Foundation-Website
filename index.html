@@ -23,7 +23,7 @@
                 <a href="travel-events.html" class="nav-link member-only-link" style="display:none;">Travel &amp; Events</a>
                 <a href="about.html" class="nav-link">About Us</a>
                 <a href="contact.html" class="nav-link">Contact Us</a>
-            <a href="donate.html" class="nav-link" style="color:#1a9e5c;font-weight:700;">Donate ♥</a>
+            <a href="donate.html" class="nav-link" style="color:#fff;font-weight:700;">Donate ♥</a>
                 <button class="login-btn">Login</button>
             </nav>
         </header>
@@ -109,6 +109,30 @@
                     <h3 class="feature-title">Unforgettable Experiences</h3>
                     <p class="feature-text">Create memories that last a lifetime with rounds at dream destinations</p>
                 </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- Donate CTA Banner -->
+    <section class="email-signup-section" style="">
+        <div class="email-signup-overlay" style="background:rgba(0,0,0,0.75);">
+            <div class="email-signup-content">
+                <h2 class="email-signup-title">Support the Mission</h2>
+                <p class="email-signup-description">Your contribution funds youth golf programs, charitable events, and creates opportunities for deserving players. Every gift makes a difference.</p>
+                <a href="donate.html" class="subscribe-btn" style="display:inline-block;text-decoration:none;padding:0.85rem 2.2rem;font-size:0.95rem;font-weight:700;letter-spacing:0.03em;margin-top:0.5rem;">Donate Today</a>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- Donate CTA Banner -->
+    <section class="email-signup-section" style="">
+        <div class="email-signup-overlay" style="background:rgba(0,0,0,0.75);">
+            <div class="email-signup-content">
+                <h2 class="email-signup-title">Support the Mission</h2>
+                <p class="email-signup-description">Your contribution funds youth golf programs, charitable events, and creates opportunities for deserving players. Every gift makes a difference.</p>
+                <a href="donate.html" class="subscribe-btn" style="display:inline-block;text-decoration:none;padding:0.85rem 2.2rem;font-size:0.95rem;font-weight:700;letter-spacing:0.03em;margin-top:0.5rem;">Donate Today</a>
             </div>
         </div>
     </section>
@@ -232,11 +256,16 @@
                                 <span class="card-date-tag">Closes: ${fmtDate(a.endDate)}</span>
                             </div>
                             <div class="card-footer">
+                                <!-- BID INFO HIDDEN — redirecting to 3rd party; code preserved below
                                 <div class="price-info">
                                     <span class="current-bid">$${a.currentBid ? a.currentBid.toLocaleString() : a.startBid.toLocaleString()}</span>
                                     <span class="bid-label">${liveBidCount} bid${liveBidCount !== 1 ? 's' : ''} · Current Bid</span>
                                 </div>
-                                <span class="card-bid-cta">Place Bid →</span>
+                                -->
+                                <div class="card-countdown" id="cd-${a.id}" style="font-size:0.75rem;color:#888;font-weight:600;"></div>
+                                <span class="card-bid-cta">View Item →</span>
+                                <div class="card-countdown" id="cd-${a.id}" style="font-size:0.75rem;color:#888;font-weight:600;"></div>
+                                <span class="card-bid-cta">View Item →</span>
                             </div>
                         </div>
                     </div>
@@ -258,7 +287,34 @@
                 otherSec.style.display = '';
             }
         }
-        renderPublicAuctions();
+        renderPublicAuctions().then(() => initCountdowns());
+        function initCountdowns() {
+            document.querySelectorAll('[id^="cd-"]').forEach(el => {
+                const card = el.closest('[data-end-time]') || el.closest('.auction-card');
+                // Find end date from data or from parent auction card data
+                const endAttr = el.id.replace('cd-', '');
+                // We need the endDate from the auction — stored in parent card's data-end-time
+                // For home page cards we use a data attribute approach
+                const parent = el.closest('a');
+                if (!parent) return;
+                // endDate embedded in card — we'll compute from rendered date tags
+                const closesTag = parent.querySelector('.card-date-tag:last-child');
+                if (!closesTag) return;
+                const closesText = closesTag.textContent.replace('Closes: ', '');
+                const endDate = new Date(closesText);
+                if (isNaN(endDate)) return;
+                function tick() {
+                    const diff = endDate - new Date();
+                    if (diff <= 0) { el.textContent = 'Closed'; return; }
+                    const d = Math.floor(diff / 86400000);
+                    const h = Math.floor((diff % 86400000) / 3600000);
+                    const m = Math.floor((diff % 3600000) / 60000);
+                    el.textContent = d > 0 ? d + 'd ' + h + 'h remaining' : h + 'h ' + m + 'm remaining';
+                }
+                tick();
+                setInterval(tick, 60000);
+            });
+        }
 
         // Transparent → solid header on scroll
         const heroHeader = document.querySelector('.hero-header');

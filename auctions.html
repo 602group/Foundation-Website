@@ -238,7 +238,7 @@
             <a href="travel-events.html" class="nav-link member-only-link" style="display:none;">Travel &amp; Events</a>
             <a href="about.html" class="nav-link">About Us</a>
             <a href="contact.html" class="nav-link">Contact Us</a>
-            <a href="donate.html" class="nav-link" style="color:#1a9e5c;font-weight:700;">Donate ♥</a>
+            <a href="donate.html" class="nav-link" style="color:#fff;font-weight:700;">Donate ♥</a>
             <button class="login-btn">Login</button>
         </nav>
     </header>
@@ -602,11 +602,16 @@
                                 <span class="card-date-tag">Closes: ${fmtDate(a.endDate)}</span>
                             </div>
                             <div class="card-footer">
+                                <!-- BID INFO HIDDEN — redirecting to 3rd party; code preserved below
                                 <div class="price-info">
                                     <div class="current-bid">$${price.toLocaleString()}</div>
                                     <div class="bid-label">${(auctionBidCounts[a.id] ?? a.bidCount ?? 0)} bids · Current Bid</div>
                                 </div>
-                                <span class="card-bid-cta">Place Bid →</span>
+                                -->
+                                <div id="countdown-${a.id}" class="card-countdown" style="font-size:0.75rem;color:#888;font-weight:600;"></div>
+                                <span class="card-bid-cta">View Item →</span>
+                                <div id="countdown-${a.id}" class="card-countdown" style="font-size:0.75rem;color:#888;font-weight:600;"></div>
+                                <span class="card-bid-cta">View Item →</span>
                             </div>
                         </div>
                     </a>
@@ -615,6 +620,38 @@
 
                 // Init filters now that cards exist in the DOM
                 if (typeof initFilters === 'function') initFilters();
+                // Init countdown timers
+                list.forEach(a => {
+                    const el = document.getElementById('countdown-' + a.id);
+                    if (!el || !a.endDate) return;
+                    const endDate = new Date(a.endDate);
+                    function tick() {
+                        const diff = endDate - new Date();
+                        if (diff <= 0) { el.textContent = 'Closed'; return; }
+                        const d = Math.floor(diff / 86400000);
+                        const h = Math.floor((diff % 86400000) / 3600000);
+                        const m = Math.floor((diff % 3600000) / 60000);
+                        el.textContent = d > 0 ? d + 'd ' + h + 'h remaining' : h + 'h ' + m + 'm remaining';
+                    }
+                    tick();
+                    setInterval(tick, 60000);
+                });
+                // Init countdown timers
+                list.forEach(a => {
+                    const el = document.getElementById('countdown-' + a.id);
+                    if (!el || !a.endDate) return;
+                    const endDate = new Date(a.endDate);
+                    function tick() {
+                        const diff = endDate - new Date();
+                        if (diff <= 0) { el.textContent = 'Closed'; return; }
+                        const d = Math.floor(diff / 86400000);
+                        const h = Math.floor((diff % 86400000) / 3600000);
+                        const m = Math.floor((diff % 3600000) / 60000);
+                        el.textContent = d > 0 ? d + 'd ' + h + 'h remaining' : h + 'h ' + m + 'm remaining';
+                    }
+                    tick();
+                    setInterval(tick, 60000);
+                });
             }
         })(); // end async renderAuctions
     </script>
