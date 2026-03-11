@@ -438,6 +438,7 @@
             <a href="users.html" class="nav-item"><span class="nav-icon">👥</span> Users</a>
             <a href="bids.html" class="nav-item"><span class="nav-icon">💰</span> Bids</a>
             <a href="events.html" class="nav-item"><span class="nav-icon">✈️</span> Events &amp; Trips</a>
+            <a href="import-rounds.html" class="nav-item"><span class="nav-icon">📥</span> Import Rounds</a>
             <a href="messages.html" class="nav-item"><span class="nav-icon">💬</span> Messages</a>
             <a href="tasks.html" class="nav-item"><span class="nav-icon">✅</span> Tasks</a>
             <a href="financials.html" class="nav-item"><span class="nav-icon">📈</span> Financials</a>
@@ -494,6 +495,7 @@
                     <button class="profile-tab" onclick="switchTab('won', this)">🏆 Won</button>
                     <button class="profile-tab" onclick="switchTab('trips', this)">✈️ Trips & Events</button>
                     <button class="profile-tab" onclick="switchTab('activity', this)">📋 Activity</button>
+                    <button class="profile-tab" onclick="switchTab('donated', this)">🎁 Donated Rounds</button>
                 </div>
             </div>
 
@@ -706,6 +708,24 @@
                 </div>
             </div>
 
+            <!-- ═══════════════════════════════════════════════════════
+                 TAB: DONATED ROUNDS
+            ═══════════════════════════════════════════════════════ -->
+            <div class="tab-card-wrap">
+                <div class="panel" id="panel-donated" style="padding:1.6rem">
+                    <div style="margin-bottom:1rem;">
+                        <h3 style="font-size:1rem;font-weight:700;margin-bottom:0.3rem;">Donated Rounds</h3>
+                        <p style="font-size:0.8rem;color:#888;">Auction rounds this member donated, imported via CSV import.</p>
+                    </div>
+                    <div id="donatedContent">
+                        <div class="empty-msg">
+                            <div class="em-icon">🎁</div>
+                            No donated rounds on record.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </div><!-- /content-wrapper -->
     </div><!-- /main-content -->
 
@@ -731,6 +751,7 @@
             renderWonTab();
             renderTripsTab();
             renderActivityTab();
+            renderDonatedTab();
         }
 
         // ── Hero ──────────────────────────────────────────────────────────
@@ -1047,6 +1068,30 @@
                     <span class="key">${e.icon} ${e.text}</span>
                     <span class="val" style="font-weight:400;color:#888;font-size:0.8rem">${e.date.toLocaleString()}</span>
                 </div>`).join('');
+        }
+
+        // ── Donated Rounds tab ───────────────────────────────────────────
+        function renderDonatedTab() {
+            const donated = (currentUser.donatedRounds || []);
+            const el = document.getElementById('donatedContent');
+            if (!donated.length) {
+                el.innerHTML = `<div class="empty-msg"><div class="em-icon">🎁</div>No donated rounds on record.<br><small style="color:#bbb;font-size:0.78rem;">Rounds donated by this member will appear here after a CSV import.</small></div>`;
+                return;
+            }
+            el.innerHTML = `
+                <table class="data-table">
+                    <thead><tr><th>Round</th><th>Course</th><th>Winner</th><th>Amount</th><th>Date</th><th>Notes</th></tr></thead>
+                    <tbody>${donated.map(d => `
+                        <tr>
+                            <td><strong>${d.title || d.auctionId || '—'}</strong></td>
+                            <td>${d.course || '—'}</td>
+                            <td>${d.winnerName || d.winnerEmail || '—'}</td>
+                            <td style="font-weight:700;">$${(d.amount || 0).toLocaleString()}</td>
+                            <td>${d.date || '—'}</td>
+                            <td style="color:#888;font-size:0.8rem;">${d.notes || '—'}</td>
+                        </tr>`).join('')}
+                    </tbody>
+                </table>`;
         }
 
         // ── Helpers ───────────────────────────────────────────────────────
