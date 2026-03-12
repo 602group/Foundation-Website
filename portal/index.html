@@ -533,7 +533,24 @@
                 if (trips.length === 0) {
                     body.innerHTML = emptyState('✈️', "You haven't registered for any trips or events yet.", '../travel-events.html', 'Browse Events');
                 } else {
-                    body.innerHTML = trips.map(t => bidRow('✈️', t.name, t.date || 'Date TBD', `../travel-events.html`, 'Registered', '#1a9e5c', '#e8f8f0')).join('');
+                    body.innerHTML = trips.map(t => {
+                        // Resolve the individual event page URL
+                        // Priority: explicit url → slug → id → fallback
+                        let eventUrl = '../travel-events.html';
+                        if (t.url) {
+                            // Already a full relative path stored
+                            eventUrl = t.url.startsWith('..') ? t.url : '../' + t.url;
+                        } else if (t.slug) {
+                            eventUrl = `../events/${t.slug}.html`;
+                        } else if (t.eventId || t.id) {
+                            eventUrl = `../events/${t.eventId || t.id}.html`;
+                        } else if (t.name) {
+                            // Build a slug from the event name as a last resort
+                            const slug = t.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+                            eventUrl = `../events/${slug}.html`;
+                        }
+                        return bidRow('✈️', t.name, t.date || 'Date TBD', eventUrl, 'Registered', '#1a9e5c', '#e8f8f0');
+                    }).join('');
                 }
 
             } else if (view === 'watchlist') {
