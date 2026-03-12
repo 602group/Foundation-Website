@@ -74,19 +74,30 @@ model VerificationToken {
 
 model Auction {
   id          String        @id @default(cuid())
+  internalId  String        @unique  // Human-readable serial: AUC-0001, AUC-0002 …
   title       String
   description String        @db.Text
   location    String
   images      String[]
+  startingBid Float         @default(0)
   currentBid  Float         @default(0)
   buyoutPrice Float?
   endDate     DateTime
   status      AuctionStatus @default(ACTIVE)
 
+  // GiveSmart mapping fields (server-side only — never sent to browser directly)
+  gsItemUrl   String?       // Full GiveSmart item bidding URL (powers Bid Now button)
+  gsItemId    String?       // GiveSmart item ID (for dedup + record linking)
+  gsEventId   String?       // GiveSmart event/fundraiser ID
+  gsLastSynced DateTime?    // Timestamp of last manual verify
+
   bids Bid[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([internalId])
+  @@index([gsItemId])
 }
 
 model Bid {

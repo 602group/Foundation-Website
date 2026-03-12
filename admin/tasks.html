@@ -350,21 +350,27 @@
 </head>
 
 <body>
-                    <aside class="sidebar">
+    <aside class="sidebar">
         <div class="sidebar-header">
             <a href="../index.html" class="logo">EPIC ADMIN</a>
         </div>
         <nav class="nav-links">
-            <a href="dashboard.html" class="nav-item" data-section="dashboard"><span class="nav-icon">📊</span> Dashboard</a>
-            <a href="auctions.html" class="nav-item" data-section="auctions"><span class="nav-icon">⛳</span> Auctions</a>
+            <a href="dashboard.html" class="nav-item" data-section="dashboard"><span class="nav-icon">📊</span>
+                Dashboard</a>
+            <a href="auctions.html" class="nav-item" data-section="auctions"><span class="nav-icon">⛳</span>
+                Auctions</a>
             <a href="users.html" class="nav-item" data-section="users"><span class="nav-icon">👥</span> Users</a>
-            <a href="events.html" class="nav-item" data-section="events"><span class="nav-icon">✈️</span> Events &amp; Trips</a>
-            <a href="messages.html" class="nav-item" data-section="messages"><span class="nav-icon">💬</span> Messages</a>
+            <a href="events.html" class="nav-item" data-section="events"><span class="nav-icon">✈️</span> Events &amp;
+                Trips</a>
+            <a href="messages.html" class="nav-item" data-section="messages"><span class="nav-icon">&#128172;</span> Messages <span class="nav-msg-badge" style="display:none;background:#e74c3c;color:#fff;border-radius:10px;padding:1px 6px;font-size:0.7rem;font-weight:700;margin-left:4px;"></span></a>
             <a href="tasks.html" class="nav-item active" data-section="tasks"><span class="nav-icon">✅</span> Tasks</a>
-            <a href="financials.html" class="nav-item" data-section="financials"><span class="nav-icon">📈</span> Financials</a>
-            <a href="newsletter.html" class="nav-item" data-section="newsletter"><span class="nav-icon">📧</span> Newsletter</a>
+            <a href="financials.html" class="nav-item" data-section="financials"><span class="nav-icon">📈</span>
+                Financials</a>
+            <a href="newsletter.html" class="nav-item" data-section="newsletter"><span class="nav-icon">📧</span>
+                Newsletter</a>
             <a href="bids.html" class="nav-item" data-section="bids"><span class="nav-icon">💰</span> Bids</a>
-            <a href="settings.html" class="nav-item" data-section="settings"><span class="nav-icon">⚙️</span> Settings</a>
+            <a href="settings.html" class="nav-item" data-section="settings"><span class="nav-icon">⚙️</span>
+                Settings</a>
         </nav>
         <div class="user-profile">
             <div class="avatar"></div>
@@ -413,6 +419,7 @@
                         <button class="ftab" onclick="setFilter('scheduled',this)">Scheduled</button>
                         <button class="ftab" onclick="setFilter('in_progress',this)">In Prog</button>
                         <button class="ftab" onclick="setFilter('completed',this)">Done</button>
+                        <button class="ftab" onclick="setFilter('linked',this)">&#128279; Linked</button>
                         <button class="ftab" onclick="setFilter('my',this)">Assigned to Me</button>
                     </div>
                     <div class="toolbar-right">
@@ -441,6 +448,7 @@
                                 <th style="width:50px"></th>
                                 <th>Category</th>
                                 <th>Task Title</th>
+                                <th>Linked To</th>
                                 <th>Due Date</th>
                                 <th>Assignee</th>
                                 <th>Status</th>
@@ -482,6 +490,7 @@
                         <option value="auction">Auction</option>
                         <option value="event">Event</option>
                         <option value="trip">Trip</option>
+                        <option value="user">User</option>
                     </select>
                 </div>
                 <div class="form-group">
@@ -502,6 +511,32 @@
                         <option value="in_progress">In Progress</option>
                         <option value="completed">Completed</option>
                     </select>
+                </div>
+            </div>
+            <!-- ── Link To Entity ──────────────────────────── -->
+            <div style="background:#f9f9f9;border:1px solid #eee;border-radius:10px;padding:1rem;margin-top:0.5rem;">
+                <div
+                    style="font-size:0.75rem;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;color:#888;margin-bottom:0.8rem;">
+                    &#128279; Link To (Optional)</div>
+                <div class="grid-2">
+                    <div class="form-group" style="margin-bottom:0.6rem;">
+                        <label>Entity Type</label>
+                        <select id="dEntityType" class="form-control" onchange="onEntityTypeChange()">
+                            <option value="">None</option>
+                            <option value="user">User</option>
+                            <option value="auction">Auction</option>
+                            <option value="event">Event</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="margin-bottom:0.6rem;">
+                        <label>Linked Record</label>
+                        <select id="dEntityId" class="form-control">
+                            <option value="">— select type first —</option>
+                        </select>
+                    </div>
+                </div>
+                <div id="dEntityBadge"
+                    style="display:none;margin-top:0.3rem;padding:0.4rem 0.8rem;background:#e0e7ff;border-radius:6px;font-size:0.8rem;font-weight:700;color:#3b3bb8;display:inline-flex;align-items:center;gap:0.4rem;">
                 </div>
             </div>
         </div>
@@ -610,16 +645,16 @@
             let list = allTasks;
 
             if (currentFilter === 'all') list = list.filter(t => t.status !== 'completed');
-            else if (currentFilter !== 'my') list = list.filter(t => t.status === currentFilter);
-            if (currentFilter === 'my') {
+            else if (currentFilter === 'linked') list = list.filter(t => t.entityId && t.status !== 'completed');
+            else if (currentFilter === 'my') {
                 let cuid = '';
                 try { cuid = AUTH.currentUser().id; } catch (e) { }
                 list = list.filter(t => t.assignedTo === cuid);
-            }
+            } else list = list.filter(t => t.status === currentFilter);
 
             const typeQ = document.getElementById('typeFilter').value;
             if (typeQ !== 'all') list = list.filter(t => t.category === typeQ);
-            if (q) list = list.filter(t => (t.title + t.desc).toLowerCase().includes(q));
+            if (q) list = list.filter(t => (t.title + t.desc + (t.entityLabel || '')).toLowerCase().includes(q));
 
             document.getElementById('sTotal').textContent = allTasks.length;
             document.getElementById('sTodo').textContent = allTasks.filter(t => t.status === 'todo').length;
@@ -628,9 +663,11 @@
 
             const tbody = document.getElementById('tasksTbody');
             if (!list.length) {
-                tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state">No tasks found.</div></td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state">No tasks found.</div></td></tr>`;
                 return;
             }
+
+            const entityColors = { user: '#f59e0b', auction: '#3b82f6', event: '#8b5cf6', trip: '#14b8a6' };
 
             tbody.innerHTML = list.map(t => {
                 const isDone = t.status === 'completed';
@@ -646,12 +683,23 @@
                     const dStr = new Date(t.date).toLocaleDateString();
                     const taskD = new Date(t.date); taskD.setHours(0, 0, 0, 0);
                     const today = new Date(); today.setHours(0, 0, 0, 0);
-                    if (taskD < today && !isDone) { dispDate = `⚠️ Past Due (${dStr})`; dateStyle = 'color:#e74c3c; font-weight:600;'; }
-                    else if (taskD.getTime() === today.getTime() && !isDone) { dispDate = `📅 Today`; dateStyle = 'color:#f39c12; font-weight:600;'; }
-                    else { dispDate = dStr; }
+                    if (taskD < today && !isDone) { dispDate = `&#9888;&#65039; Past Due (${dStr})`; dateStyle = 'color:#e74c3c;font-weight:600;'; }
+                    else if (taskD.getTime() === today.getTime() && !isDone) { dispDate = `&#128197; Today`; dateStyle = 'color:#f39c12;font-weight:600;'; }
+                    else dispDate = dStr;
                 }
 
                 const dispAssignee = assignedUsersMap[t.assignedTo] || 'Unassigned';
+
+                // Linked-to badge
+                let linkedBadge = '<span style="color:#ccc;font-size:0.78rem;">—</span>';
+                if (t.entityLabel && t.entityType) {
+                    const col = entityColors[t.entityType] || '#888';
+                    let href = '#';
+                    if (t.entityType === 'user') href = `user-profile.html?id=${t.entityId}`;
+                    else if (t.entityType === 'auction') href = `auctions.html`;
+                    else if (t.entityType === 'event') href = `events.html`;
+                    linkedBadge = `<a href="${href}" onclick="event.stopPropagation()" style="display:inline-flex;align-items:center;gap:4px;text-decoration:none;background:${col}18;color:${col};border-radius:6px;padding:2px 8px;font-size:0.75rem;font-weight:700;">&#128279; ${t.entityLabel}</a>`;
+                }
 
                 return `<tr class="${isDone ? 'row-done' : ''}" onclick="openDrawer('${t.id}')">
                     <td onclick="event.stopPropagation()">
@@ -660,7 +708,8 @@
                         </button>
                     </td>
                     <td><span class="cat-indicator ${catClass}"></span>${catName}</td>
-                    <td><strong>${t.title}</strong><br><small style="color:#888">${t.desc ? t.desc.slice(0, 50) + '...' : ''}</small></td>
+                    <td><strong>${t.title}</strong><br><small style="color:#888">${t.desc ? t.desc.slice(0, 60) + '...' : ''}</small></td>
+                    <td>${linkedBadge}</td>
                     <td style="${dateStyle}">${dispDate}</td>
                     <td>${dispAssignee}</td>
                     <td><span class="status-badge ${statColor}">${statLabel}</span></td>
@@ -668,7 +717,24 @@
             }).join('');
         }
 
-        function openDrawer(id = null) {
+        // ── Entity type/record pickers ─────────────────────────────────────────
+        function onEntityTypeChange() {
+            const type = document.getElementById('dEntityType').value;
+            const sel = document.getElementById('dEntityId');
+            sel.innerHTML = '<option value="">— select —</option>';
+            if (!type) return;
+            let records = [];
+            if (type === 'user') {
+                records = JSON.parse(localStorage.getItem('epic_users') || '[]').map(u => ({ id: u.id, label: `${u.firstName} ${u.lastName} (${u.email})` }));
+            } else if (type === 'auction') {
+                records = (typeof loadSharedAuctions === 'function' ? loadSharedAuctions() : []).map(a => ({ id: a.id, label: a.title }));
+            } else if (type === 'event') {
+                records = (typeof loadSharedEvents === 'function' ? loadSharedEvents() : []).map(e => ({ id: e.id, label: e.title }));
+            }
+            records.forEach(r => { const o = document.createElement('option'); o.value = r.id; o.textContent = r.label; sel.appendChild(o); });
+        }
+
+        function openDrawer(id = null, prefill = {}) {
             const el = i => document.getElementById(i);
             if (id) {
                 const t = allTasks.find(x => x.id === id);
@@ -681,17 +747,25 @@
                 el('dDate').value = t.date || '';
                 el('dAssignee').value = t.assignedTo || '';
                 el('dStatus').value = t.status || 'todo';
+                el('dEntityType').value = t.entityType || '';
+                onEntityTypeChange();
+                el('dEntityId').value = t.entityId || '';
                 el('btnDelete').style.display = 'block';
             } else {
                 el('dHeaderTitle').textContent = 'New Task';
                 el('dId').value = 'task_' + Date.now();
                 el('dIsAuto').value = '0';
-                el('dTitle').value = '';
-                el('dDesc').value = '';
-                el('dCategory').value = 'general';
+                el('dTitle').value = prefill.title || '';
+                el('dDesc').value = prefill.desc || '';
+                el('dCategory').value = prefill.category || 'general';
                 el('dDate').value = new Date().toISOString().split('T')[0];
                 el('dAssignee').value = '';
                 el('dStatus').value = 'todo';
+                el('dEntityType').value = prefill.entityType || '';
+                onEntityTypeChange();
+                setTimeout(() => {
+                    if (prefill.entityId) el('dEntityId').value = prefill.entityId;
+                }, 80);
                 el('btnDelete').style.display = 'none';
             }
             el('drawerOverlay').classList.add('open');
@@ -708,7 +782,25 @@
             const id = el('dId').value;
             let saved = {};
             try { saved = JSON.parse(localStorage.getItem(TASKS_KEY)) || {}; } catch (e) { }
-            const tObj = { title: el('dTitle').value.trim(), desc: el('dDesc').value.trim(), category: el('dCategory').value, date: el('dDate').value, assignedTo: el('dAssignee').value, status: el('dStatus').value };
+            // Resolve entity label
+            const eType = el('dEntityType').value;
+            const eId = el('dEntityId').value;
+            let eLabel = '';
+            if (eType && eId) {
+                const opt = el('dEntityId').querySelector(`option[value="${eId}"]`);
+                eLabel = opt ? opt.textContent : eId;
+            }
+            const tObj = {
+                title: el('dTitle').value.trim(),
+                desc: el('dDesc').value.trim(),
+                category: el('dCategory').value,
+                date: el('dDate').value,
+                assignedTo: el('dAssignee').value,
+                status: el('dStatus').value,
+                entityType: eType,
+                entityId: eId,
+                entityLabel: eLabel,
+            };
             if (el('dIsAuto').value !== '1') { tObj.id = id; tObj.isManual = true; }
             saved[id] = { ...saved[id], ...tObj };
             localStorage.setItem(TASKS_KEY, JSON.stringify(saved));
@@ -727,7 +819,30 @@
             refreshTasks();
         }
 
-        document.addEventListener('DOMContentLoaded', refreshTasks);
+        document.addEventListener('DOMContentLoaded', function() {
+            refreshTasks();
+            // Auto-open drawer pre-linked when arriving from auction/user page
+            var sp = new URLSearchParams(window.location.search);
+            var pType  = sp.get('prefillEntityType');
+            var pId    = sp.get('prefillEntityId');
+            var pLabel = sp.get('prefillEntityLabel');
+            if (pType && pId) {
+                setTimeout(function() {
+                    openDrawer(null, { entityType: pType, entityId: pId, entityLabel: pLabel || pId, category: pType });
+                }, 400);
+            }
+        });
+    
+        // Live unread-message badge
+        (function() {
+            try {
+                var msgs = JSON.parse(localStorage.getItem('epic_messages') || '[]');
+                var unread = msgs.filter(function(m){ return m.unread !== false && m.status !== 'closed'; }).length;
+                document.querySelectorAll('.nav-msg-badge').forEach(function(b){
+                    b.textContent = unread; b.style.display = unread > 0 ? 'inline-block' : 'none';
+                });
+            } catch(e) {}
+        })();
     </script>
 </body>
 

@@ -437,7 +437,7 @@
             <a href="auctions.html" class="nav-item" data-section="auctions"><span class="nav-icon">⛳</span> Auctions</a>
             <a href="users.html" class="nav-item active" data-section="users"><span class="nav-icon">👥</span> Users</a>
             <a href="events.html" class="nav-item" data-section="events"><span class="nav-icon">✈️</span> Events &amp; Trips</a>
-            <a href="messages.html" class="nav-item" data-section="messages"><span class="nav-icon">💬</span> Messages</a>
+            <a href="messages.html" class="nav-item" data-section="messages"><span class="nav-icon">&#128172;</span> Messages <span class="nav-msg-badge" style="display:none;background:#e74c3c;color:#fff;border-radius:10px;padding:1px 6px;font-size:0.7rem;font-weight:700;margin-left:4px;"></span></a>
             <a href="tasks.html" class="nav-item" data-section="tasks"><span class="nav-icon">✅</span> Tasks</a>
             <a href="financials.html" class="nav-item" data-section="financials"><span class="nav-icon">📈</span> Financials</a>
             <a href="newsletter.html" class="nav-item" data-section="newsletter"><span class="nav-icon">📧</span> Newsletter</a>
@@ -495,6 +495,7 @@
                     <button class="profile-tab" onclick="switchTab('trips', this)">✈️ Trips & Events</button>
                     <button class="profile-tab" onclick="switchTab('activity', this)">📋 Activity</button>
                     <button class="profile-tab" onclick="switchTab('donated', this)">🎁 Donated Rounds</button>
+                    <button class="profile-tab" onclick="switchTab('tasks', this)">&#9989; Tasks</button>
                 </div>
             </div>
 
@@ -725,6 +726,18 @@
                 </div>
             </div>
 
+            <!-- ═══════ TASKS TAB ═══════ -->
+            <div class="tab-card-wrap">
+                <div class="panel" id="panel-tasks" style="padding:1.6rem">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
+                        <h3 style="font-size:1rem;font-weight:700;margin:0;">&#9989; Tasks</h3>
+                        <button onclick="openUserLinkedTask()" style="padding:0.4rem 0.9rem;background:#000;color:#fff;border:none;border-radius:7px;font-size:0.82rem;font-weight:700;cursor:pointer;font-family:'Poppins',sans-serif;">+ Add Task</button>
+                    </div>
+                    <p style="font-size:0.8rem;color:#888;margin-bottom:1rem;">All tasks linked to this member's profile.</p>
+                    <div id="userTasksList"></div>
+                </div>
+            </div>
+
         </div><!-- /content-wrapper -->
     </div><!-- /main-content -->
 
@@ -751,6 +764,7 @@
             renderTripsTab();
             renderActivityTab();
             renderDonatedTab();
+            renderUserTasks();
         }
 
         // ── Hero ──────────────────────────────────────────────────────────
@@ -1069,8 +1083,49 @@
                 </div>`).join('');
         }
 
+        // ── User Tasks tab ───────────────────────────────────────────────────
+        function renderUserTasks() {
+            const u = currentUser;
+            if (!u) return;
+            const TASKS_KEY = 'epic_tasks';
+            let saved = {};
+            try { saved = JSON.parse(localStorage.getItem(TASKS_KEY)) || {}; } catch(e) {}
+            const linked = Object.values(saved).filter(function(t) { return t.entityId === u.id && !t.deleted; });
+            const el = document.getElementById('userTasksList');
+            if (!el) return;
+            if (!linked.length) {
+                el.innerHTML = '<div class="empty-msg"><div class="em-icon">&#9989;</div>No tasks linked to this member yet.<br><small style="color:#bbb;font-size:0.78rem;">Click &ldquo;+ Add Task&rdquo; above to link a task to this user.</small></div>';
+                return;
+            }
+            const scMap = { todo:'#f39c12', scheduled:'#3498db', in_progress:'#3b82f6', completed:'#10b981' };
+            const slMap = { todo:'To Do', scheduled:'Scheduled', in_progress:'In Progress', completed:'Completed' };
+            const todayStr = new Date().toISOString().split('T')[0];
+            el.innerHTML = linked.map(function(t) {
+                const c  = scMap[t.status] || '#888';
+                const l  = slMap[t.status] || t.status;
+                const d  = t.date ? new Date(t.date).toLocaleDateString() : '—';
+                const past = t.date && t.date < todayStr && t.status !== 'completed';
+                return '<div class="info-row" style="align-items:flex-start;padding:0.8rem 0;border-bottom:1px solid #f5f5f5;">' +
+                    '<span class="key" style="display:flex;flex-direction:column;gap:3px;">' +
+                        '<strong style="font-size:0.88rem;">' + t.title + '</strong>' +
+                        (t.desc ? '<small style="color:#999;font-weight:400;">' + t.desc.slice(0,90) + '</small>' : '') +
+                        '<small style="color:' + (past ? '#e74c3c' : '#aaa') + ';font-weight:400;">Due: ' + (past ? '&#9888; ' : '') + d + '</small>' +
+                    '</span>' +
+                    '<span style="flex-shrink:0;padding:3px 12px;border-radius:10px;font-size:0.72rem;font-weight:700;background:' + c + '20;color:' + c + ';">' + l + '</span>' +
+                '</div>';
+            }).join('');
+        }
+
+        function openUserLinkedTask() {
+            if (!currentUser) return;
+            var label = ((currentUser.firstName || '') + ' ' + (currentUser.lastName || '')).trim();
+            var url = 'tasks.html?prefillEntityType=user&prefillEntityId=' + encodeURIComponent(currentUser.id) + '&prefillEntityLabel=' + encodeURIComponent(label);
+            window.open(url, '_blank');
+        }
+
         // ── Donated Rounds tab ───────────────────────────────────────────
         function renderDonatedTab() {
+
             const donated = (currentUser.donatedRounds || []);
             const el = document.getElementById('donatedContent');
             if (!donated.length) {
@@ -1118,6 +1173,7 @@
 
         function switchTab(name, btn) {
             document.querySelectorAll('.profile-tab').forEach(t => t.classList.remove('active'));
+            if (name === 'tasks') renderUserTasks();
             document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
             btn.classList.add('active');
             document.getElementById('panel-' + name).classList.add('active');
@@ -1133,6 +1189,17 @@
         });
 
         loadUser();
+    
+        // Live unread-message badge
+        (function() {
+            try {
+                var msgs = JSON.parse(localStorage.getItem('epic_messages') || '[]');
+                var unread = msgs.filter(function(m){ return m.unread !== false && m.status !== 'closed'; }).length;
+                document.querySelectorAll('.nav-msg-badge').forEach(function(b){
+                    b.textContent = unread; b.style.display = unread > 0 ? 'inline-block' : 'none';
+                });
+            } catch(e) {}
+        })();
     </script>
 </body>
 

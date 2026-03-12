@@ -13,17 +13,37 @@ async function createAuction(formData: FormData) {
     const startingBidStr = formData.get("startingBid") as string;
     const endDateStr = formData.get("endDate") as string;
     const imageUrl = formData.get("imageUrl") as string;
+    const gsItemUrl = (formData.get("gsItemUrl") as string) || null;
+    const gsItemId  = (formData.get("gsItemId")  as string) || null;
+    const gsEventId = (formData.get("gsEventId") as string) || null;
+
+    // Auto-generate sequential internalId
+    const last = await db.auction.findFirst({
+        orderBy: { internalId: 'desc' },
+        select: { internalId: true },
+    });
+    let nextNum = 1;
+    if (last?.internalId) {
+        const n = parseInt(last.internalId.replace('AUC-', ''), 10);
+        if (!isNaN(n)) nextNum = n + 1;
+    }
+    const internalId = `AUC-${String(nextNum).padStart(4, '0')}`;
 
     await db.auction.create({
         data: {
+            internalId,
             title,
             description,
             location,
             images: imageUrl ? [imageUrl] : [],
-            currentBid: Number(startingBidStr),
+            startingBid: Number(startingBidStr) || 0,
+            currentBid: Number(startingBidStr) || 0,
             buyoutPrice: buyoutPriceStr ? Number(buyoutPriceStr) : null,
             endDate: new Date(endDateStr),
             status: "ACTIVE",
+            gsItemUrl,
+            gsItemId,
+            gsEventId,
         },
     });
 

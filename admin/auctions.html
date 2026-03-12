@@ -1332,8 +1332,7 @@
             <a href="users.html" class="nav-item" data-section="users"><span class="nav-icon">👥</span> Users</a>
             <a href="events.html" class="nav-item" data-section="events"><span class="nav-icon">✈️</span> Events &amp;
                 Trips</a>
-            <a href="messages.html" class="nav-item" data-section="messages"><span class="nav-icon">💬</span>
-                Messages</a>
+            <a href="messages.html" class="nav-item" data-section="messages"><span class="nav-icon">&#128172;</span> Messages <span class="nav-msg-badge" style="display:none;background:#e74c3c;color:#fff;border-radius:10px;padding:1px 6px;font-size:0.7rem;font-weight:700;margin-left:4px;"></span></a>
             <a href="tasks.html" class="nav-item" data-section="tasks"><span class="nav-icon">✅</span> Tasks</a>
             <a href="financials.html" class="nav-item" data-section="financials"><span class="nav-icon">📈</span>
                 Financials</a>
@@ -1465,6 +1464,7 @@
             <button class="drawer-tab" onclick="switchTab('pricing', this)">Pricing</button>
             <button class="drawer-tab" onclick="switchTab('images', this)">Images</button>
             <button class="drawer-tab" onclick="switchTab('bids', this)">Bids</button>
+            <button class="drawer-tab" onclick="switchTab('tasks', this)">&#9989; Tasks</button>
             <button class="drawer-tab" onclick="switchTab('preview', this)">Preview</button>
         </div>
         <div class="drawer-body">
@@ -1543,22 +1543,52 @@
                         </div>
                     </div>
 
-                    <!-- External Bidding -->
+                    <!-- ══ GiveSmart Integration ══ -->
                     <div class="form-section"
-                        style="margin-top:1rem;background:#f0f7ff;border-radius:10px;padding:1rem 1.1rem;border:1.5px solid #c3d9f7;">
-                        <div class="form-section-title" style="color:#4A90E2;">🔗 External Bidding Platform</div>
-                        <div class="form-group">
-                            <label>Bid Now URL <span style="font-weight:400;color:#4A90E2;">(powers the Bid Now button
-                                    on the public page)</span></label>
-                            <input type="url" id="admin-thirdPartyUrl"
-                                placeholder="https://auction.platform.com/item/12345">
+                        style="margin-top:1rem;background:#f5f3ff;border-radius:10px;padding:1.1rem 1.2rem;border:1.5px solid #c4b5fd;grid-column:1/-1;">
+                        <div class="form-section-title" style="color:#6d28d9;display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
+                            <span>&#127970; GiveSmart Integration</span>
+                            <button type="button" id="gsVerifyBtn"
+                                onclick="verifyGiveSmart()"
+                                style="padding:0.3rem 0.8rem;background:#6d28d9;color:#fff;border:none;border-radius:6px;font-size:0.76rem;font-weight:700;cursor:pointer;font-family:'Poppins',sans-serif;">
+                                &#10003; Verify URL
+                            </button>
                         </div>
-                        <div class="form-group" style="margin-top:0.6rem;">
-                            <label>External Auction / Platform ID</label>
-                            <input type="text" id="admin-externalAuctionId"
-                                placeholder="Platform-specific item ID e.g. LOT-4821">
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+                            <!-- Internal ID (read-only) -->
+                            <div class="form-group" style="grid-column:1/-1;">
+                                <label style="color:#6d28d9;">Internal Auction ID <span style="font-weight:400;color:#888;">(auto-generated — read only)</span></label>
+                                <input type="text" id="gs-internalId" readonly placeholder="AUC-0001"
+                                    style="background:#ede9fe;color:#5b21b6;font-weight:700;cursor:default;border-color:#c4b5fd;">
+                            </div>
+                            <!-- GiveSmart Item URL -->
+                            <div class="form-group" style="grid-column:1/-1;">
+                                <label style="color:#6d28d9;">GiveSmart Item URL <span style="font-weight:400;color:#888;">(powers the Bid Now button)</span></label>
+                                <input type="url" id="gs-itemUrl"
+                                    placeholder="https://fundraise.givesmart.com/e/…/items/…"
+                                    style="border-color:#c4b5fd;">
+                            </div>
+                            <!-- GiveSmart Item ID -->
+                            <div class="form-group">
+                                <label style="color:#6d28d9;">GiveSmart Item ID</label>
+                                <input type="text" id="gs-itemId" placeholder="e.g. 12345"
+                                    style="border-color:#c4b5fd;">
+                            </div>
+                            <!-- GiveSmart Event ID -->
+                            <div class="form-group">
+                                <label style="color:#6d28d9;">GiveSmart Event ID</label>
+                                <input type="text" id="gs-eventId" placeholder="e.g. 7236527"
+                                    style="border-color:#c4b5fd;">
+                            </div>
                         </div>
+                        <!-- Verify status message -->
+                        <div id="gsVerifyStatus" style="margin-top:0.6rem;font-size:0.78rem;font-weight:600;display:none;"></div>
+                        <p style="font-size:0.75rem;color:#7c3aed;margin-top:0.6rem;">
+                            &#128274; The GiveSmart private key is stored securely on the server. It is never sent to the browser.
+                        </p>
                     </div>
+                </div>
+
                 </div>
 
                 <!-- General Notes — full width -->
@@ -1843,6 +1873,17 @@
             </div>
 
             <!-- PREVIEW TAB -->
+            <!-- ═══════ TASKS TAB ═══════ -->
+            <div class="drawer-panel" id="panel-tasks">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
+                    <div style="font-weight:700;font-size:0.92rem;">Tasks Linked to This Auction</div>
+                    <button id="auctionAddTaskBtn"
+                        style="padding:0.4rem 0.9rem;background:#000;color:#fff;border:none;border-radius:7px;font-size:0.82rem;font-weight:700;cursor:pointer;font-family:'Poppins',sans-serif;"
+                        onclick="openLinkedTaskForm()">+ Add Task</button>
+                </div>
+                <div id="auction-tasks-list"></div>
+            </div>
+
             <div class="drawer-panel" id="panel-preview">
                 <div class="form-section">
                     <div class="form-section-title">Listing Card Preview</div>
@@ -1878,7 +1919,11 @@
 
         <div class="drawer-footer">
             <button class="btn-secondary" onclick="closeDrawer()">Cancel</button>
-            <button class="btn-primary" onclick="saveAuction()">💾 Save Auction</button>
+            <button style="padding:0.55rem 1.1rem;background:#f0fdf4;color:#166534;border:1.5px solid #bbf7d0;border-radius:8px;font-size:0.85rem;font-weight:700;cursor:pointer;font-family:'Poppins',sans-serif;margin-right:auto;"
+                onclick="createFollowUpTask()" title="Create a follow-up task linked to this auction">
+                &#128203; Follow Up Reminder
+            </button>
+            <button class="btn-primary" onclick="saveAuction()">&#128190; Save Auction</button>
         </div>
     </div>
 
@@ -2330,6 +2375,13 @@
             setVal('admin-status', a.status);
             setVal('admin-thirdPartyUrl', a.thirdPartyUrl || a.bidUrl || '');
             setVal('admin-externalAuctionId', a.externalAuctionId || '');
+            // GiveSmart mapping fields
+            setVal('gs-internalId', a.internalId || '');
+            setVal('gs-itemUrl',    a.gsItemUrl   || a.thirdPartyUrl || a.bidUrl || '');
+            setVal('gs-itemId',     a.gsItemId    || a.externalAuctionId || '');
+            setVal('gs-eventId',    a.gsEventId   || '');
+            var gsStatus = document.getElementById('gsVerifyStatus');
+            if (gsStatus) { gsStatus.style.display = 'none'; }
             populateUserSearchDisplay(a);
             setVal('admin-course', a.course || a.location || '');
             setVal('admin-donor', a.donor || a.donorName || '');
@@ -2461,7 +2513,139 @@
             document.getElementById('panel-' + tab).classList.add('active');
             btn.classList.add('active');
             if (tab === 'preview') updatePreview();
+            if (tab === 'tasks') renderAuctionTasks();
         }
+
+        // ── Linked Tasks panel ─────────────────────────────────────────────────
+        function renderAuctionTasks() {
+            if (!editingId) return;
+            const TASKS_KEY = 'epic_tasks';
+            let saved = {};
+            try { saved = JSON.parse(localStorage.getItem(TASKS_KEY)) || {}; } catch (e) { }
+            const linked = Object.values(saved).filter(t => t.entityId === editingId && !t.deleted);
+            const el = document.getElementById('auction-tasks-list');
+            if (!el) return;
+            if (!linked.length) {
+                el.innerHTML = '<div style="padding:2rem;text-align:center;color:#ccc;font-size:0.85rem;">No tasks linked to this auction yet.</div>';
+                return;
+            }
+            const statColors = { todo: '#f39c12', scheduled: '#3498db', in_progress: '#3b82f6', completed: '#10b981' };
+            const statLabels = { todo: 'To Do', scheduled: 'Scheduled', in_progress: 'In Progress', completed: 'Completed' };
+            el.innerHTML = linked.map(t => {
+                const sc = statColors[t.status] || '#888';
+                const sl = statLabels[t.status] || t.status;
+                const dueStr = t.date ? new Date(t.date).toLocaleDateString() : '—';
+                const isPast = t.date && t.date < new Date().toISOString().split('T')[0] && t.status !== 'completed';
+                return `<div style="display:flex;align-items:flex-start;justify-content:space-between;padding:0.75rem 0;border-bottom:1px solid #f5f5f5;gap:1rem;">
+                    <div>
+                        <div style="font-weight:600;font-size:0.87rem;">${t.title}</div>
+                        ${t.desc ? `<div style="font-size:0.78rem;color:#999;margin-top:2px;">${t.desc.slice(0, 80)}</div>` : ''}
+                        <div style="font-size:0.76rem;color:${isPast ? '#e74c3c' : '#aaa'};margin-top:3px;">Due: ${isPast ? '&#9888; ' : ''} ${dueStr}</div>
+                    </div>
+                    <span style="flex-shrink:0;padding:3px 10px;border-radius:10px;font-size:0.72rem;font-weight:700;background:${sc}20;color:${sc};">${sl}</span>
+                </div>`;
+            }).join('');
+        }
+
+        function openLinkedTaskForm() {
+            if (!editingId) return;
+            const auctions = loadSharedAuctions();
+            const a = auctions.find(x => x.id === editingId);
+            const label = a ? a.title : editingId;
+            const url = `tasks.html?prefillEntityType=auction&prefillEntityId=${encodeURIComponent(editingId)}&prefillEntityLabel=${encodeURIComponent(label)}`;
+            window.open(url, '_blank');
+        }
+
+        // ── Follow Up Reminder — creates task inline ──────────────────────────
+        function createFollowUpTask() {
+            if (!editingId) return;
+            const auctions = loadSharedAuctions();
+            const a = auctions.find(x => x.id === editingId);
+            const aTitle = a ? a.title : editingId;
+            // Build task
+            const TASKS_KEY = 'epic_tasks';
+            let saved = {};
+            try { saved = JSON.parse(localStorage.getItem(TASKS_KEY)) || {}; } catch(e) {}
+            const taskId = 'task_' + Date.now();
+            const today  = new Date().toISOString().split('T')[0];
+            // Default due tomorrow
+            const tomorrow = new Date(Date.now() + 86400000).toISOString().split('T')[0];
+            saved[taskId] = {
+                id:          taskId,
+                title:       'Follow Up: ' + aTitle,
+                desc:        'Created from auction record. Add follow-up notes here.',
+                category:    'auction',
+                status:      'todo',
+                date:        tomorrow,
+                assignedTo:  '',
+                entityType:  'auction',
+                entityId:    editingId,
+                entityLabel: aTitle,
+                isManual:    true,
+                createdAt:   new Date().toISOString()
+            };
+            localStorage.setItem(TASKS_KEY, JSON.stringify(saved));
+            // Refresh tasks panel if currently visible
+            renderAuctionTasks();
+            // Switch to Tasks tab to confirm
+            const tasksTabBtn = document.querySelector('.drawer-tab[onclick*="tasks"]');
+            if (tasksTabBtn) switchTab('tasks', tasksTabBtn);
+            // Toast
+            showToast('&#128203; Follow-up task created and linked to this auction.');
+        }
+
+        // ── verifyGiveSmart — calls our server-side API, private key never in browser ──
+        async function verifyGiveSmart() {
+            var itemUrl = document.getElementById('gs-itemUrl').value.trim();
+            var itemId  = document.getElementById('gs-itemId').value.trim();
+            if (!itemUrl) {
+                showGsStatus('Please enter a GiveSmart Item URL first.', '#dc2626');
+                return;
+            }
+            var btn = document.getElementById('gsVerifyBtn');
+            btn.textContent = '⏳ Verifying…'; btn.disabled = true;
+            try {
+                var res = await fetch('/api/givesmart/verify', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ itemUrl: itemUrl, itemId: itemId || undefined })
+                });
+                var data = await res.json();
+                if (data.ok) {
+                    showGsStatus('✅ URL verified and reachable. Last checked: ' + new Date().toLocaleTimeString(), '#166534');
+                    // Auto-fill Event ID from env if blank
+                    var evtEl = document.getElementById('gs-eventId');
+                    if (evtEl && !evtEl.value) evtEl.value = '7236527';
+                } else {
+                    showGsStatus('⚠️ ' + (data.message || 'Could not verify URL.'), '#b45309');
+                }
+            } catch(e) {
+                showGsStatus('❌ Server error: ' + e.message, '#dc2626');
+            }
+            btn.textContent = '✓ Verify URL'; btn.disabled = false;
+        }
+
+        function showGsStatus(msg, color) {
+            var el = document.getElementById('gsVerifyStatus');
+            if (!el) return;
+            el.textContent = msg; el.style.color = color; el.style.display = 'block';
+        }
+
+                function showToast(msg) {
+            let toast = document.getElementById('epicToast');
+            if (!toast) {
+                toast = document.createElement('div');
+                toast.id = 'epicToast';
+                toast.style.cssText = 'position:fixed;bottom:2rem;left:50%;transform:translateX(-50%);background:#222;color:#fff;padding:0.8rem 1.5rem;border-radius:10px;font-size:0.85rem;font-weight:600;font-family:\'Poppins\',sans-serif;z-index:9999;box-shadow:0 4px 20px rgba(0,0,0,0.25);transition:opacity 0.3s;';
+                document.body.appendChild(toast);
+            }
+            toast.innerHTML = msg;
+            toast.style.opacity = '1';
+            clearTimeout(toast._timer);
+            toast._timer = setTimeout(() => { toast.style.opacity = '0'; }, 3000);
+        }
+
+
 
         function setVal(id, val) {
             const el = document.getElementById(id);
@@ -2642,8 +2826,13 @@
                 extension: parseInt(getVal('edit-extension')) || 2,
                 images: [..._drawerImages],
                 mapAddress: getVal('edit-mapAddress'),
-                thirdPartyUrl: getVal('admin-thirdPartyUrl'),
-                externalAuctionId: getVal('admin-externalAuctionId'),
+                thirdPartyUrl: getVal('gs-itemUrl') || getVal('admin-thirdPartyUrl'),
+                externalAuctionId: getVal('gs-itemId') || getVal('admin-externalAuctionId'),
+                // GiveSmart canonical fields
+                gsItemUrl:   getVal('gs-itemUrl'),
+                gsItemId:    getVal('gs-itemId'),
+                gsEventId:   getVal('gs-eventId'),
+                internalId:  getVal('gs-internalId'),
             };
 
             const savedAuction = auctions[idx];
@@ -3503,6 +3692,17 @@
             a.download = 'epic-auctions-import-template.csv';
             a.click();
         }
+    
+        // Live unread-message badge
+        (function() {
+            try {
+                var msgs = JSON.parse(localStorage.getItem('epic_messages') || '[]');
+                var unread = msgs.filter(function(m){ return m.unread !== false && m.status !== 'closed'; }).length;
+                document.querySelectorAll('.nav-msg-badge').forEach(function(b){
+                    b.textContent = unread; b.style.display = unread > 0 ? 'inline-block' : 'none';
+                });
+            } catch(e) {}
+        })();
     </script>
 
     <!-- ── CSV IMPORT MODAL ──────────────────────────────────────────── -->

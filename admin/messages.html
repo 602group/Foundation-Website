@@ -372,7 +372,7 @@
             <a href="auctions.html" class="nav-item" data-section="auctions"><span class="nav-icon">⛳</span> Auctions</a>
             <a href="users.html" class="nav-item" data-section="users"><span class="nav-icon">👥</span> Users</a>
             <a href="events.html" class="nav-item" data-section="events"><span class="nav-icon">✈️</span> Events &amp; Trips</a>
-            <a href="messages.html" class="nav-item active" data-section="messages"><span class="nav-icon">💬</span> Messages</a>
+            <a href="messages.html" class="nav-item active" data-section="messages"><span class="nav-icon">&#128172;</span> Messages <span id="msgUnreadBadge" style="display:none;background:#e74c3c;color:#fff;border-radius:10px;padding:1px 6px;font-size:0.7rem;font-weight:700;margin-left:4px;"></span></a>
             <a href="tasks.html" class="nav-item" data-section="tasks"><span class="nav-icon">✅</span> Tasks</a>
             <a href="financials.html" class="nav-item" data-section="financials"><span class="nav-icon">📈</span> Financials</a>
             <a href="newsletter.html" class="nav-item" data-section="newsletter"><span class="nav-icon">📧</span> Newsletter</a>
@@ -543,44 +543,17 @@
             document.getElementById('statClosed').textContent = all.filter(m => m.status === 'closed').length;
         }
 
+        function updateMsgBadge() {
+            const unreadCount = loadMsgs().filter(m => m.unread !== false && m.status !== 'closed').length;
+            const badge = document.getElementById('msgUnreadBadge');
+            if (badge) { badge.textContent = unreadCount; badge.style.display = unreadCount > 0 ? 'inline-block' : 'none'; }
+        }
+
         function renderTable() {
-
-        // --- SEED TEST DATA FOR FORMS ---
-        try {
-            let existing = JSON.parse(localStorage.getItem('epic_messages') || '[]');
-            const hasTestAuction = existing.some(m => m.source === 'auction_request_form' && m.email === 'test@example.com');
-            const hasTestTravel = existing.some(m => m.source === 'travel_preference_form' && m.email === 'test@example.com');
-            let added = false;
-
-            if (!hasTestAuction) {
-                existing.unshift({
-                    id: 'msg_test_auc_' + Date.now(),
-                    firstName: 'Test', lastName: 'Member', email: 'test@example.com', phone: '555-1234',
-                    subject: 'auction',
-                    message: `⛳ Course / Destination: Augusta National\n🗓 Timeframe: Within 3 months\n💰 Budget: $10,000 – $25,000\n📝 Notes: Need a foursome for client entertainment.`,
-                    receivedAt: new Date(Date.now() - 3600000).toISOString(),
-                    status: 'new', unread: true, source: 'auction_request_form', memberId: null
-                });
-                added = true;
-            }
-            if (!hasTestTravel) {
-                existing.unshift({
-                    id: 'msg_test_trav_' + Date.now(),
-                    firstName: 'Travel', lastName: 'Tester', email: 'test@example.com', phone: '',
-                    subject: 'events',
-                    message: `🌍 Destination: Scotland\n🗓 Season: Summer\n💰 Budget/person: $5,000 – $10,000\n👥 Group Size: 8\n🧳 Guests: Yes\n📝 Notes: Looking for a St Andrews package.`,
-                    receivedAt: new Date(Date.now() - 7200000).toISOString(),
-                    status: 'new', unread: true, source: 'travel_preference_form', memberId: null
-                });
-                added = true;
-            }
-            if (added) localStorage.setItem('epic_messages', JSON.stringify(existing));
-        } catch(e) { console.error('Seed error:', e); }
-        // --------------------------------
-
             const all = loadMsgs();
             const q = document.getElementById('searchInput').value.toLowerCase();
             renderStats(all);
+            updateMsgBadge();
 
             let list = all.slice().sort((a, b) => new Date(b.receivedAt) - new Date(a.receivedAt));
             if (currentFilter !== 'all') list = list.filter(m => m.status === currentFilter);
@@ -697,15 +670,30 @@
             renderTable();
         }
 
-        (function seedDemo() {
-            const existing = loadMsgs();
-            if (existing.length === 0) {
-                saveMsgs([{
-                    id: 'msg_demo_001', firstName: 'Michael', lastName: 'Torres', email: 'm.torres@example.com', phone: '(555) 382-9910',
-                    subject: 'auction', message: 'Hi, I\\'m interested in bidding on the Pebble Beach round.Can you tell me more about how the auction works and when bidding opens? I\\'d also love to know if there are membership benefits for frequent bidders.',
-                    status: 'new', unread: true, receivedAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(), notes: ''
-                }]);
+        // One-time seed: runs once on load only
+        (function seedOnce() {
+            var msgs = loadMsgs();
+            if (msgs.length === 0) {
+                msgs.push({ id: 'msg_demo_001', firstName: 'Michael', lastName: 'Torres',
+                    email: 'm.torres@example.com', phone: '(555) 382-9910', subject: 'auction',
+                    message: 'Hi, I am interested in bidding on the Pebble Beach round. Can you tell me more about how the auction works?',
+                    status: 'new', unread: true, receivedAt: new Date(Date.now() - 2 * 3600000).toISOString(), notes: '', source: 'contact_form' });
             }
+            var hasTestAuc  = msgs.some(function(m){ return m.source === 'auction_request_form'  && m.email === 'test@example.com'; });
+            var hasTestTrav = msgs.some(function(m){ return m.source === 'travel_preference_form' && m.email === 'test@example.com'; });
+            if (!hasTestAuc) {
+                msgs.unshift({ id: 'msg_test_auc_001', firstName: 'Test', lastName: 'Member',
+                    email: 'test@example.com', phone: '555-1234', subject: 'auction',
+                    message: 'Course: Augusta National. Timeframe: 3 months. Budget: $10k+. Notes: Client foursome.',
+                    receivedAt: new Date(Date.now() - 3600000).toISOString(), status: 'new', unread: true, source: 'auction_request_form', notes: '' });
+            }
+            if (!hasTestTrav) {
+                msgs.unshift({ id: 'msg_test_trav_001', firstName: 'Travel', lastName: 'Tester',
+                    email: 'test@example.com', phone: '', subject: 'events',
+                    message: 'Destination: Scotland. Season: Summer. Budget: $5k-$10k. Group: 8. Notes: St Andrews.',
+                    receivedAt: new Date(Date.now() - 7200000).toISOString(), status: 'new', unread: true, source: 'travel_preference_form', notes: '' });
+            }
+            saveMsgs(msgs);
         })();
 
         document.addEventListener('DOMContentLoaded', renderTable);

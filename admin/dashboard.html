@@ -123,21 +123,27 @@
 
 <body>
     <!-- Sidebar -->
-                    <aside class="sidebar">
+    <aside class="sidebar">
         <div class="sidebar-header">
             <a href="../index.html" class="logo">EPIC ADMIN</a>
         </div>
         <nav class="nav-links">
-            <a href="dashboard.html" class="nav-item active" data-section="dashboard"><span class="nav-icon">📊</span> Dashboard</a>
-            <a href="auctions.html" class="nav-item" data-section="auctions"><span class="nav-icon">⛳</span> Auctions</a>
+            <a href="dashboard.html" class="nav-item active" data-section="dashboard"><span class="nav-icon">📊</span>
+                Dashboard</a>
+            <a href="auctions.html" class="nav-item" data-section="auctions"><span class="nav-icon">⛳</span>
+                Auctions</a>
             <a href="users.html" class="nav-item" data-section="users"><span class="nav-icon">👥</span> Users</a>
-            <a href="events.html" class="nav-item" data-section="events"><span class="nav-icon">✈️</span> Events &amp; Trips</a>
-            <a href="messages.html" class="nav-item" data-section="messages"><span class="nav-icon">💬</span> Messages</a>
+            <a href="events.html" class="nav-item" data-section="events"><span class="nav-icon">✈️</span> Events &amp;
+                Trips</a>
+            <a href="messages.html" class="nav-item" data-section="messages"><span class="nav-icon">&#128172;</span> Messages <span class="nav-msg-badge" style="display:none;background:#e74c3c;color:#fff;border-radius:10px;padding:1px 6px;font-size:0.7rem;font-weight:700;margin-left:4px;"></span></a>
             <a href="tasks.html" class="nav-item" data-section="tasks"><span class="nav-icon">✅</span> Tasks</a>
-            <a href="financials.html" class="nav-item" data-section="financials"><span class="nav-icon">📈</span> Financials</a>
-            <a href="newsletter.html" class="nav-item" data-section="newsletter"><span class="nav-icon">📧</span> Newsletter</a>
+            <a href="financials.html" class="nav-item" data-section="financials"><span class="nav-icon">📈</span>
+                Financials</a>
+            <a href="newsletter.html" class="nav-item" data-section="newsletter"><span class="nav-icon">📧</span>
+                Newsletter</a>
             <a href="bids.html" class="nav-item" data-section="bids"><span class="nav-icon">💰</span> Bids</a>
-            <a href="settings.html" class="nav-item" data-section="settings"><span class="nav-icon">⚙️</span> Settings</a>
+            <a href="settings.html" class="nav-item" data-section="settings"><span class="nav-icon">⚙️</span>
+                Settings</a>
         </nav>
         <div class="user-profile">
             <div class="avatar"></div>
@@ -158,74 +164,75 @@
         </header>
 
         <div class="content-wrapper">
-            <!-- Stats Cards -->
+            <!-- Stats Cards — all clickable -->
             <div class="stats-grid">
-                <div class="stat-card">
+                <a href="financials.html" class="stat-card" style="text-decoration:none;color:inherit;cursor:pointer;">
                     <span class="stat-label">Total Raised</span>
                     <span class="stat-value" id="dash-total-raised">$0</span>
                     <span class="stat-change neutral" id="dash-raised-sub">From all won auctions</span>
-                </div>
-                <div class="stat-card">
-                    <span class="stat-label">Active Auctions</span>
+                </a>
+                <a href="auctions.html" class="stat-card" style="text-decoration:none;color:inherit;cursor:pointer;">
+                    <span class="stat-label">Open Auctions</span>
                     <span class="stat-value" id="dash-active-auctions">0</span>
                     <span class="stat-change neutral" id="dash-auctions-sub">Currently live</span>
-                </div>
-                <div class="stat-card">
-                    <span class="stat-label">Total Bids Placed</span>
-                    <span class="stat-value" id="dash-total-bids">0</span>
-                    <span class="stat-change neutral" id="dash-bids-sub">Across all auctions</span>
-                </div>
-                <div class="stat-card">
+                </a>
+                <a href="events.html" class="stat-card" style="text-decoration:none;color:inherit;cursor:pointer;">
+                    <span class="stat-label">Active Events</span>
+                    <span class="stat-value" id="dash-active-events">0</span>
+                    <span class="stat-change neutral" id="dash-events-sub">Trips & events</span>
+                </a>
+                <a href="users.html" class="stat-card" style="text-decoration:none;color:inherit;cursor:pointer;">
                     <span class="stat-label">Total Members</span>
                     <span class="stat-value" id="dash-total-users">0</span>
                     <span class="stat-change neutral" id="dash-users-sub">Registered accounts</span>
-                </div>
+                </a>
             </div>
 
             <!-- Two-column lower section -->
             <div class="dash-grid">
-                <!-- Recent Bids -->
-                <div class="dash-panel">
+                <!-- Today's Tasks -->
+                <div class="dash-panel" onclick="window.location.href='tasks.html'" style="cursor:pointer;">
                     <div class="dash-panel-title">
-                        Recent Bids
-                        <a href="bids.html">View All →</a>
+                        ✅ Top Tasks for Today
+                        <a href="tasks.html" onclick="event.stopPropagation()">View All →</a>
                     </div>
-                    <div id="dash-recent-bids"></div>
+                    <div id="dash-today-tasks"></div>
                 </div>
 
                 <!-- Recent Signups -->
-                <div class="dash-panel">
+                <div class="dash-panel" onclick="window.location.href='users.html'" style="cursor:pointer;">
                     <div class="dash-panel-title">
                         Recent Signups
-                        <a href="users.html">View All →</a>
+                        <a href="users.html" onclick="event.stopPropagation()">View All →</a>
                     </div>
                     <div id="dash-recent-users"></div>
                 </div>
 
-                <!-- Active Auctions -->
-                <div class="dash-panel">
+                <!-- Live Auctions -->
+                <div class="dash-panel" onclick="window.location.href='auctions.html'" style="cursor:pointer;">
                     <div class="dash-panel-title">
-                        Live Auctions
-                        <a href="auctions.html">Manage →</a>
+                        ⛳ Live Auctions
+                        <a href="auctions.html" onclick="event.stopPropagation()">Manage →</a>
                     </div>
                     <div id="dash-live-auctions"></div>
                 </div>
 
-                <!-- Won Auctions / Revenue -->
-                <div class="dash-panel">
+                <!-- Upcoming Events -->
+                <div class="dash-panel" onclick="window.location.href='events.html'" style="cursor:pointer;">
                     <div class="dash-panel-title">
-                        Won Auctions
-                        <a href="financials.html">View Financials →</a>
+                        ✈️ Upcoming Events
+                        <a href="events.html" onclick="event.stopPropagation()">View All →</a>
                     </div>
-                    <div id="dash-won-auctions"></div>
+                    <div id="dash-upcoming-events"></div>
                 </div>
             </div>
 
-            <!-- ── Recent Activity ─────────────────────────────────── -->
+            <!-- Recent Activity -->
             <div class="dash-panel" style="margin-top:2rem;grid-column:1/-1;">
                 <div class="dash-panel-title">
                     Recent Activity
-                    <button onclick="clearActivity()" style="background:none;border:none;font-size:0.75rem;color:#aaa;cursor:pointer;font-family:inherit;">Clear</button>
+                    <button onclick="clearActivity()"
+                        style="background:none;border:none;font-size:0.75rem;color:#aaa;cursor:pointer;font-family:inherit;">Clear</button>
                 </div>
                 <div id="dash-activity-feed" style="max-height:400px;overflow-y:auto;"></div>
             </div>
@@ -235,96 +242,100 @@
     <script src="../db.js"></script>
     <script src="../auth.js"></script>
     <script src="../shared-auctions.js"></script>
+    <script src="../shared-events.js"></script>
     <script>
+        // ── Helpers ────────────────────────────────────────────────────────────
+        function timeAgo(date) {
+            if (!date || isNaN(date.getTime())) return '—';
+            const diff = Date.now() - date.getTime();
+            const mins = Math.floor(diff / 60000);
+            if (mins < 1) return 'Just now';
+            if (mins < 60) return mins + 'm ago';
+            const hrs = Math.floor(mins / 60);
+            if (hrs < 24) return hrs + 'h ago';
+            const days = Math.floor(hrs / 24);
+            if (days < 30) return days + 'd ago';
+            return date.toLocaleDateString();
+        }
+
+        // ── Main data load ─────────────────────────────────────────────────────
         (async () => {
-            // ── Load fresh data from server ──────────────────────────────────
             const allAuctions = (typeof EPICDB !== 'undefined')
                 ? (await EPICDB.getAuctions() || [])
                 : loadSharedAuctions();
             const allUsers = (typeof EPICDB !== 'undefined')
                 ? (await EPICDB.getUsers() || [])
                 : JSON.parse(localStorage.getItem('epic_users') || '[]');
+            const allEvents = (typeof loadSharedEvents === 'function') ? loadSharedEvents() : [];
 
-            // ── Derived stats ─────────────────────────────────────────────────
             const activeAuctions = allAuctions.filter(a => a.status === 'active' || a.status === 'scheduled');
             const endedAuctions = allAuctions.filter(a => a.status === 'ended');
-
-            // Build per-auction bid count map from user bid arrays (source of truth)
-            const bidCountMap = {};
-            const allBids = [];
-            allUsers.forEach(u => {
-                (u.bids || []).forEach(b => {
-                    if (typeof b === 'object') {
-                        allBids.push({ ...b, userName: u.firstName + ' ' + u.lastName, userId: u.id });
-                        if (b.auctionId) bidCountMap[b.auctionId] = (bidCountMap[b.auctionId] || 0) + 1;
-                    }
-                });
-            });
-
-            // Collect all purchases/wins
+            const activeEvents = allEvents.filter(e => e.status === 'active');
             const allWins = [];
-            allUsers.forEach(u => {
-                (u.purchases || []).forEach(p => {
-                    allWins.push({ ...p, userName: u.firstName + ' ' + u.lastName, userId: u.id });
-                });
-            });
+            allUsers.forEach(u => (u.purchases || []).forEach(p =>
+                allWins.push({ ...p, userName: (u.firstName || '') + ' ' + (u.lastName || ''), userId: u.id })));
+            const totalRaised = allWins.reduce((s, w) => s + (w.amount || 0), 0);
 
-            const totalRaised = allWins.reduce((sum, w) => sum + (w.amount || 0), 0);
-            const totalBids = allBids.length;
-
-            // ── Stat Cards ────────────────────────────────────────────────────
+            // ── Stat Cards ───────────────────────────────────────────────────────
             document.getElementById('dash-total-raised').textContent = '$' + totalRaised.toLocaleString();
             document.getElementById('dash-raised-sub').textContent = allWins.length + ' auction' + (allWins.length !== 1 ? 's' : '') + ' won';
             document.getElementById('dash-active-auctions').textContent = activeAuctions.length;
             document.getElementById('dash-auctions-sub').textContent = endedAuctions.length + ' ended, ' + allAuctions.length + ' total';
-            document.getElementById('dash-total-bids').textContent = totalBids;
-            document.getElementById('dash-bids-sub').textContent = allUsers.filter(u => (u.bids || []).length > 0).length + ' active bidders';
+            document.getElementById('dash-active-events').textContent = activeEvents.length;
+            document.getElementById('dash-events-sub').textContent = allEvents.length + ' total event' + (allEvents.length !== 1 ? 's' : '');
             document.getElementById('dash-total-users').textContent = allUsers.length;
             document.getElementById('dash-users-sub').textContent = allUsers.filter(u => u.memberType === 'epic_member').length + ' Epic Members';
 
-            // ── Recent Bids ───────────────────────────────────────────────────
-            const recentBids = allBids
-                .sort((a, b) => new Date(b.date || b.placedAt || 0) - new Date(a.date || a.placedAt || 0))
-                .slice(0, 8);
+            // ── Today's Tasks ────────────────────────────────────────────────────
+            const TASKS_KEY = 'epic_tasks';
+            let savedTasks = {};
+            try { savedTasks = JSON.parse(localStorage.getItem(TASKS_KEY)) || {}; } catch (e) { }
+            const todayStr = new Date().toISOString().split('T')[0];
+            const openTasks = Object.values(savedTasks)
+                .filter(t => t.isManual && !t.deleted && t.status !== 'completed' && t.date && t.date <= todayStr)
+                .sort((a, b) => (a.date || '').localeCompare(b.date || ''));
 
-            const bidsEl = document.getElementById('dash-recent-bids');
-            if (!recentBids.length) {
-                bidsEl.innerHTML = '<div class="empty-dash">No bids placed yet</div>';
+            const tasksEl = document.getElementById('dash-today-tasks');
+            const catColors = { auction: '#3b82f6', event: '#8b5cf6', trip: '#14b8a6', user: '#f59e0b', general: '#64748b' };
+            if (!openTasks.length) {
+                tasksEl.innerHTML = '<div class="empty-dash">&#10003; No tasks due today</div>';
             } else {
-                bidsEl.innerHTML = recentBids.map(b => `
-                    <div class="dash-row">
-                        <div class="dr-left">
-                            <span>🎫</span>
-                            <span>
-                                <a href="user-profile.html?id=${b.userId}" style="text-decoration:none;color:#333;font-weight:600;">${b.userName}</a>
-                                <span class="dr-sub">${b.title || b.auctionId || '—'}</span>
+                tasksEl.innerHTML = openTasks.slice(0, 8).map(t => {
+                    const isPastDue = t.date < todayStr;
+                    const dateLabel = isPastDue
+                        ? '<span style="color:#e74c3c;font-weight:600;">&#9888; Past Due</span>'
+                        : '<span style="color:#f39c12;font-weight:600;">Today</span>';
+                    const dotColor = catColors[t.category] || '#888';
+                    const linkBadge = t.entityLabel
+                        ? `<span style="font-size:0.7rem;color:#888;">&#128279; ${t.entityLabel}</span>` : '';
+                    return `<div class="dash-row" id="task-row-${t.id}">
+                        <div class="dr-left" style="flex:1;gap:0.55rem;">
+                            <button onclick="dashToggleTask('${t.id}',this)" title="Mark complete"
+                                style="width:20px;height:20px;border-radius:50%;border:2px solid #ddd;background:white;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px;padding:0;">
+                            </button>
+                            <span style="display:flex;flex-direction:column;gap:2px;">
+                                <a href="tasks.html" style="font-weight:600;text-decoration:none;color:#222;font-size:0.84rem;">${t.title}</a>
+                                <span style="display:flex;gap:0.4rem;align-items:center;">${dateLabel}${linkBadge}</span>
                             </span>
                         </div>
-                        <div class="dr-right">
-                            $${(b.amount || 0).toLocaleString()}
-                            <span class="dr-sub" style="font-weight:400;color:#aaa;text-align:right;">${b.date || b.placedAt ? timeAgo(new Date(b.date || b.placedAt)) : '—'}</span>
-                        </div>
-                    </div>`).join('');
+                        <span style="width:9px;height:9px;border-radius:50%;background:${dotColor};flex-shrink:0;margin-left:0.5rem;"></span>
+                    </div>`;
+                }).join('');
             }
 
-            // ── Recent Signups ────────────────────────────────────────────────
-            const recentUsers = allUsers
-                .slice()
-                .sort((a, b) => new Date(b.joinedAt || 0) - new Date(a.joinedAt || 0))
-                .slice(0, 8);
-
+            // ── Recent Signups ───────────────────────────────────────────────────
+            const recentUsers = allUsers.slice().sort((a, b) => new Date(b.joinedAt || 0) - new Date(a.joinedAt || 0)).slice(0, 8);
             const usersEl = document.getElementById('dash-recent-users');
             if (!recentUsers.length) {
                 usersEl.innerHTML = '<div class="empty-dash">No users yet</div>';
             } else {
-                usersEl.innerHTML = recentUsers.map(u => `
-                    <div class="dash-row">
+                usersEl.innerHTML = recentUsers.map(u => {
+                    const initials = ((u.firstName || '?')[0] + ((u.lastName || '?')[0] || '')).toUpperCase();
+                    return `<div class="dash-row">
                         <div class="dr-left">
-                            <span style="width:30px;height:30px;border-radius:50%;background:#000;color:#fff;display:flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:700;flex-shrink:0;">
-                                ${((u.firstName || '?')[0] + ((u.lastName || '?')[0] || '')).toUpperCase()}
-                            </span>
+                            <span style="width:28px;height:28px;border-radius:50%;background:#000;color:#fff;display:flex;align-items:center;justify-content:center;font-size:0.72rem;font-weight:700;flex-shrink:0;">${initials}</span>
                             <span>
-                                <a href="user-profile.html?id=${u.id}" style="text-decoration:none;color:#333;font-weight:600;">${u.firstName} ${u.lastName}</a>
+                                <a href="user-profile.html?id=${u.id}" style="text-decoration:none;color:#333;font-weight:600;font-size:0.84rem;">${u.firstName} ${u.lastName}</a>
                                 <span class="dr-sub">${u.email}</span>
                             </span>
                         </div>
@@ -332,91 +343,79 @@
                             <span class="badge ${u.memberType === 'epic_member' ? 'badge-active' : 'badge-ended'}">${u.memberType === 'epic_member' ? 'Epic' : 'Public'}</span>
                             <span class="dr-sub" style="text-align:right;margin-top:2px;">${u.joinedAt ? timeAgo(new Date(u.joinedAt)) : '—'}</span>
                         </div>
-                    </div>`).join('');
-            }
-
-            // ── Live Auctions ─────────────────────────────────────────────────
-            const liveEl = document.getElementById('dash-live-auctions');
-            if (!activeAuctions.length) {
-                liveEl.innerHTML = '<div class="empty-dash">No active auctions</div>';
-            } else {
-                liveEl.innerHTML = activeAuctions.slice(0, 8).map(a => {
-                    const liveBidCount = bidCountMap[a.id] || a.bidCount || 0;
-                    return `
-                    <div class="dash-row">
-                        <div class="dr-left">
-                            <span>⛳</span>
-                            <span>
-                                <span style="font-weight:600;">${a.title}</span>
-                                <span class="dr-sub">${liveBidCount} bid${liveBidCount !== 1 ? 's' : ''} · ends ${a.endDate ? new Date(a.endDate).toLocaleDateString() : 'TBD'}</span>
-                            </span>
-                        </div>
-                        <div class="dr-right">
-                            $${(a.currentBid || a.startBid || 0).toLocaleString()}
-                            <span class="dr-sub" style="text-align:right;">Current bid</span>
-                        </div>
                     </div>`;
                 }).join('');
             }
 
-            // ── Won Auctions ──────────────────────────────────────────────────
-            const wonEl = document.getElementById('dash-won-auctions');
-            const recentWins = allWins
-                .sort((a, b) => new Date(b.purchasedAt || b.date || 0) - new Date(a.purchasedAt || a.date || 0))
-                .slice(0, 8);
-
-            if (!recentWins.length) {
-                wonEl.innerHTML = '<div class="empty-dash">No auctions won yet</div>';
+            // ── Live Auctions ────────────────────────────────────────────────────
+            const liveEl = document.getElementById('dash-live-auctions');
+            if (!activeAuctions.length) {
+                liveEl.innerHTML = '<div class="empty-dash">No active auctions</div>';
             } else {
-                wonEl.innerHTML = recentWins.map(w => `
-                    <div class="dash-row">
+                liveEl.innerHTML = activeAuctions.slice(0, 8).map(a =>
+                    `<div class="dash-row" style="cursor:pointer;" onclick="window.location='auctions.html'">
                         <div class="dr-left">
-                            <span>🏆</span>
+                            <span>&#9971;</span>
                             <span>
-                                <span style="font-weight:600;">${w.title || '—'}</span>
-                                <span class="dr-sub">Won by <a href="user-profile.html?id=${w.userId}" style="color:#555;text-decoration:none;">${w.userName}</a></span>
+                                <span style="font-weight:600;font-size:0.84rem;">${a.title}</span>
+                                <span class="dr-sub">Ends ${a.endDate ? new Date(a.endDate).toLocaleDateString() : 'TBD'}</span>
                             </span>
                         </div>
-                        <div class="dr-right">
-                            $${(w.amount || 0).toLocaleString()}
-                            <span class="dr-sub" style="text-align:right;">${w.purchasedAt || w.date ? new Date(w.purchasedAt || w.date).toLocaleDateString() : '—'}</span>
-                        </div>
+                        <span class="badge badge-active">Live</span>
                     </div>`).join('');
             }
 
-            // ── Time-ago helper ───────────────────────────────────────────────
-            function timeAgo(date) {
-                const diff = Date.now() - date.getTime();
-                const mins = Math.floor(diff / 60000);
-                if (mins < 1) return 'Just now';
-                if (mins < 60) return mins + 'm ago';
-                const hrs = Math.floor(mins / 60);
-                if (hrs < 24) return hrs + 'h ago';
-                const days = Math.floor(hrs / 24);
-                if (days < 30) return days + 'd ago';
-                return date.toLocaleDateString();
+            // ── Upcoming Events ──────────────────────────────────────────────────
+            const evEl = document.getElementById('dash-upcoming-events');
+            const upcomingEvs = allEvents.filter(e => e.status === 'active' || e.status === 'draft').slice(0, 8);
+            if (!upcomingEvs.length) {
+                evEl.innerHTML = '<div class="empty-dash">No upcoming events</div>';
+            } else {
+                evEl.innerHTML = upcomingEvs.map(ev => {
+                    const remaining = Math.max(0, ev.spots - (ev.spotsSold || 0));
+                    return `<div class="dash-row" style="cursor:pointer;" onclick="window.location='events.html'">
+                        <div class="dr-left">
+                            <span>&#9992;&#65039;</span>
+                            <span>
+                                <span style="font-weight:600;font-size:0.84rem;">${ev.title}</span>
+                                <span class="dr-sub">${ev.date || 'Date TBD'} &middot; ${remaining} spot${remaining !== 1 ? 's' : ''} left</span>
+                            </span>
+                        </div>
+                        <span class="badge ${ev.status === 'active' ? 'badge-active' : 'badge-ended'}">${ev.status === 'active' ? 'Live' : 'Draft'}</span>
+                    </div>`;
+                }).join('');
             }
         })();
 
-        // ── Recent Activity Feed ──────────────────────────────────────
-        const ACTIVITY_KEY = 'epic_activity_log';
-        const MAX_EVENTS = 200;
-
-        function getActivity() {
-            try { return JSON.parse(localStorage.getItem(ACTIVITY_KEY) || '[]'); } catch { return []; }
+        // ── Task quick-complete from dashboard ─────────────────────────────────
+        function dashToggleTask(id, btn) {
+            const TASKS_KEY = 'epic_tasks';
+            let saved = {};
+            try { saved = JSON.parse(localStorage.getItem(TASKS_KEY)) || {}; } catch (e) { }
+            if (!saved[id]) saved[id] = {};
+            saved[id].status = 'completed';
+            saved[id].isManual = true;
+            saved[id].id = id;
+            localStorage.setItem(TASKS_KEY, JSON.stringify(saved));
+            btn.textContent = '✓';
+            btn.style.background = '#10b981';
+            btn.style.borderColor = '#10b981';
+            btn.style.color = '#fff';
+            const row = document.getElementById('task-row-' + id);
+            if (row) { row.style.opacity = '0.4'; row.style.pointerEvents = 'none'; }
+            setTimeout(() => row && row.remove(), 800);
         }
 
+        // ── Activity Feed ──────────────────────────────────────────────────────
+        const ACTIVITY_KEY = 'epic_activity_log';
+        function getActivity() { try { return JSON.parse(localStorage.getItem(ACTIVITY_KEY) || '[]'); } catch { return []; } }
         function renderActivity() {
             const feed = document.getElementById('dash-activity-feed');
             if (!feed) return;
             const events = getActivity();
-            if (!events.length) {
-                feed.innerHTML = '<div class="empty-dash">No activity recorded yet. Changes made by admins and members will appear here.</div>';
-                return;
-            }
+            if (!events.length) { feed.innerHTML = '<div class="empty-dash">No activity recorded yet.</div>'; return; }
+            const colorMap = { auction: '#000', user: '#1a9e5c', event: '#8b5cf6', system: '#888' };
             feed.innerHTML = events.slice(0, 60).map(ev => {
-                const ago = timeAgo(new Date(ev.ts));
-                const colorMap = { auction: '#000', user: '#1a9e5c', bid: '#f57f17', donate: '#1a9e5c', system: '#888' };
                 const dot = colorMap[ev.type] || '#888';
                 return `<div class="dash-row">
                     <div class="dr-left">
@@ -426,19 +425,25 @@
                             ${ev.detail ? `<span class="dr-sub">${ev.detail}</span>` : ''}
                         </span>
                     </div>
-                    <div class="dr-right" style="font-size:0.76rem;color:#aaa;white-space:nowrap;">${ago}</div>
+                    <div class="dr-right" style="font-size:0.76rem;color:#aaa;white-space:nowrap;">${timeAgo(new Date(ev.ts))}</div>
                 </div>`;
             }).join('');
         }
-
         function clearActivity() {
-            if (confirm('Clear all activity history?')) {
-                localStorage.removeItem(ACTIVITY_KEY);
-                renderActivity();
-            }
+            if (confirm('Clear all activity history?')) { localStorage.removeItem(ACTIVITY_KEY); renderActivity(); }
         }
-
         renderActivity();
+    
+        // Live unread-message badge
+        (function() {
+            try {
+                var msgs = JSON.parse(localStorage.getItem('epic_messages') || '[]');
+                var unread = msgs.filter(function(m){ return m.unread !== false && m.status !== 'closed'; }).length;
+                document.querySelectorAll('.nav-msg-badge').forEach(function(b){
+                    b.textContent = unread; b.style.display = unread > 0 ? 'inline-block' : 'none';
+                });
+            } catch(e) {}
+        })();
     </script>
 </body>
 

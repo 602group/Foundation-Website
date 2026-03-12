@@ -2,7 +2,6 @@ export const dynamic = 'force-dynamic';
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { db } from "@/app/lib/db";
-import BiddingInterface from "./BiddingInterface";
 import "./auction-round.css";
 
 export default async function AuctionPage({
@@ -24,8 +23,6 @@ export default async function AuctionPage({
         return notFound();
     }
 
-    const currentHighestBid =
-        auction.bids.length > 0 ? auction.bids[0].amount : auction.currentBid;
 
     return (
         <div className="pt-24">
@@ -64,14 +61,79 @@ export default async function AuctionPage({
                         </div>
                     </div>
 
-                    {/* This is the dynamic interactive bidding component */}
-                    <BiddingInterface
-                        auctionId={auction.id}
-                        initialHighestBid={currentHighestBid}
-                        endDate={auction.endDate}
-                        status={auction.status}
-                        buyoutPrice={auction.buyoutPrice}
-                    />
+                    {/* ── GiveSmart bidding panel ─────────────────────────── */}
+                    <div style={{
+                        background: '#fff',
+                        borderRadius: '16px',
+                        padding: '1.5rem',
+                        boxShadow: '0 4px 24px rgba(0,0,0,0.10)',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '1rem',
+                        minWidth: '280px',
+                    }}>
+                        {/* Internal ID badge */}
+                        {auction.internalId && (
+                            <span style={{ fontSize: '0.72rem', fontWeight: 700, color: '#6d28d9', background: '#ede9fe', borderRadius: '6px', padding: '2px 8px', width: 'fit-content' }}>
+                                {auction.internalId}
+                            </span>
+                        )}
+
+                        {/* Starting bid */}
+                        {auction.startingBid > 0 && (
+                            <div>
+                                <div style={{ fontSize: '0.75rem', fontWeight: 600, color: '#888', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Starting Bid</div>
+                                <div style={{ fontSize: '1.6rem', fontWeight: 800, color: '#111' }}>
+                                    ${auction.startingBid.toLocaleString()}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Status / CTA */}
+                        {auction.status === 'CLOSED' ? (
+                            <div style={{
+                                background: '#f3f4f6', color: '#6b7280',
+                                borderRadius: '12px', padding: '1rem 1.5rem',
+                                textAlign: 'center', fontWeight: 700, fontSize: '1rem',
+                                border: '2px solid #e5e7eb',
+                            }}>
+                                ⛔ This auction is closed
+                            </div>
+                        ) : auction.gsItemUrl ? (
+                            <a
+                                href={auction.gsItemUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                style={{
+                                    display: 'block', textAlign: 'center',
+                                    background: '#16a34a', color: '#fff',
+                                    borderRadius: '12px', padding: '1rem 1.5rem',
+                                    fontWeight: 800, fontSize: '1.05rem',
+                                    textDecoration: 'none',
+                                    boxShadow: '0 4px 12px rgba(22,163,74,0.35)',
+                                    transition: 'background 0.2s',
+                                }}
+                                onMouseEnter={e => (e.currentTarget.style.background = '#15803d')}
+                                onMouseLeave={e => (e.currentTarget.style.background = '#16a34a')}
+                            >
+                                ⛳ Bid Now on GiveSmart
+                            </a>
+                        ) : (
+                            <div style={{
+                                background: '#fef9c3', color: '#a16207',
+                                borderRadius: '12px', padding: '1rem 1.5rem',
+                                textAlign: 'center', fontWeight: 600, fontSize: '0.9rem',
+                                border: '1px solid #fde68a',
+                            }}>
+                                🕐 Bidding opens soon
+                            </div>
+                        )}
+
+                        <p style={{ fontSize: '0.73rem', color: '#aaa', margin: 0, textAlign: 'center' }}>
+                            Bidding is handled securely on GiveSmart
+                        </p>
+                    </div>
+
                 </div>
             </section>
 
