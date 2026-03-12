@@ -291,8 +291,9 @@
             let savedTasks = {};
             try { savedTasks = JSON.parse(localStorage.getItem(TASKS_KEY)) || {}; } catch (e) { }
             const todayStr = new Date().toISOString().split('T')[0];
+            const nextWeekStr = new Date(Date.now() + 7 * 86400000).toISOString().split('T')[0];
             const openTasks = Object.values(savedTasks)
-                .filter(t => t.isManual && !t.deleted && t.status !== 'completed' && t.date && t.date <= todayStr)
+                .filter(t => !t.deleted && t.status !== 'completed' && t.date && t.date <= nextWeekStr)
                 .sort((a, b) => (a.date || '').localeCompare(b.date || ''));
 
             const tasksEl = document.getElementById('dash-today-tasks');
