@@ -20,10 +20,11 @@
             <span class="logo">EPIC Foundation</span>
             <nav class="nav-menu">
                 <a href="auctions.html" class="nav-link member-only-link" style="display:none;">Auction</a>
-                <a href="travel-events.html" class="nav-link member-only-link" style="display:none;">Travel &amp; Events</a>
+                <a href="travel-events.html" class="nav-link member-only-link" style="display:none;">Travel &amp;
+                    Events</a>
                 <a href="about.html" class="nav-link">About Us</a>
                 <a href="contact.html" class="nav-link">Contact Us</a>
-            <a href="donate.html" class="nav-link" style="color:#fff;font-weight:700;">Donate ♥</a>
+                <a href="donate.html" class="nav-link" style="color:#fff;font-weight:700;">Donate ♥</a>
                 <button class="login-btn">Login</button>
             </nav>
         </header>
@@ -115,24 +116,15 @@
 
 
     <!-- Donate CTA Banner -->
-    <section class="email-signup-section" style="">
-        <div class="email-signup-overlay" style="background:rgba(0,0,0,0.75);">
-            <div class="email-signup-content">
-                <h2 class="email-signup-title">Support the Mission</h2>
-                <p class="email-signup-description">Your contribution funds youth golf programs, charitable events, and creates opportunities for deserving players. Every gift makes a difference.</p>
-                <a href="donate.html" class="subscribe-btn" style="display:inline-block;text-decoration:none;padding:0.85rem 2.2rem;font-size:0.95rem;font-weight:700;letter-spacing:0.03em;margin-top:0.5rem;">Donate Today</a>
-            </div>
-        </div>
-    </section>
-
-
-    <!-- Donate CTA Banner -->
-    <section class="email-signup-section" style="">
-        <div class="email-signup-overlay" style="background:rgba(0,0,0,0.75);">
-            <div class="email-signup-content">
-                <h2 class="email-signup-title">Support the Mission</h2>
-                <p class="email-signup-description">Your contribution funds youth golf programs, charitable events, and creates opportunities for deserving players. Every gift makes a difference.</p>
-                <a href="donate.html" class="subscribe-btn" style="display:inline-block;text-decoration:none;padding:0.85rem 2.2rem;font-size:0.95rem;font-weight:700;letter-spacing:0.03em;margin-top:0.5rem;">Donate Today</a>
+    <section class="email-signup-section" style="min-height:340px;">
+        <div class="email-signup-overlay" style="background:rgba(0,0,0,0.78);min-height:340px;">
+            <div class="email-signup-content" style="padding:4rem 2rem;">
+                <h2 class="email-signup-title" style="font-size:clamp(1.6rem,4vw,2.4rem);">Support the Mission</h2>
+                <p class="email-signup-description">Your contribution funds youth golf programs, charitable events, and
+                    creates opportunities for deserving players. Every gift makes a difference.</p>
+                <a href="donate.html" class="subscribe-btn"
+                    style="display:inline-block;text-decoration:none;padding:0.9rem 2.4rem;font-size:1rem;font-weight:700;letter-spacing:0.03em;margin-top:1rem;">Donate
+                    Today</a>
             </div>
         </div>
     </section>
@@ -174,7 +166,8 @@
             <div class="footer-column">
                 <h4 class="footer-title">Explore</h4>
                 <ul class="footer-links">
-                    <li><a href="travel-events.html" class="member-only-link" style="display:none;">Travel & Events</a></li>
+                    <li><a href="travel-events.html" class="member-only-link" style="display:none;">Travel & Events</a>
+                    </li>
                     <li><a href="#content">Content</a></li>
                     <li><a href="#faq">FAQ</a></li>
                     <li><a href="#login">Login</a></li>
@@ -252,7 +245,6 @@
                             <h3 class="card-title">${a.title}</h3>
                             <p class="card-location">${a.location}</p>
                             <div class="card-dates">
-                                <span class="card-date-tag">Opens: ${fmtDate(a.startDate)}</span>
                                 <span class="card-date-tag">Closes: ${fmtDate(a.endDate)}</span>
                             </div>
                             <div class="card-footer">
@@ -262,8 +254,6 @@
                                     <span class="bid-label">${liveBidCount} bid${liveBidCount !== 1 ? 's' : ''} · Current Bid</span>
                                 </div>
                                 -->
-                                <div class="card-countdown" id="cd-${a.id}" style="font-size:0.75rem;color:#888;font-weight:600;"></div>
-                                <span class="card-bid-cta">View Item →</span>
                                 <div class="card-countdown" id="cd-${a.id}" style="font-size:0.75rem;color:#888;font-weight:600;"></div>
                                 <span class="card-bid-cta">View Item →</span>
                             </div>
@@ -326,7 +316,7 @@
     </script>
 
     <script>
-        document.querySelector('.email-signup-form').addEventListener('submit', function(e) {
+        document.querySelector('.email-signup-form').addEventListener('submit', function (e) {
             e.preventDefault();
             const emailInput = this.querySelector('input[type="email"]');
             const email = emailInput.value.trim().toLowerCase();
@@ -338,15 +328,15 @@
                 const users = JSON.parse(localStorage.getItem('epic_users') || '[]');
                 const match = users.find(u => u.email.toLowerCase() === email);
                 if (match) {
-                    firstName  = match.firstName || '';
-                    lastName   = match.lastName  || '';
+                    firstName = match.firstName || '';
+                    lastName = match.lastName || '';
                     memberType = match.memberType || 'public';
                 }
-            } catch {}
+            } catch { }
 
             // Save to epic_newsletter (deduplicate by email)
             let list = [];
-            try { list = JSON.parse(localStorage.getItem('epic_newsletter') || '[]'); } catch {}
+            try { list = JSON.parse(localStorage.getItem('epic_newsletter') || '[]'); } catch { }
             if (!list.find(s => s.email === email)) {
                 list.push({ email, firstName, lastName, memberType, subscribedAt: new Date().toISOString() });
                 localStorage.setItem('epic_newsletter', JSON.stringify(list));
