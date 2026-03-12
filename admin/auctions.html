@@ -374,26 +374,20 @@
         }
 
         .drawer {
+            display: none;
             position: fixed;
             top: 0;
-            left: var(--sidebar-width, 260px);
+            left: 0;
             right: 0;
             bottom: 0;
             background: #fff;
             z-index: 1200;
-            display: flex;
             flex-direction: column;
-            transition: opacity 0.2s ease, transform 0.2s ease;
-            opacity: 0;
-            transform: translateX(12px);
-            pointer-events: none;
             box-shadow: -4px 0 24px rgba(0, 0, 0, 0.12);
         }
 
         .drawer.open {
-            opacity: 1;
-            transform: translateX(0);
-            pointer-events: all;
+            display: flex;
         }
 
         .drawer-header {
@@ -1918,7 +1912,6 @@
                         public page →</a>
                 </div>
             </div>
-        </div>
 
         <div class="drawer-footer">
             <button class="btn-secondary" onclick="closeDrawer()">Cancel</button>
@@ -1928,7 +1921,6 @@
             </button>
             <button class="btn-primary" onclick="saveAuction()">&#128190; Save Auction</button>
         </div>
-    </div>
 
     <!-- ═══════════════════ CREATE AUCTION MODAL ═══════════════════ -->
     <div class="modal-overlay" id="addModal" style="align-items:flex-start;padding:1.5rem 1rem;overflow-y:auto;">
