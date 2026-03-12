@@ -515,12 +515,13 @@
 
             // --- Map Logic ---
             const locAddressEl = document.querySelector('.location-address');
-            if (locAddressEl) locAddressEl.textContent = data.location;
+            if (locAddressEl) locAddressEl.textContent = data.mapAddress || data.location;
 
             const mapContainer = document.querySelector('.map-container');
             if (mapContainer) {
-                const encodedQuery = encodeURIComponent(data.location || data.course || 'Golf Course');
-                // Use Google Maps /place/ embed which doesn't require an API key
+                // Prefer mapAddress (full street address) for precise map embed
+                const mapQuery = data.mapAddress || data.location || data.course || 'Golf Course';
+                const encodedQuery = encodeURIComponent(mapQuery);
                 mapContainer.innerHTML = `<iframe
                     width="100%" height="400" style="border:0;border-radius:16px;"
                     loading="lazy" allowfullscreen referrerpolicy="no-referrer-when-downgrade"
@@ -738,7 +739,7 @@
                     const newConfirm = buyNowModalConfirm.cloneNode(true);
                     buyNowModalConfirm.parentNode.replaceChild(newConfirm, buyNowModalConfirm);
                     const newCancel = buyNowModalCancel.cloneNode(true);
-                  yNCancel.parentNode.replaceChild(newCancel, buyNowModalCancel);
+                    yNCancel.parentNode.replaceChild(newCancel, buyNowModalCancel);
 
                     newCancel.addEventListener('click', () => {
                         buyNowModal.style.display = 'none';
@@ -769,7 +770,7 @@
                 });
             }
         });
-    
+
         // ── Watchlist toggle ─────────────────────────────────────────
         let _watchlistAuctionId = null;
 
@@ -779,7 +780,7 @@
             if (!user) return;
             const key = 'epic_users';
             let users = [];
-            try { users = JSON.parse(localStorage.getItem(key) || '[]'); } catch {}
+            try { users = JSON.parse(localStorage.getItem(key) || '[]'); } catch { }
             const u = users.find(x => x.id === user.id);
             const watchlist = (u && u.watchlist) || [];
             const onList = watchlist.some(w => (w.auctionId || w) === auctionId);
@@ -789,7 +790,7 @@
         function updateWatchlistBtn(isOnList) {
             const label = document.getElementById('wl-label');
             const heart = document.getElementById('wl-heart');
-            const btn   = document.getElementById('watchlist-btn-main');
+            const btn = document.getElementById('watchlist-btn-main');
             if (!label || !heart || !btn) return;
             if (isOnList) {
                 label.textContent = 'On Watchlist';
@@ -813,7 +814,7 @@
             if (!auctionId) return;
             const key = 'epic_users';
             let users = [];
-            try { users = JSON.parse(localStorage.getItem(key) || '[]'); } catch {}
+            try { users = JSON.parse(localStorage.getItem(key) || '[]'); } catch { }
             const idx = users.findIndex(x => x.id === user.id);
             const u = idx > -1 ? users[idx] : { ...user, watchlist: [] };
             if (!u.watchlist) u.watchlist = [];
@@ -829,7 +830,7 @@
             localStorage.setItem(key, JSON.stringify(users));
             // Also persist to EPICDB if available
             if (typeof EPICDB !== 'undefined' && EPICDB.saveUser) {
-                EPICDB.saveUser(u).catch(() => {});
+                EPICDB.saveUser(u).catch(() => { });
             }
         }
     </script>

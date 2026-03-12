@@ -1320,21 +1320,28 @@
 
 <body>
     <!-- Sidebar -->
-        <aside class="sidebar">
+    <aside class="sidebar">
         <div class="sidebar-header">
             <a href="../index.html" class="logo">EPIC ADMIN</a>
         </div>
         <nav class="nav-links">
-            <a href="dashboard.html" class="nav-item" data-section="dashboard"><span class="nav-icon">📊</span> Dashboard</a>
-            <a href="auctions.html" class="nav-item active" data-section="auctions"><span class="nav-icon">⛳</span> Auctions</a>
+            <a href="dashboard.html" class="nav-item" data-section="dashboard"><span class="nav-icon">📊</span>
+                Dashboard</a>
+            <a href="auctions.html" class="nav-item active" data-section="auctions"><span class="nav-icon">⛳</span>
+                Auctions</a>
             <a href="users.html" class="nav-item" data-section="users"><span class="nav-icon">👥</span> Users</a>
-            <a href="events.html" class="nav-item" data-section="events"><span class="nav-icon">✈️</span> Events &amp; Trips</a>
-            <a href="messages.html" class="nav-item" data-section="messages"><span class="nav-icon">💬</span> Messages</a>
+            <a href="events.html" class="nav-item" data-section="events"><span class="nav-icon">✈️</span> Events &amp;
+                Trips</a>
+            <a href="messages.html" class="nav-item" data-section="messages"><span class="nav-icon">💬</span>
+                Messages</a>
             <a href="tasks.html" class="nav-item" data-section="tasks"><span class="nav-icon">✅</span> Tasks</a>
-            <a href="financials.html" class="nav-item" data-section="financials"><span class="nav-icon">📈</span> Financials</a>
-            <a href="newsletter.html" class="nav-item" data-section="newsletter"><span class="nav-icon">📧</span> Newsletter</a>
+            <a href="financials.html" class="nav-item" data-section="financials"><span class="nav-icon">📈</span>
+                Financials</a>
+            <a href="newsletter.html" class="nav-item" data-section="newsletter"><span class="nav-icon">📧</span>
+                Newsletter</a>
             <a href="bids.html" class="nav-item" data-section="bids"><span class="nav-icon">💰</span> Bids</a>
-            <a href="settings.html" class="nav-item" data-section="settings"><span class="nav-icon">⚙️</span> Settings</a>
+            <a href="settings.html" class="nav-item" data-section="settings"><span class="nav-icon">⚙️</span>
+                Settings</a>
         </nav>
         <div class="user-profile">
             <div class="avatar"></div>
@@ -1535,6 +1542,23 @@
                             </div>
                         </div>
                     </div>
+
+                    <!-- External Bidding -->
+                    <div class="form-section"
+                        style="margin-top:1rem;background:#f0f7ff;border-radius:10px;padding:1rem 1.1rem;border:1.5px solid #c3d9f7;">
+                        <div class="form-section-title" style="color:#4A90E2;">🔗 External Bidding Platform</div>
+                        <div class="form-group">
+                            <label>Bid Now URL <span style="font-weight:400;color:#4A90E2;">(powers the Bid Now button
+                                    on the public page)</span></label>
+                            <input type="url" id="admin-thirdPartyUrl"
+                                placeholder="https://auction.platform.com/item/12345">
+                        </div>
+                        <div class="form-group" style="margin-top:0.6rem;">
+                            <label>External Auction / Platform ID</label>
+                            <input type="text" id="admin-externalAuctionId"
+                                placeholder="Platform-specific item ID e.g. LOT-4821">
+                        </div>
+                    </div>
                 </div>
 
                 <!-- General Notes — full width -->
@@ -1563,9 +1587,14 @@
                             <input type="text" id="edit-course" placeholder="Pebble Beach Golf Links">
                         </div>
                         <div class="form-group">
-                            <label>Location</label>
+                            <label>Location <span style="font-weight:400;color:#bbb;">(city, state)</span></label>
                             <input type="text" id="edit-location" placeholder="Pebble Beach, CA">
                         </div>
+                    </div>
+                    <div class="form-group" style="margin-top:0.2rem;">
+                        <label>Map Address <span style="font-weight:400;color:#bbb;">(full address for the Google Maps
+                                embed)</span></label>
+                        <input type="text" id="edit-mapAddress" placeholder="1700 17-Mile Dr, Pebble Beach, CA 93953">
                     </div>
                     <div class="form-group"
                         style="background:#fffbe6;border:1.5px solid #ffe082;border-radius:8px;padding:0.8rem 1rem;margin-top:0.2rem;">
@@ -1740,20 +1769,34 @@
             <div class="drawer-panel" id="panel-images">
                 <div class="form-section">
                     <div class="form-section-title">Auction Images</div>
-                    <p style="font-size:0.83rem;color:#888;margin-bottom:1rem;">Upload images. The first image will be
-                        used as the thumbnail on listing pages.</p>
-                    <div class="image-preview-strip" id="imageStrip"></div>
-                    <div style="margin-top:1rem;">
-                        <div class="form-group">
-                            <label>Upload Image</label>
-                            <label
-                                style="display:flex;align-items:center;gap:0.6rem;padding:0.6rem 0.9rem;border:1.5px dashed #ccc;border-radius:6px;cursor:pointer;font-size:0.85rem;color:#666;">
-                                <input type="file" accept="image/*,.pdf" style="display:none"
-                                    onchange="addImageFile(this)">
-                                📁 Choose file (PNG, JPG, PDF)
-                            </label>
-                        </div>
-                    </div>
+                    <p style="font-size:0.83rem;color:#888;margin-bottom:1rem;">
+                        Upload multiple images. Drag thumbnails to reorder. Click <strong>Replace</strong> to swap one
+                        image.
+                        The <strong>first image</strong> is always the cover / preview card image.
+                    </p>
+
+                    <!-- Drag-to-reorder thumbnail grid -->
+                    <div id="imgMgrGrid"
+                        style="display:flex;flex-wrap:wrap;gap:0.72rem;margin-bottom:1.1rem;min-height:80px;"></div>
+
+                    <!-- Upload zone -->
+                    <label id="imgUploadZone"
+                        style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.5rem;
+                               padding:1.4rem 1rem;border:2px dashed #d4d4d4;border-radius:12px;
+                               cursor:pointer;font-size:0.85rem;color:#999;transition:border-color 0.2s,background 0.2s;"
+                        ondragover="event.preventDefault();this.style.borderColor='#4A90E2';this.style.background='#f0f7ff'"
+                        ondragleave="this.style.borderColor='#d4d4d4';this.style.background=''"
+                        ondrop="imgZoneDrop(event)" onmouseover="this.style.borderColor='#aaa'"
+                        onmouseout="this.style.borderColor='#d4d4d4'">
+                        <input type="file" accept="image/*" multiple style="display:none" onchange="imgZoneAdd(this)">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="1.8">
+                            <rect x="3" y="3" width="18" height="18" rx="2" />
+                            <circle cx="8.5" cy="8.5" r="1.5" />
+                            <polyline points="21 15 16 10 5 21" />
+                        </svg>
+                        <span>Drop images here or <strong style="color:#4A90E2;">click to upload</strong></span>
+                        <span style="font-size:0.76rem;">PNG, JPG — multiple files supported</span>
+                    </label>
                 </div>
             </div>
 
@@ -1839,82 +1882,255 @@
         </div>
     </div>
 
-    <!-- Add New Auction Modal -->
-    <div class="modal-overlay" id="addModal">
-        <div class="modal-box">
-            <div class="modal-header">
-                <h3>New Auction</h3>
+    <!-- ═══════════════════ CREATE AUCTION MODAL ═══════════════════ -->
+    <div class="modal-overlay" id="addModal" style="align-items:flex-start;padding:1.5rem 1rem;overflow-y:auto;">
+        <div class="modal-box"
+            style="max-width:680px;width:100%;border-radius:18px;padding:0;overflow:hidden;max-height:92vh;display:flex;flex-direction:column;">
+            <div class="modal-header" style="padding:1.4rem 1.8rem;border-bottom:1px solid #f0f0f0;flex-shrink:0;">
+                <h3 style="font-size:1.1rem;font-weight:800;margin:0;">New Auction</h3>
                 <button class="modal-close" onclick="closeAddModal()">✕</button>
             </div>
-            <div class="modal-body">
-                <div class="form-group">
-                    <label>Auction Title *</label>
-                    <input type="text" id="new-title" placeholder="e.g. Augusta National - Round for 2 w/ a member">
-                </div>
-                <div class="form-row">
+            <div class="modal-body" style="overflow-y:auto;padding:1.5rem 1.8rem;flex:1;">
+
+                <!-- Core -->
+                <div style="margin-bottom:1.4rem;">
+                    <div
+                        style="font-size:0.7rem;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:#aaa;margin-bottom:0.9rem;">
+                        Core</div>
                     <div class="form-group">
-                        <label>Course Name *</label>
-                        <input type="text" id="new-course" placeholder="Augusta National">
+                        <label>Auction Title *</label>
+                        <input type="text" id="new-title" placeholder="e.g. Augusta National – Round for 2 w/ a member">
                     </div>
-                    <div class="form-group">
-                        <label>Location *</label>
-                        <input type="text" id="new-location" placeholder="Augusta, GA">
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Starting Bid ($)</label>
-                        <input type="number" id="new-startBid" value="1000" min="0" step="100">
-                    </div>
-                    <div class="form-group">
-                        <label>Buy It Now ($)</label>
-                        <input type="number" id="new-buyNow" value="0" min="0" step="100">
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Auction Start</label>
-                        <input type="datetime-local" id="new-startDate">
-                    </div>
-                    <div class="form-group">
-                        <label>Auction End</label>
-                        <input type="datetime-local" id="new-endDate">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Course Name *</label>
+                            <input type="text" id="new-course" placeholder="Augusta National">
+                        </div>
+                        <div class="form-group">
+                            <label>Status</label>
+                            <select id="new-status">
+                                <option value="new">New</option>
+                                <option value="draft">Draft</option>
+                                <option value="live">Live</option>
+                                <option value="sold">Sold</option>
+                                <option value="booked">Booked</option>
+                                <option value="closed_other">Closed - Other</option>
+                                <option value="cancelled">Cancelled</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
-                <div class="form-group"
-                    style="background:#fffbe6;border:1.5px solid #ffe082;border-radius:8px;padding:0.8rem 1rem;">
-                    <label style="color:#b8860b;font-weight:700;">🔒 Donor (Admin Only)</label>
-                    <input type="text" id="new-donor" placeholder="e.g. John Smith" style="margin-top:0.3rem;">
+
+                <!-- Location -->
+                <div style="margin-bottom:1.4rem;border-top:1px solid #f0f0f0;padding-top:1.2rem;">
+                    <div
+                        style="font-size:0.7rem;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:#aaa;margin-bottom:0.9rem;">
+                        Location</div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Display Location <span style="font-weight:400;color:#bbb;">(city,
+                                    state)</span></label>
+                            <input type="text" id="new-location" placeholder="Augusta, GA">
+                        </div>
+                        <div class="form-group">
+                            <label>Map Address <span style="font-weight:400;color:#bbb;">(for map embed)</span></label>
+                            <input type="text" id="new-mapAddress" placeholder="2604 Washington Rd, Augusta, GA 30904">
+                        </div>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label>Initial Status</label>
-                    <select id="new-status">
-                        <option value="new">New</option>
-                        <option value="draft">Draft</option>
-                        <option value="live">Live</option>
-                        <option value="sold">Sold</option>
-                        <option value="booked">Booked</option>
-                        <option value="closed_other">Closed - Other</option>
-                        <option value="cancelled">Cancelled</option>
-                    </select>
+
+                <!-- External Bidding -->
+                <div
+                    style="margin-bottom:1.4rem;background:#f0f7ff;border-radius:10px;padding:1rem 1.1rem;border:1.5px solid #c3d9f7;">
+                    <div
+                        style="font-size:0.7rem;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:#4A90E2;margin-bottom:0.9rem;">
+                        🔗 External Bidding</div>
+                    <div class="form-group">
+                        <label>Bid Now URL <span style="font-weight:400;color:#4A90E2;">(powers the Bid Now
+                                button)</span></label>
+                        <input type="url" id="new-thirdPartyUrl" placeholder="https://auction.platform.com/item/12345">
+                    </div>
+                    <div class="form-group" style="margin-top:0.6rem;">
+                        <label>External / Platform Auction ID</label>
+                        <input type="text" id="new-externalAuctionId" placeholder="Platform-specific item ID">
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label>Primary Image (optional)</label>
+
+                <!-- Dates -->
+                <div style="margin-bottom:1.4rem;border-top:1px solid #f0f0f0;padding-top:1.2rem;">
+                    <div
+                        style="font-size:0.7rem;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:#aaa;margin-bottom:0.9rem;">
+                        Dates</div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Auction Start</label>
+                            <input type="datetime-local" id="new-startDate">
+                        </div>
+                        <div class="form-group">
+                            <label>Auction End</label>
+                            <input type="datetime-local" id="new-endDate">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pricing -->
+                <div style="margin-bottom:1.4rem;border-top:1px solid #f0f0f0;padding-top:1.2rem;">
+                    <div
+                        style="font-size:0.7rem;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:#aaa;margin-bottom:0.9rem;">
+                        Pricing</div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Starting Bid ($)</label>
+                            <input type="number" id="new-startBid" value="1000" min="0" step="100">
+                        </div>
+                        <div class="form-group">
+                            <label>Bid Increment ($)</label>
+                            <input type="number" id="new-increment" value="200" min="50" step="50">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Course Details -->
+                <div style="margin-bottom:1.4rem;border-top:1px solid #f0f0f0;padding-top:1.2rem;">
+                    <div
+                        style="font-size:0.7rem;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:#aaa;margin-bottom:0.9rem;">
+                        Course Details</div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Architect</label>
+                            <input type="text" id="new-architect" placeholder="e.g. Alister MacKenzie">
+                        </div>
+                        <div class="form-group">
+                            <label>Year Opened</label>
+                            <input type="number" id="new-yearOpened" placeholder="1932">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Course Type</label>
+                            <select id="new-courseType">
+                                <option value="Parkland">Parkland</option>
+                                <option value="Links">Links</option>
+                                <option value="Desert">Desert</option>
+                                <option value="Mountain">Mountain</option>
+                                <option value="Resort">Resort</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Access</label>
+                            <select id="new-access">
+                                <option value="Private">Private</option>
+                                <option value="Semi-Private">Semi-Private</option>
+                                <option value="Public">Public</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Course Ranking</label>
+                        <input type="text" id="new-ranking" placeholder="e.g. #1 Golf Digest Top 100">
+                    </div>
+                </div>
+
+                <!-- Round Details -->
+                <div style="margin-bottom:1.4rem;border-top:1px solid #f0f0f0;padding-top:1.2rem;">
+                    <div
+                        style="font-size:0.7rem;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:#aaa;margin-bottom:0.9rem;">
+                        Round Details</div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Guests Included</label>
+                            <input type="number" id="new-guests" value="2" min="1">
+                        </div>
+                        <div class="form-group">
+                            <label>Rounds Included</label>
+                            <input type="number" id="new-rounds" value="1" min="1">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Paid By</label>
+                            <select id="new-paidBy">
+                                <option value="Donor">Donor</option>
+                                <option value="Winner">Winner</option>
+                                <option value="Shared">Shared</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Charity / Beneficiary</label>
+                            <input type="text" id="new-charity" value="EPIC Foundation">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Attributes <span style="font-weight:400;color:#bbb;">(cart, caddy, food &amp; drinks,
+                                etc.)</span></label>
+                        <input type="text" id="new-attributes" placeholder="Cart, Food &amp; Drinks Included">
+                    </div>
+                    <div class="form-group">
+                        <label>Restrictions / Scheduling Notes</label>
+                        <textarea id="new-restrictions" placeholder="Date restrictions, blackout windows, etc."
+                            style="min-height:60px;"></textarea>
+                    </div>
+                </div>
+
+                <!-- Content / Descriptions -->
+                <div style="margin-bottom:1.4rem;border-top:1px solid #f0f0f0;padding-top:1.2rem;">
+                    <div
+                        style="font-size:0.7rem;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:#aaa;margin-bottom:0.9rem;">
+                        Content</div>
+                    <div class="form-group">
+                        <label>Item Description <span style="font-weight:400;color:#bbb;">(public auction
+                                page)</span></label>
+                        <textarea id="new-description" placeholder="Describe the experience…"
+                            style="min-height:90px;"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Course Description</label>
+                        <textarea id="new-courseDescription" placeholder="Course history, character, notable facts…"
+                            style="min-height:70px;"></textarea>
+                    </div>
+                </div>
+
+                <!-- Images -->
+                <div style="margin-bottom:1.4rem;border-top:1px solid #f0f0f0;padding-top:1.2rem;">
+                    <div
+                        style="font-size:0.7rem;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:#aaa;margin-bottom:0.9rem;">
+                        Images</div>
+                    <div id="new-img-grid" style="display:flex;flex-wrap:wrap;gap:0.6rem;margin-bottom:0.8rem;"></div>
                     <label
-                        style="display:flex;align-items:center;gap:0.6rem;padding:0.6rem 0.9rem;border:1.5px dashed #ccc;border-radius:6px;cursor:pointer;font-size:0.85rem;color:#666;">
-                        <input type="file" accept="image/*,.pdf" style="display:none"
-                            onchange="handleNewAuctionImage(this)">
-                        📁 Choose file (PNG, JPG, PDF)
+                        style="display:flex;align-items:center;gap:0.6rem;padding:0.75rem 1rem;border:2px dashed #ddd;border-radius:10px;cursor:pointer;font-size:0.85rem;color:#888;"
+                        onmouseover="this.style.borderColor='#aaa'" onmouseout="this.style.borderColor='#ddd'">
+                        <input type="file" accept="image/*" multiple style="display:none"
+                            onchange="newModalAddImages(this)">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <rect x="3" y="3" width="18" height="18" rx="2" />
+                            <circle cx="8.5" cy="8.5" r="1.5" />
+                            <polyline points="21 15 16 10 5 21" />
+                        </svg>
+                        Click to upload images — first image = cover
                     </label>
                     <input type="hidden" id="new-imageUrl">
-                    <img id="new-image-preview"
-                        style="width:100%;max-height:140px;object-fit:cover;border-radius:6px;margin-top:0.5rem;display:none;"
-                        alt="preview">
+                </div>
+
+                <!-- Admin -->
+                <div
+                    style="margin-bottom:1rem;background:#fffbe6;border-radius:10px;padding:1rem 1.1rem;border:1.5px solid #ffe082;">
+                    <div
+                        style="font-size:0.7rem;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:#b8860b;margin-bottom:0.9rem;">
+                        🔒 Admin Only</div>
+                    <div class="form-group">
+                        <label style="color:#b8860b;">Donor</label>
+                        <input type="text" id="new-donor" placeholder="Donor name">
+                    </div>
+                    <div class="form-group" style="margin-top:0.5rem;">
+                        <label style="color:#b8860b;">Admin Notes</label>
+                        <textarea id="new-adminNotes" placeholder="Internal notes…" style="min-height:60px;"></textarea>
+                    </div>
                 </div>
             </div>
-            <div class="modal-footer">
+            <div class="modal-footer" style="border-top:1px solid #f0f0f0;padding:1.1rem 1.8rem;flex-shrink:0;">
                 <button class="btn-secondary" onclick="closeAddModal()">Cancel</button>
-                <button class="btn-primary" onclick="createAuction()">Create & Edit →</button>
+                <button class="btn-primary" onclick="createAuction()">Create &amp; Edit →</button>
             </div>
         </div>
     </div>
@@ -2054,14 +2270,16 @@
             const a = auctions.find(x => x.id === id);
             if (!a) return;
             editingId = id;
-            editImages = [...(a.images || [])];
+            // Initialize image manager from existing auction images
+            _drawerImages = [...(a.images || [])];
 
-            document.getElementById('drawerTitle').textContent = 'Edit: ' + a.title.substring(0, 40) + (a.title.length > 40 ? '…' : '');
+            document.getElementById('drawerTitle').textContent = 'Edit: ' + a.title.substring(0, 40) + (a.title.length > 40 ? '\u2026' : '');
 
             // Fill in all fields
             setVal('edit-title', a.title);
             setVal('edit-course', a.course);
             setVal('edit-location', a.location);
+            setVal('edit-mapAddress', a.mapAddress || '');
             setVal('edit-status', a.status);
             setVal('edit-visibility', a.visibility || 'all');
             setVal('edit-architect', a.architect);
@@ -2092,10 +2310,10 @@
             const apCheck = document.getElementById('approveCheck');
             if (a.status === 'pending' && a.donorEmail) {
                 banner.style.display = 'block';
-                infoEl.innerHTML = `<strong>From:</strong> ${a.donorName || '—'} &nbsp;|&nbsp; <strong>Email:</strong> ${a.donorEmail || '—'}` +
+                infoEl.innerHTML = `<strong>From:</strong> ${a.donorName || '\u2014'} &nbsp;|&nbsp; <strong>Email:</strong> ${a.donorEmail || '\u2014'}` +
                     (a.donorOrg ? ` &nbsp;|&nbsp; <strong>Org:</strong> ${a.donorOrg}` : '') +
                     (a.estimatedValue ? `<br><strong>Est. Value:</strong> ${a.estimatedValue}` : '') +
-                    `<br><strong>Submitted:</strong> ${a.submittedAt ? new Date(a.submittedAt).toLocaleString() : '—'}`;
+                    `<br><strong>Submitted:</strong> ${a.submittedAt ? new Date(a.submittedAt).toLocaleString() : '\u2014'}`;
                 apCheck.checked = false;
             } else {
                 banner.style.display = 'none';
@@ -2104,11 +2322,14 @@
             setVal('edit-endDate', a.endDate);
             setVal('edit-extension', a.extension);
 
-            renderImageStrip();
+            // Render the drag-to-reorder image manager
+            renderImgMgrGrid();
             populateDrawerBids(a.title);
             switchTab('admin', document.querySelector('.drawer-tab'));
             // Load admin fields
             setVal('admin-status', a.status);
+            setVal('admin-thirdPartyUrl', a.thirdPartyUrl || a.bidUrl || '');
+            setVal('admin-externalAuctionId', a.externalAuctionId || '');
             populateUserSearchDisplay(a);
             setVal('admin-course', a.course || a.location || '');
             setVal('admin-donor', a.donor || a.donorName || '');
@@ -2419,7 +2640,10 @@
                 startDate: getVal('edit-startDate'),
                 endDate: getVal('edit-endDate'),
                 extension: parseInt(getVal('edit-extension')) || 2,
-                images: [...editImages],
+                images: [..._drawerImages],
+                mapAddress: getVal('edit-mapAddress'),
+                thirdPartyUrl: getVal('admin-thirdPartyUrl'),
+                externalAuctionId: getVal('admin-externalAuctionId'),
             };
 
             const savedAuction = auctions[idx];
@@ -2584,6 +2808,25 @@
             const end = new Date(now); end.setDate(end.getDate() + 30);
             document.getElementById('new-startDate').value = fmt(now);
             document.getElementById('new-endDate').value = fmt(end);
+            // Reset all new fields
+            ['new-title', 'new-course', 'new-location', 'new-mapAddress',
+                'new-thirdPartyUrl', 'new-externalAuctionId', 'new-donor', 'new-adminNotes',
+                'new-architect', 'new-ranking', 'new-attributes', 'new-charity',
+                'new-description', 'new-courseDescription', 'new-restrictions'].forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) el.value = id === 'new-charity' ? 'EPIC Foundation' : '';
+                });
+            document.getElementById('new-startBid').value = '1000';
+            document.getElementById('new-increment').value = '200';
+            document.getElementById('new-guests').value = '2';
+            document.getElementById('new-rounds').value = '1';
+            document.getElementById('new-status').value = 'new';
+            document.getElementById('new-courseType').value = 'Parkland';
+            document.getElementById('new-access').value = 'Private';
+            document.getElementById('new-paidBy').value = 'Donor';
+            // Reset image grid
+            _newModalImages = [];
+            renderNewModalImages();
             document.getElementById('addModal').classList.add('open');
         }
 
@@ -2595,15 +2838,13 @@
             return str.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
         }
 
-        // ── Scalable Auction ID Generator ────────────────────────────
+        // ── Scalable Auction ID Generator ─────────────────────────────
         // Format: EPIC-YYYYMMDD-NNNNN (e.g. EPIC-20260311-00042)
-        // Guaranteed unique across all existing auctions.
         function generateAuctionId() {
             const today = new Date();
             const datePart = today.getFullYear().toString()
                 + String(today.getMonth() + 1).padStart(2, '0')
                 + String(today.getDate()).padStart(2, '0');
-            // Find the highest sequence number already used today
             const prefix = 'EPIC-' + datePart + '-';
             let maxSeq = 0;
             (auctions || []).forEach(a => {
@@ -2615,6 +2856,135 @@
             return prefix + String(maxSeq + 1).padStart(5, '0');
         }
 
+        // ── New Modal Image Manager ────────────────────────────────────
+        let _newModalImages = []; // array of { dataUrl, name }
+
+        function newModalAddImages(input) {
+            const files = Array.from(input.files);
+            files.forEach(file => {
+                const reader = new FileReader();
+                reader.onload = e => {
+                    _newModalImages.push({ dataUrl: e.target.result, name: file.name });
+                    renderNewModalImages();
+                };
+                reader.readAsDataURL(file);
+            });
+            input.value = '';
+        }
+
+        function renderNewModalImages() {
+            const grid = document.getElementById('new-img-grid');
+            if (!grid) return;
+            if (_newModalImages.length === 0) {
+                grid.innerHTML = '';
+                document.getElementById('new-imageUrl').value = '';
+                return;
+            }
+            grid.innerHTML = _newModalImages.map((img, i) => `
+                <div style="position:relative;width:86px;height:86px;flex-shrink:0;border-radius:9px;overflow:hidden;
+                            border:${i === 0 ? '2.5px solid #4A90E2' : '2px solid #e5e5e5'};">
+                    <img src="${img.dataUrl}" style="width:100%;height:100%;object-fit:cover;display:block;">
+                    ${i === 0 ? '<div style="position:absolute;bottom:0;left:0;right:0;background:rgba(74,144,226,0.9);color:#fff;font-size:0.6rem;font-weight:800;text-align:center;padding:2px;text-transform:uppercase;letter-spacing:0.05em;">Cover</div>' : ''}
+                    <button onclick="newModalRemoveImage(${i})" title="Remove"
+                        style="position:absolute;top:3px;right:3px;width:18px;height:18px;background:rgba(0,0,0,0.6);color:#fff;
+                               border:none;border-radius:50%;font-size:11px;line-height:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;">×</button>
+                    ${i > 0 ? `<button onclick="newModalMoveToFront(${i})" title="Set as cover"
+                        style="position:absolute;top:3px;left:3px;width:18px;height:18px;background:rgba(74,144,226,0.75);color:#fff;
+                               border:none;border-radius:50%;font-size:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;" title="Make cover">★</button>`: ''}
+                </div>`).join('');
+            // Keep first image URL in the hidden input (for backward compat with card rendering)
+            document.getElementById('new-imageUrl').value = _newModalImages[0].dataUrl;
+        }
+
+        function newModalRemoveImage(idx) {
+            _newModalImages.splice(idx, 1);
+            renderNewModalImages();
+        }
+
+        function newModalMoveToFront(idx) {
+            const img = _newModalImages.splice(idx, 1)[0];
+            _newModalImages.unshift(img);
+            renderNewModalImages();
+        }
+
+        // ── Edit Drawer Image Manager ──────────────────────────────────
+        let _drawerImages = []; // mirrors currentAuction.images during edit
+        let _drawerDragIdx = null;
+
+        function renderImgMgrGrid() {
+            const grid = document.getElementById('imgMgrGrid');
+            if (!grid) return;
+            if (_drawerImages.length === 0) {
+                grid.innerHTML = '<p style="color:#bbb;font-size:0.82rem;">No images yet. Upload some below.</p>';
+                return;
+            }
+            grid.innerHTML = _drawerImages.map((url, i) => `
+                <div draggable="true" data-idx="${i}"
+                    ondragstart="imgDragStart(event,${i})"
+                    ondragover="imgDragOver(event)"
+                    ondrop="imgDrop(event,${i})"
+                    ondragend="imgDragEnd()"
+                    style="position:relative;width:100px;height:100px;flex-shrink:0;border-radius:10px;
+                           overflow:hidden;border:${i === 0 ? '2.5px solid #4A90E2' : '2px solid #e5e5e5'};
+                           cursor:grab;transition:opacity 0.2s;">
+                    <img src="${url}" style="width:100%;height:100%;object-fit:cover;display:block;">
+                    ${i === 0 ? '<div style="position:absolute;bottom:0;left:0;right:0;background:rgba(74,144,226,0.88);color:#fff;font-size:0.58rem;font-weight:800;text-align:center;padding:2px;text-transform:uppercase;">Cover</div>' : ''}
+                    <div style="position:absolute;top:3px;right:3px;display:flex;gap:2px;">
+                        <label title="Replace" style="width:20px;height:20px;background:rgba(0,0,0,0.55);border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;">
+                            <input type="file" accept="image/*" style="display:none" onchange="imgMgrReplace(this,${i})">
+                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                        </label>
+                        <button onclick="imgMgrRemove(${i})" title="Remove"
+                            style="width:20px;height:20px;background:rgba(200,50,50,0.75);color:#fff;
+                                   border:none;border-radius:50%;font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;">×</button>
+                    </div>
+                    <div style="position:absolute;bottom:3px;left:3px;" title="Drag to reorder">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="white" opacity="0.7"><circle cx="9" cy="5" r="1.5"/><circle cx="15" cy="5" r="1.5"/><circle cx="9" cy="12" r="1.5"/><circle cx="15" cy="12" r="1.5"/><circle cx="9" cy="19" r="1.5"/><circle cx="15" cy="19" r="1.5"/></svg>
+                    </div>
+                </div>`).join('');
+        }
+
+        function imgDragStart(e, idx) { _drawerDragIdx = idx; e.currentTarget.style.opacity = '0.4'; }
+        function imgDragEnd() { _drawerDragIdx = null; document.querySelectorAll('#imgMgrGrid [data-idx]').forEach(el => el.style.opacity = ''); }
+        function imgDragOver(e) { e.preventDefault(); }
+        function imgDrop(e, targetIdx) {
+            e.preventDefault();
+            if (_drawerDragIdx === null || _drawerDragIdx === targetIdx) return;
+            const moved = _drawerImages.splice(_drawerDragIdx, 1)[0];
+            _drawerImages.splice(targetIdx, 0, moved);
+            renderImgMgrGrid();
+        }
+        function imgMgrRemove(idx) {
+            if (!confirm('Remove this image?')) return;
+            _drawerImages.splice(idx, 1);
+            renderImgMgrGrid();
+        }
+        function imgMgrReplace(input, idx) {
+            const file = input.files[0]; if (!file) return;
+            const reader = new FileReader();
+            reader.onload = e => { _drawerImages[idx] = e.target.result; renderImgMgrGrid(); };
+            reader.readAsDataURL(file);
+            input.value = '';
+        }
+        function imgZoneAdd(input) {
+            Array.from(input.files).forEach(file => {
+                const reader = new FileReader();
+                reader.onload = e => { _drawerImages.push(e.target.result); renderImgMgrGrid(); };
+                reader.readAsDataURL(file);
+            });
+            input.value = '';
+        }
+        function imgZoneDrop(e) {
+            e.preventDefault();
+            const zone = document.getElementById('imgUploadZone');
+            if (zone) { zone.style.borderColor = '#d4d4d4'; zone.style.background = ''; }
+            Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('image/')).forEach(file => {
+                const reader = new FileReader();
+                reader.onload = ev => { _drawerImages.push(ev.target.result); renderImgMgrGrid(); };
+                reader.readAsDataURL(file);
+            });
+        }
+
         function createAuction() {
             const title = document.getElementById('new-title').value.trim();
             const course = document.getElementById('new-course').value.trim();
@@ -2624,39 +2994,42 @@
                 return;
             }
             const id = generateAuctionId();
-
-            const imgUrl = document.getElementById('new-imageUrl').value.trim();
+            const startBid = parseFloat(document.getElementById('new-startBid').value) || 1000;
             const newA = {
                 id,
                 title,
                 course,
                 location: loc,
+                mapAddress: document.getElementById('new-mapAddress').value.trim(),
                 status: document.getElementById('new-status').value,
-                architect: '',
-                courseType: 'Parkland',
-                access: 'Private',
-                yearOpened: null,
-                ranking: '',
+                thirdPartyUrl: document.getElementById('new-thirdPartyUrl').value.trim(),
+                externalAuctionId: document.getElementById('new-externalAuctionId').value.trim(),
+                architect: document.getElementById('new-architect').value.trim(),
+                courseType: document.getElementById('new-courseType').value,
+                access: document.getElementById('new-access').value,
+                yearOpened: parseInt(document.getElementById('new-yearOpened').value) || null,
+                ranking: document.getElementById('new-ranking').value.trim(),
                 courseUrl: '',
-                guests: 2,
-                rounds: 1,
-                attributes: '',
-                paidBy: 'Donor',
-                restrictions: '',
-                description: '',
-                courseDescription: '',
-                charity: 'EPIC Foundation',
+                guests: parseInt(document.getElementById('new-guests').value) || 2,
+                rounds: parseInt(document.getElementById('new-rounds').value) || 1,
+                attributes: document.getElementById('new-attributes').value.trim(),
+                paidBy: document.getElementById('new-paidBy').value,
+                restrictions: document.getElementById('new-restrictions').value.trim(),
+                description: document.getElementById('new-description').value.trim(),
+                courseDescription: document.getElementById('new-courseDescription').value.trim(),
+                charity: document.getElementById('new-charity').value.trim() || 'EPIC Foundation',
                 taxDeductible: 'no',
-                startBid: parseFloat(document.getElementById('new-startBid').value) || 1000,
-                currentBid: parseFloat(document.getElementById('new-startBid').value) || 1000,
-                increment: 200,
-                buyNow: parseFloat(document.getElementById('new-buyNow').value) || 0,
+                startBid,
+                currentBid: startBid,
+                increment: parseInt(document.getElementById('new-increment').value) || 200,
+                buyNow: 0,
                 bidCount: 0,
                 startDate: document.getElementById('new-startDate').value,
                 endDate: document.getElementById('new-endDate').value,
                 extension: 2,
-                images: imgUrl ? [imgUrl] : [],
+                images: _newModalImages.map(i => i.dataUrl),
                 donor: document.getElementById('new-donor').value.trim(),
+                adminNotes: document.getElementById('new-adminNotes').value.trim(),
                 createdAt: new Date().toISOString(),
             };
 
@@ -2665,7 +3038,7 @@
             closeAddModal();
             renderTable();
             showToast('🎉 Auction created!');
-            // Open the edit drawer so they can fill in all details
+            // Open the edit drawer so they can continue filling in details
             setTimeout(() => openEditDrawer(id), 300);
         }
 
