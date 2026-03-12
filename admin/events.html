@@ -956,23 +956,29 @@
 
     <!-- Add Event Modal -->
     <div class="modal" id="eventModal">
-        <div class="modal-box" style="max-width:620px;">
-            <h2 style="margin-bottom:0.25rem;">Add New Event</h2>
-            <p style="font-size:0.82rem;color:#999;margin-bottom:1.5rem;">Fill in all the details. You can edit anything
-                later from the event drawer.</p>
+        <div class="modal-box" style="max-width:700px;max-height:92vh;overflow-y:auto;">
+            <h2 style="margin-bottom:0.25rem;">New Event</h2>
+            <p style="font-size:0.82rem;color:#999;margin-bottom:1.5rem;">Fill in all the details. An Event ID is generated automatically. Edit anything later from the drawer.</p>
             <form onsubmit="handleEventModalSubmit(event)">
 
-                <!-- Basic Info -->
-                <div
-                    style="font-size:0.7rem;text-transform:uppercase;letter-spacing:0.1em;color:#bbb;font-weight:600;margin-bottom:0.6rem;padding-bottom:0.3rem;border-bottom:1px solid #f0f0f0;">
-                    Basic Information</div>
+                <!-- CORE -->
+                <div style="font-size:0.7rem;text-transform:uppercase;letter-spacing:0.1em;color:#bbb;font-weight:700;margin-bottom:0.7rem;padding-bottom:0.3rem;border-bottom:1px solid #f0f0f0;">Core</div>
                 <div class="form-row">
-                    <div class="form-group" style="flex:2"><label>Trip Title</label><input type="text" id="new-title"
-                            required placeholder="e.g. Pebble Beach Golf Experience"></div>
+                    <div class="form-group" style="flex:2"><label>Event Title *</label><input type="text" id="new-title" required placeholder="e.g. Quaker Ridge Golf Day 2026"></div>
+                    <div class="form-group" style="flex:1">
+                        <label>Event Type</label>
+                        <select id="new-eventType" style="width:100%;padding:0.6rem 0.8rem;border-radius:6px;border:1px solid #ddd;font-family:inherit;font-size:0.88rem;background:white;">
+                            <option value="Golf Day">Golf Day</option>
+                            <option value="Gala">Gala</option>
+                            <option value="Clinic">Clinic</option>
+                            <option value="Trip">Trip</option>
+                            <option value="Tournament">Tournament</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
                     <div class="form-group" style="flex:1">
                         <label>Status</label>
-                        <select id="new-status"
-                            style="width:100%;padding:0.6rem 0.8rem;border-radius:6px;border:1px solid #ddd;font-family:inherit;font-size:0.88rem;background:white;">
+                        <select id="new-status" style="width:100%;padding:0.6rem 0.8rem;border-radius:6px;border:1px solid #ddd;font-family:inherit;font-size:0.88rem;background:white;">
                             <option value="pending" selected>Pending — Hidden</option>
                             <option value="draft">Draft — Hidden</option>
                             <option value="active">Active — Live</option>
@@ -980,87 +986,82 @@
                         </select>
                     </div>
                 </div>
-                <div class="form-group"><label>Location</label><input type="text" id="new-location" required
-                        placeholder="e.g. Pebble Beach, California"></div>
 
-                <!-- Dates -->
-                <div
-                    style="font-size:0.7rem;text-transform:uppercase;letter-spacing:0.1em;color:#bbb;font-weight:600;margin:1rem 0 0.6rem;padding-bottom:0.3rem;border-bottom:1px solid #f0f0f0;">
-                    Dates</div>
+                <!-- LOCATION -->
+                <div style="font-size:0.7rem;text-transform:uppercase;letter-spacing:0.1em;color:#bbb;font-weight:700;margin:1.1rem 0 0.7rem;padding-bottom:0.3rem;border-bottom:1px solid #f0f0f0;">Location</div>
                 <div class="form-row">
-                    <div class="form-group"><label>Start Date</label><input type="date" id="new-date-start" required>
-                    </div>
-                    <div class="form-group"><label>End Date</label><input type="date" id="new-date-end" required></div>
+                    <div class="form-group"><label>Display Location <span style="font-weight:400;color:#bbb;">(city, state)</span></label><input type="text" id="new-location" required placeholder="e.g. Pebble Beach, California"></div>
+                    <div class="form-group"><label>Map Address <span style="font-weight:400;color:#bbb;">(full address for map embed)</span></label><input type="text" id="new-mapAddress" placeholder="1700 17-Mile Dr, Pebble Beach, CA 93953"></div>
                 </div>
 
-                <!-- Capacity & Pricing -->
-                <div
-                    style="font-size:0.7rem;text-transform:uppercase;letter-spacing:0.1em;color:#bbb;font-weight:600;margin:1rem 0 0.6rem;padding-bottom:0.3rem;border-bottom:1px solid #f0f0f0;">
-                    Capacity & Pricing</div>
+                <!-- DATES -->
+                <div style="font-size:0.7rem;text-transform:uppercase;letter-spacing:0.1em;color:#bbb;font-weight:700;margin:1.1rem 0 0.7rem;padding-bottom:0.3rem;border-bottom:1px solid #f0f0f0;">Dates</div>
                 <div class="form-row">
-                    <div class="form-group"><label>Total Spots</label><input type="number" id="new-spots" required
-                            min="1"></div>
-                    <div class="form-group"><label>Spots Sold</label><input type="number" id="new-spotsSold" min="0"
-                            value="0"></div>
-                    <div class="form-group"><label>Price Per Person ($)</label><input type="number" id="new-price"
-                            required min="0"></div>
-                </div>
-                <div class="form-group" style="margin-top:-0.5rem; margin-bottom:1rem;">
-                    <label style="display:flex; align-items:center; gap:0.5rem; cursor:pointer;">
-                        <input type="checkbox" id="new-allowGuests" checked style="width:auto;"> Allow Guests
-                    </label>
+                    <div class="form-group"><label>Event Start *</label><input type="date" id="new-date-start" required></div>
+                    <div class="form-group"><label>Event End</label><input type="date" id="new-date-end"></div>
+                    <div class="form-group"><label>Registration Deadline</label><input type="date" id="new-regDeadline"></div>
                 </div>
 
-                <!-- Description -->
-                <div
-                    style="font-size:0.7rem;text-transform:uppercase;letter-spacing:0.1em;color:#bbb;font-weight:600;margin:1rem 0 0.6rem;padding-bottom:0.3rem;border-bottom:1px solid #f0f0f0;">
-                    Details</div>
-                <div class="form-group"><label>Description</label><textarea id="new-description" rows="3"
-                        style="width:100%;padding:0.6rem 0.8rem;border-radius:6px;border:1px solid #ddd;font-family:inherit;font-size:0.88rem;resize:vertical;"
-                        placeholder="Describe the experience..."></textarea></div>
-                <div class="form-group"><label>What's Included</label><input type="text" id="new-includes"
-                        placeholder="e.g. Lodging, Meals, Greens Fees, Caddies"></div>
-                <div class="form-group"><label>Landing Page Link</label><input type="text" id="new-link"
-                        placeholder="events/your-page.html (leave blank for #)" value="#"></div>
-
-                <!-- Image -->
-                <div class="form-group">
-                    <label>Cover Image</label>
-                    <input type="hidden" id="new-image">
-                    <label class="upload-label">
-                        <input type="file" accept="image/*,.pdf"
-                            onchange="uploadImage(this, 'new-image', 'new-image-preview')">
-                        📁 Choose file (PNG, JPG, PDF)
-                    </label>
-                    <img id="new-image-preview" class="img-preview" alt="preview">
-                </div>
-
-                <!-- Operating Costs -->
-                <div
-                    style="font-size:0.7rem;text-transform:uppercase;letter-spacing:0.1em;color:#bbb;font-weight:600;margin:1rem 0 0.6rem;padding-bottom:0.3rem;border-bottom:1px solid #f0f0f0;">
-                    Operating Costs (Optional)</div>
+                <!-- CAPACITY & PRICING -->
+                <div style="font-size:0.7rem;text-transform:uppercase;letter-spacing:0.1em;color:#bbb;font-weight:700;margin:1.1rem 0 0.7rem;padding-bottom:0.3rem;border-bottom:1px solid #f0f0f0;">Capacity &amp; Pricing</div>
                 <div class="form-row">
-                    <div class="form-group"><label>Venue / Greens Fees ($)</label><input type="number"
-                            id="new-costVenue" min="0" value="0"></div>
-                    <div class="form-group"><label>Catering / Meals ($)</label><input type="number"
-                            id="new-costCatering" min="0" value="0"></div>
+                    <div class="form-group"><label>Total Spots *</label><input type="number" id="new-spots" required min="1"></div>
+                    <div class="form-group"><label>Spots Sold</label><input type="number" id="new-spotsSold" min="0" value="0"></div>
+                    <div class="form-group"><label>Price Per Person ($) *</label><input type="number" id="new-price" required min="0"></div>
                 </div>
+                <div class="form-group" style="margin-top:-0.4rem;margin-bottom:0.5rem;">
+                    <label style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;"><input type="checkbox" id="new-allowGuests" checked style="width:auto;"> Allow Guests (+1 spot per registration)</label>
+                </div>
+
+                <!-- CONTENT -->
+                <div style="font-size:0.7rem;text-transform:uppercase;letter-spacing:0.1em;color:#bbb;font-weight:700;margin:1.1rem 0 0.7rem;padding-bottom:0.3rem;border-bottom:1px solid #f0f0f0;">Content</div>
+                <div class="form-group"><label>Event Description <span style="font-weight:400;color:#bbb;">(shown on public event page)</span></label><textarea id="new-description" rows="3" style="width:100%;padding:0.6rem 0.8rem;border-radius:6px;border:1px solid #ddd;font-family:inherit;font-size:0.88rem;resize:vertical;" placeholder="Describe the experience..."></textarea></div>
+                <div class="form-group"><label>What's Included</label><textarea id="new-includes" rows="2" style="width:100%;padding:0.6rem 0.8rem;border-radius:6px;border:1px solid #ddd;font-family:inherit;font-size:0.88rem;resize:vertical;" placeholder="Greens Fees&#13;&#10;Breakfast &amp; Lunch&#13;&#10;Cocktail Reception"></textarea></div>
+                <div class="form-group"><label>Format / Competition Style</label><input type="text" id="new-format" placeholder="e.g. Shotgun start, Best Ball competition"></div>
+
+                <!-- SCHEDULE -->
+                <div style="font-size:0.7rem;text-transform:uppercase;letter-spacing:0.1em;color:#bbb;font-weight:700;margin:1.1rem 0 0.7rem;padding-bottom:0.3rem;border-bottom:1px solid #f0f0f0;">Day Schedule <span style="font-weight:400;text-transform:none;letter-spacing:0;">(optional)</span></div>
                 <div class="form-row">
-                    <div class="form-group"><label>Transportation ($)</label><input type="number"
-                            id="new-costTransportation" min="0" value="0"></div>
-                    <div class="form-group"><label>Marketing ($)</label><input type="number" id="new-costMarketing"
-                            min="0" value="0"></div>
+                    <div class="form-group"><label>🌅 Morning</label><input type="text" id="new-scheduleMorning" placeholder="9:30 AM Registration / 10:00 AM Breakfast"></div>
+                    <div class="form-group"><label>⛳ Afternoon</label><input type="text" id="new-scheduleAfternoon" placeholder="12:00 PM Shotgun Start"></div>
+                    <div class="form-group"><label>🍸 Evening</label><input type="text" id="new-scheduleEvening" placeholder="5:00 PM Cocktail Reception"></div>
+                </div>
+
+                <!-- IMAGES -->
+                <div style="font-size:0.7rem;text-transform:uppercase;letter-spacing:0.1em;color:#bbb;font-weight:700;margin:1.1rem 0 0.7rem;padding-bottom:0.3rem;border-bottom:1px solid #f0f0f0;">Images</div>
+                <div id="new-event-img-grid" style="display:flex;flex-wrap:wrap;gap:0.6rem;margin-bottom:0.8rem;"></div>
+                <label style="display:flex;align-items:center;gap:0.6rem;padding:0.75rem 1rem;border:2px dashed #ddd;border-radius:10px;cursor:pointer;font-size:0.85rem;color:#888;margin-bottom:0.5rem;">
+                    <input type="file" accept="image/*" multiple style="display:none" onchange="newEventAddImages(this)">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                    Click to upload images — first image = cover
+                </label>
+                <input type="hidden" id="new-image">
+
+                <!-- ADMIN -->
+                <div style="font-size:0.7rem;text-transform:uppercase;letter-spacing:0.1em;color:#b8860b;font-weight:700;margin:1.1rem 0 0.7rem;padding-bottom:0.3rem;border-bottom:1px solid #ffe082;">🔒 Admin Only</div>
+                <div class="form-row" style="background:#fffbe6;border-radius:8px;padding:0.8rem;border:1.5px solid #ffe082;">
+                    <div class="form-group"><label style="color:#b8860b;">Event Coordinator</label><input type="text" id="new-coordinator" placeholder="Name / team lead"></div>
+                    <div class="form-group"><label style="color:#b8860b;">Internal Notes</label><input type="text" id="new-adminNotes" placeholder="Internal tracking notes"></div>
+                </div>
+
+                <!-- OPERATING COSTS -->
+                <div style="font-size:0.7rem;text-transform:uppercase;letter-spacing:0.1em;color:#bbb;font-weight:700;margin:1.1rem 0 0.7rem;padding-bottom:0.3rem;border-bottom:1px solid #f0f0f0;">Operating Costs <span style="font-weight:400;text-transform:none;letter-spacing:0;">(Optional)</span></div>
+                <div class="form-row">
+                    <div class="form-group"><label>Venue / Greens Fees ($)</label><input type="number" id="new-costVenue" min="0" value="0"></div>
+                    <div class="form-group"><label>Catering / Meals ($)</label><input type="number" id="new-costCatering" min="0" value="0"></div>
                 </div>
                 <div class="form-row">
-                    <div class="form-group"><label>Staff / Guides ($)</label><input type="number" id="new-costStaff"
-                            min="0" value="0"></div>
-                    <div class="form-group"><label>Miscellaneous ($)</label><input type="number" id="new-costMisc"
-                            min="0" value="0"></div>
+                    <div class="form-group"><label>Transportation ($)</label><input type="number" id="new-costTransportation" min="0" value="0"></div>
+                    <div class="form-group"><label>Marketing ($)</label><input type="number" id="new-costMarketing" min="0" value="0"></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label>Staff / Guides ($)</label><input type="number" id="new-costStaff" min="0" value="0"></div>
+                    <div class="form-group"><label>Miscellaneous ($)</label><input type="number" id="new-costMisc" min="0" value="0"></div>
                 </div>
 
-                <div class="modal-footer" style="margin-top: 2rem;">
+                <div class="modal-footer" style="margin-top:2rem;">
                     <button type="button" class="btn-cancel" onclick="closeModals()">Cancel</button>
-                    <button type="submit" class="btn-save">Create Event</button>
+                    <button type="submit" class="btn-save">Create Event →</button>
                 </div>
             </form>
         </div>
@@ -1601,6 +1602,61 @@
         function openDestModal() { document.getElementById('destModal').classList.add('active'); }
         function closeModals() { document.querySelectorAll('.modal').forEach(m => m.classList.remove('active')); }
 
+        // ── Event ID Generator ────────────────────────────────────────
+        // Format: EPIC-EVT-YYYYMMDD-NNNNN
+        function generateEventId() {
+            const today = new Date();
+            const datePart = today.getFullYear().toString()
+                + String(today.getMonth() + 1).padStart(2, '0')
+                + String(today.getDate()).padStart(2, '0');
+            const prefix = 'EPIC-EVT-' + datePart + '-';
+            const events = loadSharedEvents() || [];
+            let maxSeq = 0;
+            events.forEach(ev => {
+                if (ev.id && ev.id.startsWith(prefix)) {
+                    const seq = parseInt(ev.id.replace(prefix, ''), 10);
+                    if (!isNaN(seq) && seq > maxSeq) maxSeq = seq;
+                }
+            });
+            return prefix + String(maxSeq + 1).padStart(5, '0');
+        }
+
+        // ── New Event Modal Image Manager ──────────────────────────────
+        let _newEventImages = [];
+
+        function newEventAddImages(input) {
+            Array.from(input.files).forEach(file => {
+                const reader = new FileReader();
+                reader.onload = e => {
+                    _newEventImages.push({ dataUrl: e.target.result, name: file.name });
+                    renderNewEventImages();
+                };
+                reader.readAsDataURL(file);
+            });
+            input.value = '';
+        }
+
+        function renderNewEventImages() {
+            const grid = document.getElementById('new-event-img-grid');
+            if (!grid) return;
+            if (_newEventImages.length === 0) { grid.innerHTML = ''; return; }
+            grid.innerHTML = _newEventImages.map((img, i) => `
+                <div style="position:relative;width:80px;height:80px;flex-shrink:0;border-radius:9px;overflow:hidden;
+                            border:${i===0?'2.5px solid #4A90E2':'2px solid #e5e5e5'};">
+                    <img src="${img.dataUrl}" style="width:100%;height:100%;object-fit:cover;display:block;">
+                    ${i===0?'<div style="position:absolute;bottom:0;left:0;right:0;background:rgba(74,144,226,0.9);color:#fff;font-size:0.58rem;font-weight:800;text-align:center;padding:2px;">Cover</div>':''}
+                    <button onclick="newEventRemoveImg(${i})" style="position:absolute;top:3px;right:3px;width:18px;height:18px;background:rgba(0,0,0,0.6);color:#fff;border:none;border-radius:50%;font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;">×</button>
+                    ${i>0?`<button onclick="newEventSetCover(${i})" title="Set as cover" style="position:absolute;top:3px;left:3px;width:18px;height:18px;background:rgba(74,144,226,0.75);color:#fff;border:none;border-radius:50%;font-size:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;">★</button>`:''}
+                </div>`).join('');
+        }
+
+        function newEventRemoveImg(idx) { _newEventImages.splice(idx,1); renderNewEventImages(); }
+        function newEventSetCover(idx) {
+            const img = _newEventImages.splice(idx,1)[0];
+            _newEventImages.unshift(img);
+            renderNewEventImages();
+        }
+
         function handleEventModalSubmit(e) {
             e.preventDefault();
 
@@ -1616,31 +1672,57 @@
                 ? fmtDate(startRaw) + ' – ' + fmtDate(endRaw)
                 : fmtDate(startRaw) || fmtDate(endRaw);
 
+            const newId = generateEventId();
+            const slug = newId.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+            const autoLink = `events/event-page.html?id=${newId}`;
+
+            const images = _newEventImages.map(i => i.dataUrl);
+
             saveEvent({
+                id: newId,
                 title: document.getElementById('new-title').value,
+                eventType: document.getElementById('new-eventType').value,
                 status: document.getElementById('new-status').value,
                 location: document.getElementById('new-location').value,
+                mapAddress: document.getElementById('new-mapAddress').value,
                 date: dateRange,
+                dateStart: startRaw,
+                dateEnd: document.getElementById('new-date-end').value,
+                registrationDeadline: document.getElementById('new-regDeadline').value,
                 spots: parseInt(document.getElementById('new-spots').value),
                 spotsSold: parseInt(document.getElementById('new-spotsSold').value) || 0,
                 price: parseInt(document.getElementById('new-price').value),
                 allowGuests: document.getElementById('new-allowGuests').checked,
                 description: document.getElementById('new-description').value,
                 includes: document.getElementById('new-includes').value,
-                image: document.getElementById('new-image').value,
-                link: document.getElementById('new-link').value || '#',
+                format: document.getElementById('new-format').value,
+                schedule: {
+                    morning: document.getElementById('new-scheduleMorning').value,
+                    afternoon: document.getElementById('new-scheduleAfternoon').value,
+                    evening: document.getElementById('new-scheduleEvening').value,
+                },
+                images,
+                image: images[0] || '',
+                link: autoLink,
+                coordinator: document.getElementById('new-coordinator').value,
+                adminNotes: document.getElementById('new-adminNotes').value,
                 costVenue: parseInt(document.getElementById('new-costVenue').value) || 0,
                 costCatering: parseInt(document.getElementById('new-costCatering').value) || 0,
                 costTransportation: parseInt(document.getElementById('new-costTransportation').value) || 0,
                 costMarketing: parseInt(document.getElementById('new-costMarketing').value) || 0,
                 costStaff: parseInt(document.getElementById('new-costStaff').value) || 0,
                 costMisc: parseInt(document.getElementById('new-costMisc').value) || 0,
+                createdAt: new Date().toISOString(),
             });
+
+            // Reset images
+            _newEventImages = [];
+            renderNewEventImages();
+
             closeModals();
             renderEvents();
             // Auto-open the drawer for the newly created event
-            const newest = loadSharedEvents().slice(-1)[0];
-            if (newest) openDrawer(newest.id);
+            setTimeout(() => openDrawer(newId), 200);
         }
 
         function handleDestSubmit(e) {
