@@ -64,43 +64,77 @@
             </div>
 
             <!-- Right: Auction Details -->
-            <div class="auction-details">
+            <div class="auction-details" style="display:flex;flex-direction:column;gap:1.8rem;">
+
+                <!-- Countdown -->
                 <div class="time-left-section">
-                    <h3>Time Left</h3>
-                    <div class="countdown" id="auction-countdown">Loading...</div>
-                    <p class="auction-end" id="auction-end-date">Loading...</p>
-                    <p class="bid-extension">Bids in the final 2 minutes extend the auction's end by 2 minutes</p>
+                    <h3
+                        style="font-size:0.72rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#888;margin-bottom:0.5rem;">
+                        Auction Closes In</h3>
+                    <div class="countdown" id="auction-countdown"
+                        style="font-size:2.2rem;font-weight:900;letter-spacing:-0.02em;line-height:1;">Loading…</div>
+                    <p class="auction-end" id="auction-end-date"
+                        style="font-size:0.78rem;color:#888;margin-top:0.4rem;"></p>
                 </div>
 
+                <!-- CTA Buttons -->
+                <div style="display:flex;flex-direction:column;gap:0.75rem;">
+                    <a id="bid-now-link" href="#" target="_blank" rel="noopener" style="display:flex;align-items:center;justify-content:center;gap:0.5rem;
+                               padding:1rem 1.5rem;background:#000;color:#fff;
+                               border-radius:12px;font-size:1rem;font-weight:800;
+                               text-decoration:none;letter-spacing:0.02em;
+                               transition:opacity 0.2s,transform 0.15s;text-align:center;"
+                        onmouseover="this.style.opacity='0.85';this.style.transform='translateY(-1px)'"
+                        onmouseout="this.style.opacity='1';this.style.transform=''">
+                        Bid Now
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="7" y1="17" x2="17" y2="7" />
+                            <polyline points="7 7 17 7 17 17" />
+                        </svg>
+                    </a>
+
+                    <button id="watchlist-btn-main" style="display:flex;align-items:center;justify-content:center;gap:0.5rem;
+                               padding:0.9rem 1.5rem;background:#fff;color:#111;
+                               border:2px solid #e0e0e0;border-radius:12px;
+                               font-family:'Poppins',sans-serif;font-size:0.9rem;font-weight:700;
+                               cursor:pointer;letter-spacing:0.02em;
+                               transition:border-color 0.2s,background 0.2s;" onclick="toggleWatchlist()"
+                        onmouseover="this.style.borderColor='#111'" onmouseout="this.style.borderColor='#e0e0e0'">
+                        <svg id="wl-heart" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path
+                                d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+                        </svg>
+                        <span id="wl-label">Add to Watchlist</span>
+                    </button>
+                </div>
+
+                <!-- Short description -->
+                <p id="auction-cta-note"
+                    style="font-size:0.78rem;color:#999;line-height:1.6;border-top:1px solid #f0f0f0;padding-top:1.2rem;">
+                    Bidding takes place on our secure auction platform. Click <strong style="color:#555;">Bid
+                        Now</strong> to view full details and place your bid.
+                </p>
+
+                <!-- LEGACY BID CODE PRESERVED — hidden, not deleted
                 <div class="pricing-section">
-                    <div class="current-bid-display">
-                        <h2>$8,000</h2>
-                        <p>Current bid</p>
-                    </div>
+                    <div class="current-bid-display"><h2 id="current-bid-legacy">$8,000</h2><p>Current bid</p></div>
                     <div class="bid-info">
-                        <div class="bid-increment">
-                            <span class="label">Bid Increment</span>
-                            <span class="value">$200</span>
-                        </div>
-                        <div class="buy-now-price" style="display:none;">
-                            <span class="label">Buy It Now</span>
-                            <span class="value">$12,000</span>
-                        </div>
+                        <div class="bid-increment"><span class="label">Bid Increment</span><span class="value">$200</span></div>
+                        <div class="buy-now-price" style="display:none;"><span class="label">Buy It Now</span><span class="value">$12,000</span></div>
                     </div>
                 </div>
-
-                <div class="winning-announcement" id="winningAnnouncement"
-                    style="display:none; background:#e8f8f0; color:#1a9e5c; padding:0.8rem 1rem; border-radius:8px; font-size:0.85rem; font-weight:600; text-align:center; margin-bottom:1rem; border:1px solid #1a9e5c;">
-                    🎉 You currently hold the highest bid!
-                </div>
-
-                <div class="action-buttons">
+                <div class="winning-announcement" id="winningAnnouncement" style="display:none;">🎉 You currently hold the highest bid!</div>
+                <div class="action-buttons" style="display:none;">
                     <button class="bid-btn">BID</button>
                     <div class="secondary-buttons">
                         <button class="buy-now-action-btn" style="display:none;">BUY NOW</button>
                         <button class="watchlist-btn">ADD TO WATCHLIST</button>
                     </div>
                 </div>
+                END LEGACY -->
+
             </div>
         </div>
     </section>
@@ -494,8 +528,21 @@
                 setGalleryImages(data.images);
             }
 
-            // --- Pricing Display ---
-            const currentBidEl = document.querySelector('.current-bid-display h2');
+            // --- Bid Now External Link ---
+            const bidNowLink = document.getElementById('bid-now-link');
+            if (bidNowLink) {
+                const extUrl = data.thirdPartyUrl || data.bidUrl || data.externalUrl || '#';
+                bidNowLink.href = extUrl;
+                if (!extUrl || extUrl === '#') {
+                    bidNowLink.title = 'External bid link coming soon';
+                }
+            }
+
+            // --- Watchlist init ---
+            initWatchlistBtn(data.id);
+
+            // --- Pricing Display (legacy, still updates hidden element) ---
+            const currentBidEl = document.querySelector('#current-bid-legacy');
             if (currentBidEl) {
                 const currentBidLabel = data.currentBid || data.startBid;
                 currentBidEl.textContent = `$${currentBidLabel.toLocaleString()}`;
@@ -693,6 +740,69 @@
                 });
             }
         });
-    </script>
+    
+        // ── Watchlist toggle ─────────────────────────────────────────
+        let _watchlistAuctionId = null;
+
+        function initWatchlistBtn(auctionId) {
+            _watchlistAuctionId = auctionId;
+            const user = typeof AUTH !== 'undefined' ? AUTH.currentUser() : null;
+            if (!user) return;
+            const key = 'epic_users';
+            let users = [];
+            try { users = JSON.parse(localStorage.getItem(key) || '[]'); } catch {}
+            const u = users.find(x => x.id === user.id);
+            const watchlist = (u && u.watchlist) || [];
+            const onList = watchlist.some(w => (w.auctionId || w) === auctionId);
+            updateWatchlistBtn(onList);
+        }
+
+        function updateWatchlistBtn(isOnList) {
+            const label = document.getElementById('wl-label');
+            const heart = document.getElementById('wl-heart');
+            const btn   = document.getElementById('watchlist-btn-main');
+            if (!label || !heart || !btn) return;
+            if (isOnList) {
+                label.textContent = 'On Watchlist';
+                heart.setAttribute('fill', '#e53935');
+                heart.setAttribute('stroke', '#e53935');
+                btn.style.borderColor = '#e53935';
+                btn.style.color = '#e53935';
+            } else {
+                label.textContent = 'Add to Watchlist';
+                heart.setAttribute('fill', 'none');
+                heart.setAttribute('stroke', 'currentColor');
+                btn.style.borderColor = '#e0e0e0';
+                btn.style.color = '#111';
+            }
+        }
+
+        function toggleWatchlist() {
+            const user = typeof AUTH !== 'undefined' ? AUTH.currentUser() : null;
+            if (!user) { alert('Please log in to save to your watchlist.'); return; }
+            const auctionId = _watchlistAuctionId;
+            if (!auctionId) return;
+            const key = 'epic_users';
+            let users = [];
+            try { users = JSON.parse(localStorage.getItem(key) || '[]'); } catch {}
+            const idx = users.findIndex(x => x.id === user.id);
+            const u = idx > -1 ? users[idx] : { ...user, watchlist: [] };
+            if (!u.watchlist) u.watchlist = [];
+            const wi = u.watchlist.findIndex(w => (w.auctionId || w) === auctionId);
+            if (wi > -1) {
+                u.watchlist.splice(wi, 1);
+                updateWatchlistBtn(false);
+            } else {
+                u.watchlist.push({ auctionId, addedAt: new Date().toISOString() });
+                updateWatchlistBtn(true);
+            }
+            if (idx > -1) users[idx] = u; else users.push(u);
+            localStorage.setItem(key, JSON.stringify(users));
+            // Also persist to EPICDB if available
+            if (typeof EPICDB !== 'undefined' && EPICDB.saveUser) {
+                EPICDB.saveUser(u).catch(() => {});
+            }
+        }
+</script>
 
 </html>
