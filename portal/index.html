@@ -435,7 +435,7 @@
                     const allUsers = JSON.parse(localStorage.getItem('epic_users') || '[]');
                     user = allUsers.find(u => u.id === session.id) || session;
                 }
-            } catch(e) {
+            } catch (e) {
                 const allUsers = JSON.parse(localStorage.getItem('epic_users') || '[]');
                 user = allUsers.find(u => u.id === session.id) || session;
             }
@@ -458,7 +458,7 @@
         }
         renderStats(); // render immediately with session data
         loadFreshUser(); // then update from EPICDB
-        logActivity('user', 'Member portal viewed', ((session.firstName||'')+' '+(session.lastName||'')).trim() + ' · ' + (session.email||'')).trimEnd();
+        logActivity('user', 'Member portal viewed', ((session.firstName || '') + ' ' + (session.lastName || '')).trim() + ' · ' + (session.email || '')).trimEnd();
 
         // ── Panel Renderer ──────────────────────────────────────────────
         function showPanel(view) {
@@ -500,9 +500,35 @@
                 title.textContent = 'Auctions Won';
                 const purchases = user.purchases || [];
                 if (purchases.length === 0) {
-                    body.innerHTML = emptyState('🏆', "You haven't won any auctions yet. Keep bidding!", '../auctions.html', 'Browse Auctions');
+                    body.innerHTML = emptyState('🏆', "You haven't won any auctions yet.", '../auctions.html', 'Browse Auctions');
                 } else {
-                    body.innerHTML = purchases.map(p => bidRow('🏆', p.title || p.auctionId, `$${p.amount.toLocaleString()}`, `../auction-rounds/pebble-beach-round-2?id=${p.auctionId}`, 'Won', '#f57f17', '#fff8e1')).join('');
+                    const now = new Date();
+                    body.innerHTML = purchases.map(p => {
+                        const endDate = p.endDate ? new Date(p.endDate) : null;
+                        const isClosed = p.status === 'closed' || p.status === 'ended' || p.status === 'sold' || (endDate && endDate < now);
+                        const badge = isClosed ? 'Closed' : 'Won';
+                        const badgeBg = isClosed ? '#f5f5f5' : '#fff8e1';
+                        const badgeColor = isClosed ? '#888' : '#f57f17';
+                        const scheduleBtn = isClosed
+                            ? `<a href="../contact.html?subject=Schedule+My+Round+%28${encodeURIComponent(p.title || p.auctionId)}%29"
+                                  style="display:inline-flex;align-items:center;gap:0.3rem;margin-top:0.5rem;
+                                         padding:0.4rem 0.9rem;background:#1a9e5c;color:#fff;
+                                         border-radius:7px;font-size:0.75rem;font-weight:700;
+                                         text-decoration:none;"
+                                  onmouseover="this.style.opacity='0.85'"
+                                  onmouseout="this.style.opacity='1'">
+                                  Schedule My Round →
+                               </a>`
+                            : '';
+                        return `<div class="bid-row" style="display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;padding:0.9rem 0;border-bottom:1px solid #f3f3f3;">
+                            <div style="display:flex;flex-direction:column;min-width:0;">
+                                <a href="../auction-rounds/pebble-beach-round-2?id=${p.auctionId}" style="font-weight:700;font-size:0.88rem;color:#111;text-decoration:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${p.title || p.auctionId}</a>
+                                <span style="font-size:0.78rem;color:#888;margin-top:2px;">$${(p.amount || 0).toLocaleString()}</span>
+                                ${scheduleBtn}
+                            </div>
+                            <span style="display:inline-block;padding:3px 9px;border-radius:6px;font-size:0.72rem;font-weight:700;background:${badgeBg};color:${badgeColor};white-space:nowrap;flex-shrink:0;">${badge}</span>
+                        </div>`;
+                    }).join('');
                 }
 
             } else if (view === 'trips') {
@@ -647,17 +673,17 @@
 
         // Default: show auctions won on load
         showPanel('won');
-    
+
         // Log user login activity
         function logActivity(type, msg, detail) {
             const ACTIVITY_KEY = 'epic_activity_log';
             let log = [];
-            try { log = JSON.parse(localStorage.getItem(ACTIVITY_KEY) || '[]'); } catch {}
+            try { log = JSON.parse(localStorage.getItem(ACTIVITY_KEY) || '[]'); } catch { }
             log.unshift({ type, msg, detail: detail || '', ts: new Date().toISOString() });
             if (log.length > 200) log = log.slice(0, 200);
             localStorage.setItem(ACTIVITY_KEY, JSON.stringify(log));
         }
-</script>
+    </script>
 </body>
 
 </html>

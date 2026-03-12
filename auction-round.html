@@ -117,6 +117,23 @@
                         Now</strong> to view full details and place your bid.
                 </p>
 
+                <!-- Schedule button — shown only when auction is closed -->
+                <div id="schedule-btn-wrap" style="display:none;padding-top:1rem;">
+                    <div
+                        style="background:#e8f8f0;border-radius:12px;padding:1.2rem 1.4rem;border:1.5px solid #1a9e5c;">
+                        <p style="font-size:0.82rem;font-weight:700;color:#1a9e5c;margin-bottom:0.5rem;">Ready to
+                            schedule your round?</p>
+                        <p style="font-size:0.76rem;color:#555;margin-bottom:0.9rem;line-height:1.6;">This auction has
+                            closed. Contact our team to begin scheduling your outing.</p>
+                        <a href="../contact.html?subject=Schedule+My+Round" style="display:inline-flex;align-items:center;gap:0.4rem;padding:0.65rem 1.2rem;
+                                   background:#1a9e5c;color:#fff;border-radius:9px;
+                                   font-size:0.84rem;font-weight:700;text-decoration:none;"
+                            onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">
+                            Schedule My Round →
+                        </a>
+                    </div>
+                </div>
+
                 <!-- LEGACY BID CODE PRESERVED — hidden, not deleted
                 <div class="pricing-section">
                     <div class="current-bid-display"><h2 id="current-bid-legacy">$8,000</h2><p>Current bid</p></div>
@@ -502,14 +519,13 @@
 
             const mapContainer = document.querySelector('.map-container');
             if (mapContainer) {
-                const encodedQuery = encodeURIComponent(data.location);
-                mapContainer.innerHTML = `
-                    <iframe
-                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1!2d-0!3d0!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2z0!5e0!3m2!1sen!2sus!4v1!5m2!1sen!2sus&q=${encodedQuery}"
-                        width="100%" height="400" style="border:0; border-radius: 16px;" allowfullscreen=""
-                        loading="lazy" referrerpolicy="no-referrer-when-downgrade">
-                    </iframe>
-                `;
+                const encodedQuery = encodeURIComponent(data.location || data.course || 'Golf Course');
+                // Use Google Maps /place/ embed which doesn't require an API key
+                mapContainer.innerHTML = `<iframe
+                    width="100%" height="400" style="border:0;border-radius:16px;"
+                    loading="lazy" allowfullscreen referrerpolicy="no-referrer-when-downgrade"
+                    src="https://maps.google.com/maps?q=${encodedQuery}&output=embed">
+                </iframe>`;
             }
 
             // --- Main Image Layout ---
@@ -578,12 +594,25 @@
                     const distance = endTimestamp - now;
 
                     if (distance < 0) {
-                        timerEl.textContent = "AUCTION ENDED";
+                        timerEl.textContent = 'Closed';
+                        timerEl.style.color = '#e53935';
+                        endEl.textContent = 'This auction has ended.';
+                        // Update Bid Now button to reflect closed state
+                        const bidNowEl = document.getElementById('bid-now-link');
+                        if (bidNowEl) {
+                            bidNowEl.textContent = 'Auction Closed';
+                            bidNowEl.style.background = '#888';
+                            bidNowEl.style.cursor = 'default';
+                            bidNowEl.style.pointerEvents = 'none';
+                        }
+                        // Show schedule button
+                        const schedBtn = document.getElementById('schedule-btn-wrap');
+                        if (schedBtn) schedBtn.style.display = '';
+                        // Legacy bid btn (hidden but still markup)
                         const bidBtn = document.querySelector('.bid-btn');
                         if (bidBtn) {
                             bidBtn.textContent = 'AUCTION CLOSED';
                             bidBtn.style.opacity = '0.7';
-                            bidBtn.style.cursor = 'not-allowed';
                             bidBtn.style.pointerEvents = 'none';
                         }
                         return;
@@ -709,7 +738,7 @@
                     const newConfirm = buyNowModalConfirm.cloneNode(true);
                     buyNowModalConfirm.parentNode.replaceChild(newConfirm, buyNowModalConfirm);
                     const newCancel = buyNowModalCancel.cloneNode(true);
-                    buyNowModalCancel.parentNode.replaceChild(newCancel, buyNowModalCancel);
+                  yNCancel.parentNode.replaceChild(newCancel, buyNowModalCancel);
 
                     newCancel.addEventListener('click', () => {
                         buyNowModal.style.display = 'none';
@@ -803,6 +832,6 @@
                 EPICDB.saveUser(u).catch(() => {});
             }
         }
-</script>
+    </script>
 
 </html>
