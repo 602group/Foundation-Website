@@ -56,7 +56,7 @@ const EPICDB = (() => {
     async function getUsers() {
         const users = await apiGet('/users');
         if (users) {
-            localStorage.setItem('epic_users', JSON.stringify(users));
+            try { localStorage.setItem('epic_users', JSON.stringify(users)); } catch(e) { console.warn('Bypassing local cache for ' + 'localStorage.setItem('epic_users', JSON.stringify(users));'); }
             return users;
         }
         // Fallback to localStorage if API fails
@@ -76,7 +76,7 @@ const EPICDB = (() => {
     async function getAuctions() {
         const auctions = await apiGet('/auctions');
         if (auctions) {
-            localStorage.setItem('epic_auctions', JSON.stringify(auctions));
+            try { localStorage.setItem('epic_auctions', JSON.stringify(auctions)); } catch(e) { console.warn('Bypassing local cache for ' + 'localStorage.setItem('epic_auctions', JSON.stringify(auctions));'); }
             return auctions;
         }
         try { return JSON.parse(localStorage.getItem('epic_auctions')) || []; }
@@ -114,7 +114,7 @@ const EPICDB = (() => {
                 });
             }
 
-            localStorage.setItem('epic_courses', JSON.stringify(merged));
+            try { localStorage.setItem('epic_courses', JSON.stringify(merged)); } catch(e) { console.warn('Bypassing local cache for ' + 'localStorage.setItem('epic_courses', JSON.stringify(merged));'); }
             return merged;
         }
 
@@ -125,7 +125,7 @@ const EPICDB = (() => {
                     if (!local.find(c => c.id === def.id)) local.push(def);
                 });
             }
-            localStorage.setItem('epic_courses', JSON.stringify(local));
+            try { localStorage.setItem('epic_courses', JSON.stringify(local)); } catch(e) { console.warn('Bypassing local cache for ' + 'localStorage.setItem('epic_courses', JSON.stringify(local));'); }
             return local;
         }
         if (typeof loadSharedCourses === 'function') return loadSharedCourses();

@@ -21,7 +21,7 @@ function loadSharedEvents() {
 }
 
 function saveSharedEvents(events) {
-    localStorage.setItem('epic_events', JSON.stringify(events));
+    try { localStorage.setItem('epic_events', JSON.stringify(events)); } catch(e) { console.warn('localStorage quota hit for 'epic_events''); }
 }
 
 function getEventById(id) {
@@ -33,7 +33,7 @@ const DESTINATIONS_VERSION = '2';
 function loadSharedDestinations() {
     const raw = localStorage.getItem('epic_destinations');
     if (!raw || raw === '[]') {
-        localStorage.setItem('epic_destinations', JSON.stringify(DEFAULT_DESTINATIONS));
+        try { localStorage.setItem('epic_destinations', JSON.stringify(DEFAULT_DESTINATIONS)); } catch(e) { console.warn('localStorage quota hit for 'epic_destinations''); }
         localStorage.setItem('epic_destinations_ver', DESTINATIONS_VERSION);
         return DEFAULT_DESTINATIONS;
     }
@@ -64,7 +64,7 @@ function saveEvent(eventData) {
             ...eventData
         });
     }
-    localStorage.setItem('epic_events', JSON.stringify(events));
+    try { localStorage.setItem('epic_events', JSON.stringify(events)); } catch(e) { console.warn('localStorage quota hit for 'epic_events''); }
     return events;
 }
 
@@ -104,7 +104,7 @@ function recomputeAllSpotsSold() {
         }
     });
     if (changed) {
-        localStorage.setItem('epic_events', JSON.stringify(events));
+        try { localStorage.setItem('epic_events', JSON.stringify(events)); } catch(e) { console.warn('localStorage quota hit for 'epic_events''); }
     }
     return events;
 }
@@ -118,13 +118,13 @@ function saveDestination(destData) {
     } else {
         destinations.push(destData);
     }
-    localStorage.setItem('epic_destinations', JSON.stringify(destinations));
+    try { localStorage.setItem('epic_destinations', JSON.stringify(destinations)); } catch(e) { console.warn('localStorage quota hit for 'epic_destinations''); }
     return destinations;
 }
 
 function deleteEvent(id) {
     const events = loadSharedEvents().filter(e => e.id !== id);
-    localStorage.setItem('epic_events', JSON.stringify(events));
+    try { localStorage.setItem('epic_events', JSON.stringify(events)); } catch(e) { console.warn('localStorage quota hit for 'epic_events''); }
 
     // Cascade: scrub orphaned trips from users
     try {
@@ -137,11 +137,11 @@ function deleteEvent(id) {
                 if (u.trips.length !== initLen) changed = true;
             }
         });
-        if (changed) localStorage.setItem('epic_users', JSON.stringify(users));
+        if (changed) try { localStorage.setItem('epic_users', JSON.stringify(users)); } catch(e) { console.warn('localStorage quota hit for 'epic_users''); }
     } catch (e) { console.error('Error cascading event delete to users:', e); }
 }
 
 function deleteDestination(id) {
     const destinations = loadSharedDestinations().filter(d => d.id !== id);
-    localStorage.setItem('epic_destinations', JSON.stringify(destinations));
+    try { localStorage.setItem('epic_destinations', JSON.stringify(destinations)); } catch(e) { console.warn('localStorage quota hit for 'epic_destinations''); }
 }

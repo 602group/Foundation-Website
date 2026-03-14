@@ -3103,9 +3103,7 @@
                         try {
                 localStorage.setItem('epic_auctions', JSON.stringify(auctions));
             } catch (e) {
-                console.error("localStorage Quota Exceeded:", e);
-                alert("Storage limit reached! The images are too large. Please upload fewer or smaller images.");
-                return;
+                console.warn("localStorage quota exceeded. Bypassing local cache and relying entirely on Postgres DB...");
             }
             document.getElementById('drawerOverlay').classList.remove('open');
             document.getElementById('editDrawer').classList.remove('open');

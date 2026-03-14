@@ -15,7 +15,7 @@ function loadSharedCourses() {
 
         // If completely empty, seed everything
         if (!raw || raw === '[]') {
-            localStorage.setItem(COURSES_STORE_KEY, JSON.stringify(defaults));
+            try { localStorage.setItem(COURSES_STORE_KEY, JSON.stringify(defaults)); } catch(e) { console.warn('localStorage quota hit for COURSES_STORE_KEY'); }
             localStorage.setItem(COURSES_STORE_KEY + '_ver', COURSES_VERSION);
             return defaults;
         }
@@ -31,7 +31,7 @@ function loadSharedCourses() {
                     changed = true;
                 }
             });
-            if (changed) localStorage.setItem(COURSES_STORE_KEY, JSON.stringify(local));
+            if (changed) try { localStorage.setItem(COURSES_STORE_KEY, JSON.stringify(local)); } catch(e) { console.warn('localStorage quota hit for COURSES_STORE_KEY'); }
             localStorage.setItem(COURSES_STORE_KEY + '_ver', COURSES_VERSION);
         }
 
@@ -42,7 +42,7 @@ function loadSharedCourses() {
 }
 
 function saveSharedCourses(data) {
-    localStorage.setItem(COURSES_STORE_KEY, JSON.stringify(data));
+    try { localStorage.setItem(COURSES_STORE_KEY, JSON.stringify(data)); } catch(e) { console.warn('localStorage quota hit for COURSES_STORE_KEY'); }
     if (typeof EPICDB !== 'undefined' && EPICDB.saveCourse) {
         data.forEach(c => EPICDB.saveCourse(c).catch(console.warn));
     }
@@ -51,7 +51,7 @@ function saveSharedCourses(data) {
 function deleteCourse(courseId) {
     const courses = loadSharedCourses();
     const updated = courses.filter(c => c.id !== courseId);
-    localStorage.setItem(COURSES_STORE_KEY, JSON.stringify(updated));
+    try { localStorage.setItem(COURSES_STORE_KEY, JSON.stringify(updated)); } catch(e) { console.warn('localStorage quota hit for COURSES_STORE_KEY'); }
     if (typeof EPICDB !== 'undefined' && EPICDB.deleteCourse) {
         EPICDB.deleteCourse(courseId).catch(console.warn);
     }

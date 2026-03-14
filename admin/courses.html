@@ -874,9 +874,7 @@
             try {
                 localStorage.setItem(COURSES_STORE_KEY, JSON.stringify(allCourses));
             } catch (e) {
-                console.error("localStorage Quota Exceeded:", e);
-                alert("Storage limit reached! The images are too large. Please upload fewer or smaller images.");
-                return;
+                console.warn("localStorage quota exceeded. Bypassing local cache and relying entirely on Postgres DB...");
             }
 
             // Save to the database and wait for confirmation

@@ -13,7 +13,7 @@ function loadSharedAuctions() {
         // Only seed if completely empty. Never overwrite existing live data.
         if (!raw || raw === '[]') {
             const defaults = getDefaultAuctions();
-            localStorage.setItem(AUCTIONS_STORE_KEY, JSON.stringify(defaults));
+            try { localStorage.setItem(AUCTIONS_STORE_KEY, JSON.stringify(defaults)); } catch(e) { console.warn('localStorage quota hit for AUCTIONS_STORE_KEY'); }
             localStorage.setItem(AUCTIONS_STORE_KEY + '_ver', AUCTIONS_VERSION);
             return defaults;
         }
@@ -24,7 +24,7 @@ function loadSharedAuctions() {
 }
 
 function saveSharedAuctions(data) {
-    localStorage.setItem(AUCTIONS_STORE_KEY, JSON.stringify(data));
+    try { localStorage.setItem(AUCTIONS_STORE_KEY, JSON.stringify(data)); } catch(e) { console.warn('localStorage quota hit for AUCTIONS_STORE_KEY'); }
     // Persist to shared database
     if (typeof EPICDB !== 'undefined') {
         data.forEach(a => EPICDB.saveAuction(a).catch(console.warn));
