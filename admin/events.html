@@ -1474,19 +1474,9 @@
             document.getElementById('d-visibility').value = e.visibility || 'all';
             document.getElementById('d-title').value = e.title;
             document.getElementById('d-location').value = e.location;
-            // Parse stored date range back into two date inputs
-            // Stored format: "Month Day, Year – Month Day, Year" or free text
-            (function () {
-                const raw = e.date || '';
-                const parts = raw.split(/[–\-]/); // en-dash or hyphen
-                const toISO = str => {
-                    const d = new Date(str.trim());
-                    if (isNaN(d)) return '';
-                    return d.toISOString().slice(0, 10);
-                };
-                document.getElementById('d-date-start').value = toISO(parts[0] || '');
-                document.getElementById('d-date-end').value = toISO(parts[1] || parts[0] || '');
-            })();
+            // Use explicitly stored start/end dates if available
+            document.getElementById('d-date-start').value = e.dateStart || '';
+            document.getElementById('d-date-end').value = e.dateEnd || '';
             document.getElementById('d-price').value = e.price;
             document.getElementById('d-allowGuests').checked = e.allowGuests !== false;
             document.getElementById('d-spots').value = e.spots;
