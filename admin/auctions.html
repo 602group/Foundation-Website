@@ -2283,8 +2283,13 @@
             } else {
                 banner.style.display = 'none';
             }
-            setVal('edit-startDate', a.startDate);
-            setVal('edit-endDate', a.endDate);
+            // Normalize dates to YYYY-MM-DDTHH:mm for datetime-local inputs
+            const toLocal = v => {
+                if (!v) return '';
+                try { return new Date(v).toISOString().slice(0, 16); } catch { return ''; }
+            };
+            setVal('edit-startDate', toLocal(a.startDate));
+            setVal('edit-endDate', toLocal(a.endDate));
             setVal('edit-extension', a.extension);
 
             // Render the drag-to-reorder image manager
@@ -2701,7 +2706,8 @@
             const adminCourse = getVal('admin-course') || getVal('edit-course');
 
             auctions[idx] = {
-                ...latestAuctions[latestIdx],
+                // Spread from in-memory object only — avoids stale localStorage cross-contamination
+                ...auctions[idx],
                 title: getVal('edit-title'),
                 course: adminCourse,
                 status: getVal('admin-status') || getVal('edit-status'),
@@ -2731,8 +2737,7 @@
                 charity: getVal('edit-charity'),
                 taxDeductible: getVal('edit-taxDeductible'),
                 startBid: parseFloat(getVal('edit-startBid')) || 0,
-                currentBid: (parseFloat(getVal('edit-currentBid')) !== auctions[idx].currentBid)
-                    ? parseFloat(getVal('edit-currentBid')) : currentLiveBid,
+                currentBid: currentLiveBid,
                 bidCount: currentLiveCount,
                 highestBidder: currentLiveBidder,
                 increment: parseFloat(getVal('edit-increment')) || 200,
@@ -2740,14 +2745,13 @@
                 startDate: getVal('edit-startDate'),
                 endDate: getVal('edit-endDate'),
                 extension: parseInt(getVal('edit-extension')) || 2,
-                
                 thirdPartyUrl: getVal('gs-itemUrl') || getVal('admin-thirdPartyUrl'),
                 externalAuctionId: getVal('gs-itemId') || getVal('admin-externalAuctionId'),
-                // GiveSmart canonical fields
                 gsItemUrl:   getVal('gs-itemUrl'),
                 gsItemId:    getVal('gs-itemId'),
                 gsEventId:   getVal('gs-eventId'),
                 internalId:  getVal('gs-internalId'),
+                updated_at: new Date().toISOString(),
             };
 
             const savedAuction = auctions[idx];

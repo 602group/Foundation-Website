@@ -1705,10 +1705,9 @@
         }
 
         // ── Save drawer form ──────────────────────────────────────────────────
-        function handleDrawerSave(e) {
+        async function handleDrawerSave(e) {
             e.preventDefault();
 
-            // Format date from two pickers
             const fmtD = raw => {
                 if (!raw) return '';
                 const d = new Date(raw + 'T00:00:00');
@@ -1717,31 +1716,44 @@
             const ds = document.getElementById('d-date-start').value;
             const de = document.getElementById('d-date-end').value;
             const dateRange = ds && de ? fmtD(ds) + ' – ' + fmtD(de) : fmtD(ds) || fmtD(de);
+            const eventId = document.getElementById('drawer-event-id').value;
 
+            // Merge with existing event so no fields (images, schedule, etc.) are lost
+            const existing = getEventById(eventId) || {};
+            const newImg = document.getElementById('d-image').value;
             const payload = {
-                id: document.getElementById('drawer-event-id').value,
+                ...existing,
+                id: eventId,
                 status: document.getElementById('d-status').value,
                 visibility: document.getElementById('d-visibility').value || 'all',
                 title: document.getElementById('d-title').value,
                 location: document.getElementById('d-location').value,
                 date: dateRange,
+                dateStart: ds,
+                dateEnd: de,
                 price: parseInt(document.getElementById('d-price').value),
                 allowGuests: document.getElementById('d-allowGuests').checked,
                 spots: parseInt(document.getElementById('d-spots').value),
                 spotsSold: parseInt(document.getElementById('d-spotsSold').value) || 0,
                 description: document.getElementById('d-description').value,
                 includes: document.getElementById('d-includes').value,
-                image: document.getElementById('d-image').value,
-                link: document.getElementById('d-link').value || '#',
+                image: newImg || existing.image || '',
+                link: document.getElementById('d-link').value || existing.link || '#',
                 costVenue: parseInt(document.getElementById('d-costVenue').value) || 0,
                 costCatering: parseInt(document.getElementById('d-costCatering').value) || 0,
                 costTransportation: parseInt(document.getElementById('d-costTransportation').value) || 0,
                 costMarketing: parseInt(document.getElementById('d-costMarketing').value) || 0,
                 costStaff: parseInt(document.getElementById('d-costStaff').value) || 0,
                 costMisc: parseInt(document.getElementById('d-costMisc').value) || 0,
+                updated_at: new Date().toISOString(),
             };
+
             saveEvent(payload);
-            // Re-open drawer with fresh data
+            if (typeof EPICDB !== 'undefined') {
+                try { await EPICDB.saveEvent(payload); } catch(err) { console.warn('EPICDB.saveEvent failed', err); }
+            }
+            if (typeof showToast === 'function') showToast('Event saved ✓', 'success');
+            clearEventCourse('d');
             openDrawer(payload.id);
             renderEvents();
         }
