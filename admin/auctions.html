@@ -2816,7 +2816,8 @@
                         canvas.height = h;
                         const ctx = canvas.getContext('2d');
                         ctx.drawImage(img, 0, 0, w, h);
-                        resolve(canvas.toDataURL('image/jpeg', 0.8));
+                        // Using 0.6 quality to heavily reduce base64 footprint for localStorage
+                        resolve(canvas.toDataURL('image/jpeg', 0.6));
                     };
                     img.src = e.target.result;
                 };
@@ -3099,7 +3100,13 @@
                     // Just remove locally and save updated list via PUT with status rejected
                 }
             } catch (e) { }
-            localStorage.setItem('epic_auctions', JSON.stringify(auctions));
+                        try {
+                localStorage.setItem('epic_auctions', JSON.stringify(auctions));
+            } catch (e) {
+                console.error("localStorage Quota Exceeded:", e);
+                alert("Storage limit reached! The images are too large. Please upload fewer or smaller images.");
+                return;
+            }
             document.getElementById('drawerOverlay').classList.remove('open');
             document.getElementById('editDrawer').classList.remove('open');
             renderTable();

@@ -782,7 +782,8 @@
                         canvas.height = h;
                         const ctx = canvas.getContext('2d');
                         ctx.drawImage(img, 0, 0, w, h);
-                        resolve(canvas.toDataURL('image/jpeg', 0.8));
+                        // Using 0.6 quality to heavily reduce base64 footprint for localStorage
+                        resolve(canvas.toDataURL('image/jpeg', 0.6));
                     };
                     img.src = e.target.result;
                 };
@@ -793,7 +794,7 @@
         async function courseImgZoneAdd(input) {
             for (let file of input.files) {
                 if (!file.type.startsWith('image/')) continue;
-                const base64 = await resizeImage(file, 1200);
+                const base64 = await resizeImage(file, 800);
                 _courseImages.push(base64);
             }
             renderCourseImgGrid();
@@ -806,9 +807,10 @@
             if (zone) { zone.style.borderColor = '#d4d4d4'; zone.style.background = ''; }
             for (let file of e.dataTransfer.files) {
                 if (!file.type.startsWith('image/')) continue;
-                const base64 = await resizeImage(file, 1200);
+                const base64 = await resizeImage(file, 800);
                 _courseImages.push(base64);
             }
+
             renderCourseImgGrid();
         }
         // ── Collect Form ──────────────────────────────────────────────────────
@@ -869,7 +871,13 @@
             else allCourses.push(course);
 
             // Save to localStorage immediately so UI feels instant
-            localStorage.setItem(COURSES_STORE_KEY, JSON.stringify(allCourses));
+            try {
+                localStorage.setItem(COURSES_STORE_KEY, JSON.stringify(allCourses));
+            } catch (e) {
+                console.error("localStorage Quota Exceeded:", e);
+                alert("Storage limit reached! The images are too large. Please upload fewer or smaller images.");
+                return;
+            }
 
             // Save to the database and wait for confirmation
             if (typeof EPICDB !== 'undefined' && EPICDB.saveCourse) {
