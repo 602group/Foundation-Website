@@ -41,16 +41,16 @@
         <div class="hero-container">
             <!-- Left: Main Image -->
             <div class="main-image-container">
-                <img src="hero.png" alt="Golf Course" class="main-image">
+                <img id="main-hero-img" src="" alt="Golf Course" class="main-image" style="background:#111;">
             </div>
 
             <!-- Middle: Smaller Images -->
             <div class="side-images-container">
                 <div class="side-image">
-                    <img src="hero.png" alt="Golf Course View 1">
+                    <img id="side-img-1" src="" alt="Golf Course View 1" style="background:#111;">
                 </div>
                 <div class="side-image">
-                    <img src="hero.png" alt="Golf Course View 2">
+                    <img id="side-img-2" src="" alt="Golf Course View 2" style="background:#111;">
                     <button class="view-more-btn" onclick="openGallery()">
                         <svg viewBox="0 0 24 24" fill="currentColor"
                             style="width: 20px; height: 20px; margin-right: 8px;">
@@ -68,37 +68,20 @@
                     <h3>Time Left</h3>
                     <div class="countdown" id="auction-countdown">Loading...</div>
                     <p class="auction-end" id="auction-end-date">Loading...</p>
-                    <p class="bid-extension">Bids in the final 2 minutes extend the auction's end by 2 minutes</p>
                 </div>
 
-                <div class="pricing-section">
-                    <div class="current-bid-display">
-                        <h2>$8,000</h2>
-                        <p>Current bid</p>
-                    </div>
-                    <div class="bid-info">
-                        <div class="bid-increment">
-                            <span class="label">Bid Increment</span>
-                            <span class="value">$100</span>
-                        </div>
-                        <div class="buy-now-price" style="display:none;">
-                            <span class="label">Buy It Now</span>
-                            <span class="value">$12,000</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="winning-announcement" id="winningAnnouncement"
-                    style="display:none; background:#e8f8f0; color:#1a9e5c; padding:0.8rem 1rem; border-radius:8px; font-size:0.85rem; font-weight:600; text-align:center; margin-bottom:1rem; border:1px solid #1a9e5c;">
-                    🎉 You currently hold the highest bid!
-                </div>
-
-                <div class="action-buttons">
-                    <button class="bid-btn">BID</button>
+                <div class="action-buttons" style="margin-top:1.5rem;">
+                    <a id="bid-now-link" href="#" target="_blank" rel="noopener"
+                        class="bid-btn"
+                        style="display:block;text-align:center;text-decoration:none;color:#fff;">
+                        BID NOW
+                    </a>
                     <div class="secondary-buttons">
-                        <button class="buy-now-action-btn" style="display:none;">BUY NOW</button>
-                        <button class="watchlist-btn">ADD TO WATCHLIST</button>
+                        <button class="watchlist-btn" id="watchlist-btn">ADD TO WATCHLIST</button>
                     </div>
+                    <p style="font-size:0.75rem;color:#888;margin-top:0.75rem;text-align:center;line-height:1.5;">
+                        Bidding is handled securely via our auction partner. You'll be taken to the external checkout page.
+                    </p>
                 </div>
             </div>
         </div>
@@ -243,11 +226,7 @@
                             <p class="support-label">This Auction Proudly Supports:</p>
                             <h2 class="charity-name">EPIC Foundation</h2>
                             <p class="charity-description">
-                                EPIC Foundation is a charitable organization dedicated to creating once-in-a-lifetime
-                                golf experiences that benefit important causes. Through our auction platform, we connect
-                                golf enthusiasts with exclusive access to the world's most prestigious courses while
-                                raising funds for non-profit organizations. Every bid supports our mission to make
-                                unforgettable golf moments accessible while giving back to the community.
+                                EPIC Foundation exists to create extraordinary golf experiences that serve a greater purpose. We partner with world-class golf clubs to offer access that money alone can't buy — then direct the proceeds to Folds of Honor, Hope Kids, and Youth on Course. When you bid, you're not just winning a round of golf. You're funding something that matters.
                             </p>
                         </div>
                         <div class="charity-logo-box">
@@ -260,11 +239,11 @@
             <div class="info-sidebar">
                 <div class="charity-info">
                     <h3>Supporting</h3>
-                    <div class="charity-logo">
-                        <p>Member For A Day</p>
+                    <div class="charity-logo" style="background:#f8f9fa;border-radius:10px;padding:1rem;text-align:center;margin-bottom:0.75rem;">
+                        <p style="font-weight:800;font-size:1rem;color:#000;margin:0;">EPIC Foundation</p>
+                        <p style="font-size:0.75rem;color:#666;margin:0.25rem 0 0;">Folds of Honor &bull; Hope Kids &bull; Youth on Course</p>
                     </div>
-                    <p class="charity-description">100% of proceeds benefit our charitable mission to provide
-                        once-in-a-lifetime golf experiences while supporting important causes.</p>
+                    <p class="charity-description">Every dollar bid through EPIC Foundation goes directly to organizations changing lives through golf — funding scholarships for military families, experiences for children fighting illness, and access to the game for underserved youth.</p>
                 </div>
 
                 <div class="share-section">
@@ -407,7 +386,6 @@
                 return;
             }
 
-            // Always fetch fresh data from server so admin changes are reflected immediately
             let auctions;
             if (typeof EPICDB !== 'undefined') {
                 auctions = await EPICDB.getAuctions();
@@ -421,14 +399,10 @@
                 return;
             }
 
-            // --- Header Details ---
+            // --- Page Title & Location ---
             document.title = `${data.title} - EPIC Foundation`;
             document.getElementById('page-auction-title').textContent = data.title;
 
-            const stateMatch = data.location.match(/,\s*([A-Za-z]{2})/);
-            const state = stateMatch ? stateMatch[1] : '';
-
-            // Need to retain the SVG icon inside location/date but change text
             const locSpan = document.getElementById('page-auction-location');
             locSpan.innerHTML = `
                 <svg class="meta-icon" viewBox="0 0 24 24" fill="currentColor">
@@ -437,306 +411,97 @@
                 ${data.location}
             `;
 
-            document.getElementById('page-auction-description').innerHTML = data.description.replace(/\n/g, '<br>');
+            document.getElementById('page-auction-description').innerHTML =
+                data.description ? data.description.replace(/\n/g, '<br>') : '';
 
-            // --- Map Logic ---
+            // --- Images ---
+            const images = data.images && data.images.length ? data.images : [];
+            const mainImg = document.getElementById('main-hero-img');
+            const side1   = document.getElementById('side-img-1');
+            const side2   = document.getElementById('side-img-2');
+            if (mainImg && images[0]) mainImg.src = images[0];
+            if (side1   && images[1]) side1.src   = images[1];
+            if (side2   && images[2]) side2.src   = images[2];
+            if (typeof setGalleryImages === 'function') setGalleryImages(images);
+
+            // --- Bid Now Link ---
+            const bidLink = document.getElementById('bid-now-link');
+            if (bidLink) {
+                bidLink.href = data.bidUrl || data.checkoutUrl || '#';
+            }
+
+            // --- Map ---
             document.getElementById('page-auction-map-address').textContent = data.location;
-            const encodedQuery = encodeURIComponent(data.location);
+            const encoded = encodeURIComponent(data.location);
             document.getElementById('page-auction-map').innerHTML = `
                 <iframe
-                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1!2d-0!3d0!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2z0!5e0!3m2!1sen!2sus!4v1!5m2!1sen!2sus&q=${encodedQuery}"
-                    width="100%" height="400" style="border:0; border-radius: 16px;" allowfullscreen=""
-                    loading="lazy" referrerpolicy="no-referrer-when-downgrade">
+                    src="https://www.openstreetmap.org/export/embed.html?bbox=-122.5,36.5,-121.8,37.0&layer=mapnik&marker=${encodeURIComponent(data.location)}&q=${encoded}"
+                    width="100%" height="400" style="border:0; border-radius:16px;"
+                    loading="lazy">
                 </iframe>
+                <p style="margin-top:0.5rem;font-size:0.82rem;color:#888;">
+                    <a href="https://maps.google.com/maps?q=${encoded}" target="_blank" rel="noopener"
+                        style="color:#000;font-weight:600;">Open in Google Maps →</a>
+                </p>
             `;
 
-            // --- Main Image Layout ---
-            const mainImage = document.querySelector('.main-image');
-            if (mainImage && data.images[0]) {
-                mainImage.src = data.images[0];
-            }
-
-            const sideImages = document.querySelectorAll('.side-image img');
-            if (sideImages.length > 0) {
-                if (data.images[1]) sideImages[0].src = data.images[1];
-                if (data.images[2]) sideImages[1].src = data.images[2];
-            }
-
-            if (typeof setGalleryImages === 'function') {
-                setGalleryImages(data.images);
-            }
-
-            // --- Pricing Display ---
-            // Compute the REAL current bid by scanning all users' bids for this auction
-            // This prevents stale data from being displayed if epic_auctions was reset
-            const currentBidEl = document.querySelector('.current-bid-display h2');
-            if (currentBidEl) {
-                let realHighestBid = data.startBid || 0;
-                let realHighestBidder = '';
-                try {
-                    const allUsers = JSON.parse(localStorage.getItem('epic_users') || '[]');
-                    allUsers.forEach(u => {
-                        (u.bids || []).forEach(b => {
-                            if (typeof b === 'object' && b.auctionId === data.id && Number(b.amount) > realHighestBid) {
-                                realHighestBid = Number(b.amount);
-                                realHighestBidder = u.email;
-                            }
-                        });
-                    });
-                } catch (e) { }
-
-                // If the real highest bid is greater than what the auction record thinks, sync it back
-                if (realHighestBid > (data.currentBid || 0)) {
-                    data.currentBid = realHighestBid;
-                    if (realHighestBidder) data.highestBidder = realHighestBidder;
-                    const idx = auctions.findIndex(a => a.id === data.id);
-                    if (idx > -1) auctions[idx] = data;
-                    saveSharedAuctions(auctions);
-                }
-
-                const displayBid = data.currentBid || data.startBid;
-                currentBidEl.textContent = `$${displayBid.toLocaleString()}`;
-            }
-
-            const bidInfoParent = document.querySelector('.bid-info');
-            if (bidInfoParent) {
-                if (data.buyNow) {
-                    bidInfoParent.querySelector('.buy-now-price .value').textContent = `$${data.buyNow.toLocaleString()}`;
-                } else {
-                    const buyNowRow = bidInfoParent.querySelector('.buy-now-price');
-                    if (buyNowRow) buyNowRow.style.display = 'none';
-                    const buyNowBtn = document.querySelector('.buy-now-action-btn');
-                    if (buyNowBtn) buyNowBtn.style.display = 'none';
-                }
-            }
-
-            // --- Live Countdown Logic ---
+            // --- Countdown ---
             const timerEl = document.getElementById('auction-countdown');
-            const endEl = document.getElementById('auction-end-date');
+            const endEl   = document.getElementById('auction-end-date');
             if (data.endDate && timerEl && endEl) {
                 const endTimestamp = new Date(data.endDate).getTime();
-
-                // Set the static end date string
-                const endDateObj = new Date(data.endDate);
-                const opts = { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', second: '2-digit' };
-                endEl.textContent = `Auction Ends: ${endDateObj.toLocaleString('en-US', opts)}`;
+                const endDateObj   = new Date(data.endDate);
+                endEl.textContent  = `Auction Ends: ${endDateObj.toLocaleString('en-US', { month:'short', day:'numeric', hour:'numeric', minute:'2-digit' })}`;
 
                 function updateCountdown() {
-                    const now = new Date().getTime();
-                    const distance = endTimestamp - now;
-
+                    const distance = endTimestamp - Date.now();
                     if (distance < 0) {
-                        timerEl.textContent = "AUCTION ENDED";
-                        const bidBtn = document.querySelector('.bid-btn');
-                        if (bidBtn) {
-                            bidBtn.textContent = 'AUCTION CLOSED';
-                            bidBtn.style.opacity = '0.7';
-                            bidBtn.style.cursor = 'not-allowed';
-                            bidBtn.style.pointerEvents = 'none';
-                        }
-
-                        // ── Auto-close: mark auction sold and push to winner's purchases ──
-                        try {
-                            const auctions = JSON.parse(localStorage.getItem('epic_auctions') || '[]');
-                            const idx = auctions.findIndex(a => a.id === data.id);
-                            if (idx > -1 && auctions[idx].status !== 'sold') {
-                                const auc = auctions[idx];
-                                auc.status = 'sold';
-                                auc.soldAt = new Date().toISOString();
-                                auc.finalPrice = auc.currentBid || auc.startBid;
-
-                                // Find the winning user and push to their purchases
-                                if (auc.highestBidder) {
-                                    const users = JSON.parse(localStorage.getItem('epic_users') || '[]');
-                                    const winnerIdx = users.findIndex(u => u.email === auc.highestBidder);
-                                    if (winnerIdx > -1) {
-                                        if (!users[winnerIdx].purchases) users[winnerIdx].purchases = [];
-                                        const alreadyHas = users[winnerIdx].purchases.some(p => p.auctionId === auc.id);
-                                        if (!alreadyHas) {
-                                            users[winnerIdx].purchases.push({
-                                                auctionId: auc.id,
-                                                title: auc.title,
-                                                amount: auc.finalPrice,
-                                                date: auc.soldAt,
-                                                status: 'won',
-                                                location: auc.location || '',
-                                                image: (auc.images && auc.images[0]) || ''
-                                            });
-                                            localStorage.setItem('epic_users', JSON.stringify(users));
-                                            // Persist winner's updated purchases to server
-                                            if (typeof EPICDB !== 'undefined') EPICDB.saveUser(users[winnerIdx]).catch(console.warn);
-                                        }
-                                    }
-                                }
-
-                                localStorage.setItem('epic_auctions', JSON.stringify(auctions));
-                                // Persist sold auction to server
-                                if (typeof EPICDB !== 'undefined') EPICDB.saveAuction(auc).catch(console.warn);
-                            }
-                        } catch (e) { console.error('Auction close error:', e); }
-
+                        timerEl.textContent = 'AUCTION ENDED';
+                        if (bidLink) { bidLink.style.opacity = '0.5'; bidLink.style.pointerEvents = 'none'; }
                         clearInterval(countdownInterval);
                         return;
                     }
-
-                    const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-                    const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-                    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
-                    timerEl.textContent = `${days}d: ${hours}h: ${minutes}m: ${seconds}s`;
+                    const d = Math.floor(distance / 86400000);
+                    const h = Math.floor((distance % 86400000) / 3600000);
+                    const m = Math.floor((distance % 3600000) / 60000);
+                    const s = Math.floor((distance % 60000) / 1000);
+                    timerEl.textContent = `${d}d: ${h}h: ${m}m: ${s}s`;
                 }
-
-                updateCountdown(); // Initial call
+                updateCountdown();
                 const countdownInterval = setInterval(updateCountdown, 1000);
             }
 
-            // --- Custom Modal Elements ---
-            const bidModal = document.getElementById('bidModal');
-            const bidModalText = document.getElementById('bidModalText');
-            const bidModalInput = document.getElementById('bidModalInput');
-            const bidModalCancel = document.getElementById('bidModalCancel');
-            const bidModalConfirm = document.getElementById('bidModalConfirm');
-
-            const buyNowModal = document.getElementById('buyNowModal');
-            const buyNowModalText = document.getElementById('buyNowModalText');
-            const buyNowModalCancel = document.getElementById('buyNowModalCancel');
-            const buyNowModalConfirm = document.getElementById('buyNowModalConfirm');
-
-            const currentUser = AUTH.currentUser();
-            const bidBtn = document.querySelector('.bid-btn');
-
-            // Winning Bidder Lockout Logic
-            // Default check to ensure `highestBidder` isn't undefined before strict comparion
-            const highestBidderEmail = data.highestBidder || '';
-
-            if (currentUser && highestBidderEmail === currentUser.email) {
-                const announcement = document.getElementById('winningAnnouncement');
-                if (announcement) announcement.style.display = 'block';
-
-                if (bidBtn) {
-                    bidBtn.textContent = 'WINNING BID';
-                    bidBtn.style.opacity = '0.7';
-                    bidBtn.style.cursor = 'not-allowed';
-                    bidBtn.style.pointerEvents = 'none';
-                }
-            }
-
-            // --- Bidding Logic ---
-            if (bidBtn && (!currentUser || highestBidderEmail !== currentUser.email)) {
-                bidBtn.addEventListener('click', () => {
-                    const user = AUTH.currentUser();
-                    if (!user) {
-                        alert('You must be logged in to place a bid.');
+            // --- Watchlist ---
+            const watchlistBtn = document.getElementById('watchlist-btn');
+            if (watchlistBtn) {
+                let session = null;
+                try { session = JSON.parse(localStorage.getItem('epic_session')); } catch {}
+                if (!session) {
+                    watchlistBtn.addEventListener('click', () => {
+                        alert('Please log in to add items to your watchlist.');
                         window.location.href = '../login.html';
-                        return;
-                    }
-
-                    const currentBid = data.currentBid || data.startBid;
-                    const increment = 100; // $100 minimum increment
-                    const minBid = currentBid + increment;
-
-                    // Setup and show modal
-                    bidModalText.innerHTML = `Current bid is $${currentBid.toLocaleString()}.<br>Please enter your bid (minimum $${minBid.toLocaleString()}):`;
-                    bidModalInput.value = minBid;
-                    bidModalInput.min = minBid;
-                    bidModal.style.display = 'flex';
-                    bidModalInput.focus();
-
-                    // Cleanup old listeners if any exist
-                    const newConfirm = bidModalConfirm.cloneNode(true);
-                    bidModalConfirm.parentNode.replaceChild(newConfirm, bidModalConfirm);
-                    const newCancel = bidModalCancel.cloneNode(true);
-                    bidModalCancel.parentNode.replaceChild(newCancel, bidModalCancel);
-
-                    newCancel.addEventListener('click', () => {
-                        bidModal.style.display = 'none';
                     });
+                } else {
+                    // Check if already on watchlist
+                    let wl = [];
+                    try { wl = JSON.parse(localStorage.getItem('epic_watchlist') || '[]'); } catch {}
+                    const already = wl.find(w => w.auctionId === data.id && w.userId === session.id);
+                    if (already) watchlistBtn.textContent = '✓ ON WATCHLIST';
 
-                    newConfirm.addEventListener('click', () => {
-                        let bidAmount = parseFloat(bidModalInput.value);
-                        if (isNaN(bidAmount) || bidAmount < minBid) {
-                            alert(`Invalid bid. You must bid at least $${minBid.toLocaleString()}.`);
-                            bidModalInput.focus();
-                            return;
+                    watchlistBtn.addEventListener('click', () => {
+                        let list = [];
+                        try { list = JSON.parse(localStorage.getItem('epic_watchlist') || '[]'); } catch {}
+                        const idx = list.findIndex(w => w.auctionId === data.id && w.userId === session.id);
+                        if (idx > -1) {
+                            list.splice(idx, 1);
+                            watchlistBtn.textContent = 'ADD TO WATCHLIST';
+                        } else {
+                            list.push({ auctionId: data.id, userId: session.id, title: data.title, addedAt: new Date().toISOString() });
+                            watchlistBtn.textContent = '✓ ON WATCHLIST';
                         }
-
-                        // 1. Update Auction Data
-                        data.currentBid = bidAmount;
-                        data.bids = (data.bids || 0) + 1;
-                        data.highestBidder = user.email;
-
-                        const idx = auctions.findIndex(a => a.id === data.id);
-                        if (idx > -1) auctions[idx] = data;
-                        saveSharedAuctions(auctions);
-
-                        // 2. Update User Profile
-                        const bids = user.bids || [];
-                        bids.push({
-                            auctionId: data.id,
-                            amount: bidAmount,
-                            date: new Date().toISOString(),
-                            title: data.title,
-                            status: 'active'
-                        });
-                        AUTH.updateProfile({ bids });
-
-                        bidModal.style.display = 'none';
-                        alert(`Success! You have placed a bid of $${bidAmount.toLocaleString()}.`);
-                        window.location.reload();
+                        localStorage.setItem('epic_watchlist', JSON.stringify(list));
                     });
-                });
-            }
-
-            // --- Buy Now Logic ---
-            const buyNowBtn = document.querySelector('.buy-now-action-btn');
-            if (buyNowBtn && data.buyNow) {
-                buyNowBtn.addEventListener('click', () => {
-                    const user = AUTH.currentUser();
-                    if (!user) {
-                        alert('You must be logged in to buy an item.');
-                        window.location.href = '../login.html';
-                        return;
-                    }
-
-                    // Setup and show Buy Now modal
-                    buyNowModalText.innerHTML = `Are you sure you want to buy "${data.title}" right now for <strong>$${data.buyNow.toLocaleString()}</strong>?`;
-                    buyNowModal.style.display = 'flex';
-
-                    // Cleanup old listeners
-                    const newConfirm = buyNowModalConfirm.cloneNode(true);
-                    buyNowModalConfirm.parentNode.replaceChild(newConfirm, buyNowModalConfirm);
-                    const newCancel = buyNowModalCancel.cloneNode(true);
-                    buyNowModalCancel.parentNode.replaceChild(newCancel, buyNowModalCancel);
-
-                    newCancel.addEventListener('click', () => {
-                        buyNowModal.style.display = 'none';
-                    });
-
-                    newConfirm.addEventListener('click', () => {
-                        // 1. Update Auction Data (Mark Sold)
-                        data.status = 'sold';
-                        data.currentBid = data.buyNow;
-
-                        const idx = auctions.findIndex(a => a.id === data.id);
-                        if (idx > -1) auctions[idx] = data;
-                        saveSharedAuctions(auctions);
-
-                        // 2. Update User Profile
-                        const purchases = user.purchases || [];
-                        purchases.push({
-                            auctionId: data.id,
-                            amount: data.buyNow,
-                            date: new Date().toISOString(),
-                            title: data.title
-                        });
-                        AUTH.updateProfile({ purchases });
-
-                        buyNowModal.style.display = 'none';
-                        alert(`Congratulations! You have purchased "${data.title}".`);
-                        window.location.reload();
-                    });
-                });
+                }
             }
         });
     </script>
