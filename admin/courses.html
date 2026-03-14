@@ -426,6 +426,7 @@
         let currentStatusFilter = 'all';
         let editingCourseId = null;
         let _courseImages = [];
+        let galleryImages = [];
             renderCourseImgGrid();
 
         const AMENITY_LABELS = {
@@ -651,6 +652,7 @@
 
         function renderGalleryStrip() {
             const strip = document.getElementById('gallery-strip');
+            if (!strip) return;
             strip.innerHTML = galleryImages.map((url, i) => `
                 <div class="image-preview-item">
                     <img src="${url}" alt="Gallery ${i+1}" onerror="this.src='data:image/svg+xml,<svg xmlns=\\'http://www.w3.org/2000/svg\\'><rect width=\\'90\\' height=\\'68\\' fill=\\'%23eee\\'/></svg>'">
@@ -686,7 +688,8 @@
             document.getElementById('f-featured').value = 'false';
             document.getElementById('f-status').value = 'draft';
             document.getElementById('f-accent-color').value = '#1a5276';
-            document.getElementById('featured-img-preview').style.display = 'none';
+            const previewEl = document.getElementById('featured-img-preview');
+            if (previewEl) previewEl.style.display = 'none';
             _courseImages = [];
             renderCourseImgGrid();
             renderGalleryStrip();
