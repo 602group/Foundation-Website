@@ -733,6 +733,7 @@
                     <table>
                         <thead>
                             <tr>
+                                <th style="width:52px;">Photo</th>
                                 <th class="sortable" onclick="cycleSort('title')" id="th-title">Trip <span
                                         class="sort-icon">↕</span></th>
                                 <th class="sortable" onclick="cycleSort('date')" id="th-date">Dates <span
@@ -842,6 +843,18 @@
                     <input type="hidden" id="drawer-event-id">
 
                     <div class="section-label">Event Details</div>
+
+                    <!-- Course selector in edit drawer -->
+                    <div style="margin-bottom:1.2rem;background:#f0f7ff;border-radius:10px;padding:0.9rem 1rem;border:1.5px solid #c3d9f7;">
+                        <div style="font-size:0.7rem;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:#4A90E2;margin-bottom:0.6rem;">⛳ Link a Course <span style="font-weight:400;text-transform:none;letter-spacing:0;color:#888;">(auto-fills location &amp; image)</span></div>
+                        <div class="course-selector-wrap">
+                            <input type="text" id="d-course-search" class="course-search-input" placeholder="Search courses…" autocomplete="off" oninput="filterEventCourseOptions('d')" onfocus="showEventCourseDropdown('d')">
+                            <div class="course-dropdown" id="d-course-dropdown"></div>
+                        </div>
+                        <div id="d-course-preview" style="display:none;"></div>
+                        <input type="hidden" id="d-course_id" value="">
+                    </div>
+
                     <div class="fin-grid">
                         <div class="fin-group">
                             <label>Status</label>
@@ -1213,16 +1226,19 @@
             return _evtCachedCourses || [];
         }
 
-        async function filterEventCourseOptions() {
-            const q = (document.getElementById('evt-course-search').value || '').toLowerCase();
-            const dd = document.getElementById('evt-course-dropdown');
+        async function filterEventCourseOptions(prefix) {
+            prefix = prefix || 'evt';
+            const searchId = prefix === 'evt' ? 'evt-course-search' : 'd-course-search';
+            const ddId     = prefix === 'evt' ? 'evt-course-dropdown' : 'd-course-dropdown';
+            const q = (document.getElementById(searchId).value || '').toLowerCase();
+            const dd = document.getElementById(ddId);
             const courses = await getCachedCoursesForEvents();
             const matches = q ? courses.filter(c => ((c.name||'') + ' ' + (c.city||'') + ' ' + (c.state||'')).toLowerCase().includes(q)) : courses;
             if (!matches.length) {
                 dd.innerHTML = '<div style="padding:0.8rem;color:#aaa;font-size:0.84rem;">No courses found</div>';
             } else {
                 dd.innerHTML = matches.slice(0, 12).map(c => `
-                    <div class="course-option" onclick="selectCourseForEvent('${c.id}')">
+                    <div class="course-option" onclick="selectCourseForEvent('${c.id}','${prefix}')">
                         ${c.featured_image_url ? `<img src="${c.featured_image_url}" alt="" onerror="this.style.display='none'">` : ''}
                         <div class="course-option-info">
                             <strong>${c.name}</strong>
@@ -1233,40 +1249,48 @@
             dd.classList.add('open');
         }
 
-        function showEventCourseDropdown() {
-            const q = document.getElementById('evt-course-search').value;
-            if (!q) filterEventCourseOptions();
+        function showEventCourseDropdown(prefix) {
+            prefix = prefix || 'evt';
+            const searchId = prefix === 'evt' ? 'evt-course-search' : 'd-course-search';
+            const q = document.getElementById(searchId).value;
+            if (!q) filterEventCourseOptions(prefix);
         }
 
-        async function selectCourseForEvent(courseId) {
+        async function selectCourseForEvent(courseId, prefix) {
+            prefix = prefix || 'evt';
+            const idPfx = prefix === 'evt' ? 'evt' : 'd';
             const courses = await getCachedCoursesForEvents();
             const course = courses.find(c => c.id === courseId);
             if (!course) return;
 
-            document.getElementById('evt-course_id').value = courseId;
-            document.getElementById('evt-course-search').value = course.name;
-            document.getElementById('evt-course-dropdown').classList.remove('open');
-            renderEventCoursePreview(course);
+            document.getElementById(idPfx + '-course_id').value = courseId;
+            document.getElementById(idPfx + '-course-search').value = course.name;
+            document.getElementById(idPfx + '-course-dropdown').classList.remove('open');
+            renderEventCoursePreview(course, prefix);
 
-            // Auto-fill event fields from course data
+            // Auto-fill form fields
             const sv = (id, val) => { const el = document.getElementById(id); if (el && val) el.value = val; };
             const svIfBlank = (id, val) => { const el = document.getElementById(id); if (el && !el.value && val) el.value = val; };
 
             const loc = [course.city, course.state].filter(Boolean).join(', ');
             const addr = [course.address, course.city, course.state, course.zip_code].filter(Boolean).join(', ');
+            const titleField = prefix === 'evt' ? 'new-title' : 'd-title';
+            const locationField = prefix === 'evt' ? 'new-location' : 'd-location';
+            const descField = prefix === 'evt' ? 'new-description' : 'd-description';
+            const imgField = prefix === 'evt' ? 'new-image' : 'd-image';
 
-            sv('new-location', loc);
-            sv('new-mapAddress', addr);
-            svIfBlank('new-title', course.name + ' Golf Day');
-            svIfBlank('new-description', course.description || course.course_description || '');
+            sv(locationField, loc);
+            if (prefix === 'evt') sv('new-mapAddress', addr);
+            svIfBlank(titleField, course.name + ' Golf Day');
+            svIfBlank(descField, course.description || course.course_description || '');
 
-            // Set the hero image from the course's first gallery image or featured image
             const img = course.featured_image_url || (course.gallery && course.gallery[0]) || '';
-            if (img) sv('new-image', img);
+            if (img) sv(imgField, img);
         }
 
-        function renderEventCoursePreview(course) {
-            const previewEl = document.getElementById('evt-course-preview');
+        function renderEventCoursePreview(course, prefix) {
+            const idPfx = (prefix === 'evt' || !prefix) ? 'evt' : 'd';
+            const previewEl = document.getElementById(idPfx + '-course-preview');
             const stats = [course.holes ? course.holes + ' holes' : null, course.par ? 'Par ' + course.par : null, course.ranking].filter(Boolean).join(' &bull; ');
             previewEl.innerHTML = `
                 <div class="course-preview-card">
@@ -1276,15 +1300,20 @@
                         <span>${course.city || ''}, ${course.state || ''} &bull; ${course.public_private || ''}</span>
                         ${stats ? `<div style="margin-top:4px;font-size:0.74rem;color:#888;">${stats}</div>` : ''}
                     </div>
-                    <button class="course-preview-remove" onclick="clearEventCourse()" title="Remove">✕ Remove</button>
+                    <button class="course-preview-remove" onclick="clearEventCourse('${idPfx}')" title="Remove">✕ Remove</button>
                 </div>`;
             previewEl.style.display = '';
         }
 
-        function clearEventCourse() {
-            document.getElementById('evt-course_id').value = '';
-            document.getElementById('evt-course-search').value = '';
-            document.getElementById('evt-course-preview').style.display = 'none';
+        function clearEventCourse(prefix) {
+            const idPfx = prefix || 'evt';
+            const searchId = idPfx + '-course-search';
+            const el = document.getElementById(searchId);
+            if (el) el.value = '';
+            const cid = document.getElementById(idPfx + '-course_id');
+            if (cid) cid.value = '';
+            const prev = document.getElementById(idPfx + '-course-preview');
+            if (prev) prev.style.display = 'none';
         }
 
         // Close course dropdown when clicking outside
@@ -1337,7 +1366,11 @@
                     : '';
 
                 const isDraft = status === 'draft' || status === 'pending';
+                const thumb = e.image
+                    ? `<img src="${e.image}" style="width:44px;height:32px;object-fit:cover;border-radius:6px;flex-shrink:0;" onerror="this.style.display='none'">`
+                    : `<div style="width:44px;height:32px;border-radius:6px;background:#f0f0f0;display:flex;align-items:center;justify-content:center;font-size:1rem;">⛳</div>`;
                 return `<tr onclick="openDrawer('${e.id}')" class="${currentEventId === e.id ? 'selected' : isDraft ? 'row-draft' : ''}">
+                    <td style="padding:6px 8px;">${thumb}</td>
                     <td><strong>${e.title}</strong><br><small style="color:#888">${e.location}</small></td>
                     <td>${e.date}</td>
                     <td>
@@ -1847,7 +1880,42 @@
             renderNewEventImages();
 
             closeModals();
+            clearEventCourse();
             renderEvents();
+            // Persist to Postgres
+            if (typeof EPICDB !== 'undefined') {
+                EPICDB.saveEvent({
+                    id: newId,
+                    title: document.getElementById('new-title').value,
+                    eventType: document.getElementById('new-eventType').value,
+                    status: document.getElementById('new-status').value,
+                    location: document.getElementById('new-location').value,
+                    mapAddress: document.getElementById('new-mapAddress').value,
+                    date: dateRange,
+                    dateStart: startRaw,
+                    dateEnd: document.getElementById('new-date-end').value,
+                    registrationDeadline: document.getElementById('new-regDeadline').value,
+                    spots: parseInt(document.getElementById('new-spots').value),
+                    spotsSold: 0,
+                    price: parseInt(document.getElementById('new-price').value),
+                    allowGuests: document.getElementById('new-allowGuests').checked,
+                    description: document.getElementById('new-description').value,
+                    includes: document.getElementById('new-includes').value,
+                    format: document.getElementById('new-format').value,
+                    image: images[0] || document.getElementById('new-image').value || '',
+                    images,
+                    link: autoLink,
+                    coordinator: document.getElementById('new-coordinator').value,
+                    adminNotes: document.getElementById('new-adminNotes').value,
+                    costVenue: parseInt(document.getElementById('new-costVenue').value) || 0,
+                    costCatering: parseInt(document.getElementById('new-costCatering').value) || 0,
+                    costTransportation: parseInt(document.getElementById('new-costTransportation').value) || 0,
+                    costMarketing: parseInt(document.getElementById('new-costMarketing').value) || 0,
+                    costStaff: parseInt(document.getElementById('new-costStaff').value) || 0,
+                    costMisc: parseInt(document.getElementById('new-costMisc').value) || 0,
+                    createdAt: new Date().toISOString(),
+                }).catch(console.warn);
+            }
             // Auto-open the drawer for the newly created event
             setTimeout(() => openDrawer(newId), 200);
         }
