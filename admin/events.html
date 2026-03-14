@@ -662,6 +662,24 @@
             opacity: 1;
             color: var(--accent-color);
         }
+        /* Course selector */
+        .course-selector-wrap { position:relative; }
+        .course-search-input { width:100%; padding:0.6rem 0.8rem; border:1px solid #e0e0e0; border-radius:8px; font-family:inherit; font-size:0.88rem; outline:none; transition:border 0.2s; background:white; box-sizing:border-box; }
+        .course-search-input:focus { border-color:#4A90E2; box-shadow:0 0 0 3px rgba(74,144,226,0.1); }
+        .course-dropdown { position:absolute; top:100%; left:0; right:0; background:white; border:1px solid #e0e0e0; border-radius:8px; box-shadow:0 8px 24px rgba(0,0,0,0.12); z-index:9000; max-height:220px; overflow-y:auto; display:none; margin-top:2px; }
+        .course-dropdown.open { display:block; }
+        .course-option { display:flex; align-items:center; gap:0.7rem; padding:0.6rem 0.8rem; cursor:pointer; border-bottom:1px solid #f5f5f5; transition:background 0.15s; }
+        .course-option:hover { background:#f0f7ff; }
+        .course-option img { width:48px; height:34px; object-fit:cover; border-radius:5px; flex-shrink:0; }
+        .course-option-info strong { display:block; font-size:0.85rem; font-weight:700; }
+        .course-option-info span { font-size:0.74rem; color:#888; }
+        .course-preview-card { background:#f8f9fa; border-radius:10px; padding:0.9rem; display:flex; gap:0.85rem; align-items:center; margin-top:0.6rem; border:1px solid #e8e8e8; }
+        .course-preview-card img { width:72px; height:52px; object-fit:cover; border-radius:7px; flex-shrink:0; background:#eee; }
+        .course-preview-info { flex:1; }
+        .course-preview-info strong { display:block; font-size:0.88rem; font-weight:700; margin-bottom:2px; }
+        .course-preview-info span { font-size:0.77rem; color:#666; }
+        .course-preview-remove { background:none; border:none; color:#aaa; cursor:pointer; font-size:0.78rem; margin-left:auto; flex-shrink:0; padding:0.2rem 0.5rem; border-radius:5px; }
+        .course-preview-remove:hover { background:#fee2e2; color:#e74c3c; }
     </style>
 </head>
 
@@ -962,6 +980,17 @@
             <p style="font-size:0.82rem;color:#999;margin-bottom:1.5rem;">Fill in all the details. An Event ID is generated automatically. Edit anything later from the drawer.</p>
             <form onsubmit="handleEventModalSubmit(event)">
 
+                <!-- COURSE SELECTOR (auto-fills location, description, images) -->
+                <div style="margin-bottom:1.2rem;background:#f0f7ff;border-radius:12px;padding:1rem 1.1rem;border:1.5px solid #c3d9f7;">
+                    <div style="font-size:0.7rem;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:#4A90E2;margin-bottom:0.7rem;">⛳ Link a Course <span style="font-weight:400;text-transform:none;letter-spacing:0;color:#888;">(auto-fills location, description &amp; images)</span></div>
+                    <div class="course-selector-wrap">
+                        <input type="text" id="evt-course-search" class="course-search-input" placeholder="Search your course network — type to find…" autocomplete="off" oninput="filterEventCourseOptions()" onfocus="showEventCourseDropdown()">
+                        <div class="course-dropdown" id="evt-course-dropdown"></div>
+                    </div>
+                    <div id="evt-course-preview" style="display:none;"></div>
+                    <input type="hidden" id="evt-course_id" value="">
+                </div>
+
                 <!-- CORE -->
                 <div style="font-size:0.7rem;text-transform:uppercase;letter-spacing:0.1em;color:#bbb;font-weight:700;margin-bottom:0.7rem;padding-bottom:0.3rem;border-bottom:1px solid #f0f0f0;">Core</div>
                 <div class="form-row">
@@ -1167,6 +1196,103 @@
         }
 
         let adminUsers = []; // populated from DB on page load
+        let _evtCachedCourses = null;
+
+        // ── Course Selector for Events ─────────────────────────────────────────
+        async function getCachedCoursesForEvents() {
+            if (_evtCachedCourses) return _evtCachedCourses;
+            try {
+                if (typeof EPICDB !== 'undefined') {
+                    _evtCachedCourses = await EPICDB.getCourses();
+                } else {
+                    _evtCachedCourses = JSON.parse(localStorage.getItem('epic_courses') || '[]');
+                }
+            } catch(e) {
+                _evtCachedCourses = JSON.parse(localStorage.getItem('epic_courses') || '[]');
+            }
+            return _evtCachedCourses || [];
+        }
+
+        async function filterEventCourseOptions() {
+            const q = (document.getElementById('evt-course-search').value || '').toLowerCase();
+            const dd = document.getElementById('evt-course-dropdown');
+            const courses = await getCachedCoursesForEvents();
+            const matches = q ? courses.filter(c => ((c.name||'') + ' ' + (c.city||'') + ' ' + (c.state||'')).toLowerCase().includes(q)) : courses;
+            if (!matches.length) {
+                dd.innerHTML = '<div style="padding:0.8rem;color:#aaa;font-size:0.84rem;">No courses found</div>';
+            } else {
+                dd.innerHTML = matches.slice(0, 12).map(c => `
+                    <div class="course-option" onclick="selectCourseForEvent('${c.id}')">
+                        ${c.featured_image_url ? `<img src="${c.featured_image_url}" alt="" onerror="this.style.display='none'">` : ''}
+                        <div class="course-option-info">
+                            <strong>${c.name}</strong>
+                            <span>${c.city || ''}, ${c.state || ''} &bull; ${c.public_private || ''}</span>
+                        </div>
+                    </div>`).join('');
+            }
+            dd.classList.add('open');
+        }
+
+        function showEventCourseDropdown() {
+            const q = document.getElementById('evt-course-search').value;
+            if (!q) filterEventCourseOptions();
+        }
+
+        async function selectCourseForEvent(courseId) {
+            const courses = await getCachedCoursesForEvents();
+            const course = courses.find(c => c.id === courseId);
+            if (!course) return;
+
+            document.getElementById('evt-course_id').value = courseId;
+            document.getElementById('evt-course-search').value = course.name;
+            document.getElementById('evt-course-dropdown').classList.remove('open');
+            renderEventCoursePreview(course);
+
+            // Auto-fill event fields from course data
+            const sv = (id, val) => { const el = document.getElementById(id); if (el && val) el.value = val; };
+            const svIfBlank = (id, val) => { const el = document.getElementById(id); if (el && !el.value && val) el.value = val; };
+
+            const loc = [course.city, course.state].filter(Boolean).join(', ');
+            const addr = [course.address, course.city, course.state, course.zip_code].filter(Boolean).join(', ');
+
+            sv('new-location', loc);
+            sv('new-mapAddress', addr);
+            svIfBlank('new-title', course.name + ' Golf Day');
+            svIfBlank('new-description', course.description || course.course_description || '');
+
+            // Set the hero image from the course's first gallery image or featured image
+            const img = course.featured_image_url || (course.gallery && course.gallery[0]) || '';
+            if (img) sv('new-image', img);
+        }
+
+        function renderEventCoursePreview(course) {
+            const previewEl = document.getElementById('evt-course-preview');
+            const stats = [course.holes ? course.holes + ' holes' : null, course.par ? 'Par ' + course.par : null, course.ranking].filter(Boolean).join(' &bull; ');
+            previewEl.innerHTML = `
+                <div class="course-preview-card">
+                    ${course.featured_image_url ? `<img src="${course.featured_image_url}" alt="${course.name}" onerror="this.style.display='none'">` : ''}
+                    <div class="course-preview-info">
+                        <strong>${course.name}</strong>
+                        <span>${course.city || ''}, ${course.state || ''} &bull; ${course.public_private || ''}</span>
+                        ${stats ? `<div style="margin-top:4px;font-size:0.74rem;color:#888;">${stats}</div>` : ''}
+                    </div>
+                    <button class="course-preview-remove" onclick="clearEventCourse()" title="Remove">✕ Remove</button>
+                </div>`;
+            previewEl.style.display = '';
+        }
+
+        function clearEventCourse() {
+            document.getElementById('evt-course_id').value = '';
+            document.getElementById('evt-course-search').value = '';
+            document.getElementById('evt-course-preview').style.display = 'none';
+        }
+
+        // Close course dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.course-selector-wrap')) {
+                document.querySelectorAll('.course-dropdown').forEach(d => d.classList.remove('open'));
+            }
+        });
 
         // ── Render ────────────────────────────────────────────────────────────
         document.addEventListener('DOMContentLoaded', async () => {
