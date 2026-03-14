@@ -10,8 +10,8 @@ const AUCTIONS_VERSION = '3';
 function loadSharedAuctions() {
     try {
         const raw = localStorage.getItem(AUCTIONS_STORE_KEY);
-        // Only seed if completely empty. Never overwrite existing live data.
-        if (!raw || raw === '[]') {
+        // Only seed if completely empty (null/undefined). Never overwrite existing live data.
+        if (!raw) {
             const defaults = getDefaultAuctions();
             try { localStorage.setItem(AUCTIONS_STORE_KEY, JSON.stringify(defaults)); } catch(e) { console.warn('localStorage quota hit for AUCTIONS_STORE_KEY'); }
             localStorage.setItem(AUCTIONS_STORE_KEY + '_ver', AUCTIONS_VERSION);

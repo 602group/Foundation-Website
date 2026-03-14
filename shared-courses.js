@@ -13,8 +13,8 @@ function loadSharedCourses() {
         const raw = localStorage.getItem(COURSES_STORE_KEY);
         const defaults = getDefaultCourses();
 
-        // If completely empty, seed everything
-        if (!raw || raw === '[]') {
+        // If completely empty (null/undefined), seed everything
+        if (!raw) {
             try { localStorage.setItem(COURSES_STORE_KEY, JSON.stringify(defaults)); } catch(e) { console.warn('localStorage quota hit for COURSES_STORE_KEY'); }
             localStorage.setItem(COURSES_STORE_KEY + '_ver', COURSES_VERSION);
             return defaults;
