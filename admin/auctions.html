@@ -2241,7 +2241,7 @@
             // Fill in all fields
             setVal('edit-title', a.title);
             setVal('edit-course', a.course);
-            setVal('edit-status', a.status);
+            setVal('admin-status', a.status);
             setVal('edit-visibility', a.visibility || 'all');
             // Associated course record
             document.getElementById('edit-course_id').value = a.course_id || '';
@@ -2739,7 +2739,7 @@
                 startDate: getVal('edit-startDate'),
                 endDate: getVal('edit-endDate'),
                 extension: parseInt(getVal('edit-extension')) || 2,
-                images: [..._drawerImages],
+                images: [], // Images now handled via course references
                 thirdPartyUrl: getVal('gs-itemUrl') || getVal('admin-thirdPartyUrl'),
                 externalAuctionId: getVal('gs-itemId') || getVal('admin-externalAuctionId'),
                 // GiveSmart canonical fields
@@ -3041,9 +3041,8 @@
         function createAuction() {
             const title = document.getElementById('new-title').value.trim();
             const course = document.getElementById('new-course').value.trim();
-            const loc = document.getElementById('new-location').value.trim();
-            if (!title || !course || !loc) {
-                alert('Please fill in Title, Course, and Location.');
+            if (!title || !course) {
+                alert('Please fill in Title and Course.');
                 return;
             }
             const id = generateAuctionId();
@@ -3052,16 +3051,9 @@
                 id,
                 title,
                 course,
-                location: loc,
-                mapAddress: document.getElementById('new-mapAddress').value.trim(),
                 status: document.getElementById('new-status').value,
                 thirdPartyUrl: document.getElementById('new-thirdPartyUrl').value.trim(),
                 externalAuctionId: document.getElementById('new-externalAuctionId').value.trim(),
-                architect: document.getElementById('new-architect').value.trim(),
-                courseType: document.getElementById('new-courseType').value,
-                access: document.getElementById('new-access').value,
-                yearOpened: parseInt(document.getElementById('new-yearOpened').value) || null,
-                ranking: document.getElementById('new-ranking').value.trim(),
                 courseUrl: '',
                 guests: parseInt(document.getElementById('new-guests').value) || 2,
                 rounds: parseInt(document.getElementById('new-rounds').value) || 1,
@@ -3069,7 +3061,6 @@
                 paidBy: document.getElementById('new-paidBy').value,
                 restrictions: document.getElementById('new-restrictions').value.trim(),
                 description: document.getElementById('new-description').value.trim(),
-                courseDescription: document.getElementById('new-courseDescription').value.trim(),
                 charity: document.getElementById('new-charity').value.trim() || 'EPIC Foundation',
                 taxDeductible: 'no',
                 startBid,
