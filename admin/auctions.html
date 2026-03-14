@@ -2942,29 +2942,28 @@
             const now = new Date();
             const fmt = d => d.toISOString().slice(0, 16);
             const end = new Date(now); end.setDate(end.getDate() + 30);
-            document.getElementById('new-startDate').value = fmt(now);
-            document.getElementById('new-endDate').value = fmt(end);
-            // Reset all new fields
+            const se = id => { const el = document.getElementById(id); if (el) el.value = ''; };
+            const sv = (id, val) => { const el = document.getElementById(id); if (el) el.value = val; };
+            sv('new-startDate', fmt(now));
+            sv('new-endDate', fmt(end));
             ['new-title', 'new-course', 'new-location', 'new-mapAddress',
                 'new-thirdPartyUrl', 'new-externalAuctionId', 'new-donor', 'new-adminNotes',
-                'new-architect', 'new-ranking', 'new-attributes', 'new-charity',
-                'new-description', 'new-courseDescription', 'new-restrictions'].forEach(id => {
-                    const el = document.getElementById(id);
-                    if (el) el.value = id === 'new-charity' ? 'EPIC Foundation' : '';
-                });
-            document.getElementById('new-startBid').value = '1000';
-            document.getElementById('new-increment').value = '200';
-            document.getElementById('new-guests').value = '2';
-            document.getElementById('new-rounds').value = '1';
-            document.getElementById('new-status').value = 'new';
-            document.getElementById('new-courseType').value = 'Parkland';
-            document.getElementById('new-access').value = 'Private';
-            document.getElementById('new-paidBy').value = 'Donor';
-            // Reset image grid
+                'new-architect', 'new-ranking', 'new-attributes',
+                'new-description', 'new-courseDescription', 'new-restrictions'].forEach(id => se(id));
+            sv('new-charity', 'EPIC Foundation');
+            sv('new-startBid', '1000');
+            sv('new-increment', '200');
+            sv('new-guests', '2');
+            sv('new-rounds', '1');
+            sv('new-status', 'new');
+            sv('new-courseType', 'Parkland');
+            sv('new-access', 'Private');
+            sv('new-paidBy', 'Donor');
             _newModalImages = [];
             renderNewModalImages();
             document.getElementById('addModal').classList.add('open');
         }
+
 
         function closeAddModal() {
             document.getElementById('addModal').classList.remove('open');
