@@ -893,7 +893,7 @@
                 const courseForDB = { ...course, featured_image_url: course.featured_image_url ? '[base64]' : '', gallery: (course.gallery || []).map(() => '[base64]') };
                 // Actually send the FULL course so DB has it — but at best effort
                 try {
-                    const result = await EPICDB.saveCourse(course);
+                    const result = await EPICDB.saveCourse(courseForDB);
                     if (!result || result.error) {
                         console.warn('DB sync failed (likely oversized payload). Images are safe in local cache.');
                     }
