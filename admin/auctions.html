@@ -2057,6 +2057,22 @@
         let currentSort = 'created-desc';
         let editingId = null;
         let editImages = [];
+        let _newModalImages = [];  // Images for the + New Auction modal
+
+        function renderNewModalImages() {
+            const grid = document.getElementById('new-modal-img-grid');
+            if (!grid) return;
+            if (_newModalImages.length === 0) {
+                grid.innerHTML = '<p style="color:#aaa;font-size:0.85rem;">No images added yet.</p>';
+                return;
+            }
+            grid.innerHTML = _newModalImages.map((url, i) => `
+                <div style="position:relative;width:90px;height:60px;border-radius:6px;overflow:hidden;flex-shrink:0;">
+                    <img src="${url}" style="width:100%;height:100%;object-fit:cover;">
+                    <button onclick="_newModalImages.splice(${i},1);renderNewModalImages();" style="position:absolute;top:2px;right:2px;background:rgba(0,0,0,0.6);color:#fff;border:none;border-radius:50%;width:18px;height:18px;font-size:11px;cursor:pointer;line-height:18px;padding:0;">&times;</button>
+                </div>`).join('');
+        }
+
 
         // Load fresh auction data from the server before rendering
         (async function initAdmin() {
