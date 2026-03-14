@@ -90,10 +90,13 @@ const EPICDB = (() => {
     // ── Courses ─────────────────────────────────────────────────
     async function getCourses() {
         const courses = await apiGet('/courses');
-        if (courses) {
+        // Treat [] from server as "no data" — fall back to local seed
+        if (courses && courses.length > 0) {
             localStorage.setItem('epic_courses', JSON.stringify(courses));
             return courses;
         }
+        // Fall back to localStorage seed (which includes Pebble Beach, Augusta, Pine Valley etc.)
+        if (typeof loadSharedCourses === 'function') return loadSharedCourses();
         try { return JSON.parse(localStorage.getItem('epic_courses')) || []; }
         catch { return []; }
     }
