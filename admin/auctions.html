@@ -2130,8 +2130,17 @@
                 return;
             }
             tbody.innerHTML = list.map(a => {
-                const thumb = a.images && a.images[0]
-                    ? `<img src="${a.images[0]}" class="auction-thumb" onerror="this.style.background='#eee';this.src=''">`
+                let coverImg = (a.images && a.images[0]) || '';
+                if (!coverImg && a.courseId && typeof allCourses !== 'undefined') {
+                    const linkedCourse = allCourses.find(c => c.id === a.courseId);
+                    if (linkedCourse && linkedCourse.featured_image_url) {
+                        coverImg = linkedCourse.featured_image_url;
+                    } else if (linkedCourse && linkedCourse.gallery && linkedCourse.gallery.length) {
+                        coverImg = linkedCourse.gallery[0];
+                    }
+                }
+                const thumb = coverImg
+                    ? `<img src="${coverImg}" class="auction-thumb" onerror="this.style.background='#eee';this.src=''">`
                     : `<div class="auction-thumb" style="background:#eee;display:inline-block;"></div>`;
                 const closedFmt = a.endDate ? new Date(a.endDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '—';
                 // Due date = 12 months after close date

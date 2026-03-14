@@ -515,12 +515,13 @@
         AUTH.applyGatedNav('');
 
         (async function renderAuctions() {
-            let allAuctions, allUsers;
+            let allAuctions, allUsers, allCourses = [];
             if (typeof EPICDB !== 'undefined') {
-                [allAuctions, allUsers] = await Promise.all([EPICDB.getAuctions(), EPICDB.getUsers()]);
+                [allAuctions, allUsers, allCourses] = await Promise.all([EPICDB.getAuctions(), EPICDB.getUsers(), EPICDB.getCourses()]);
             } else {
                 allAuctions = loadSharedAuctions();
                 allUsers = [];
+                allCourses = typeof loadSharedCourses === 'function' ? loadSharedCourses() : JSON.parse(localStorage.getItem('epic_courses') || '[]');
             }
 
             const auctionBidCounts = {};
@@ -553,7 +554,16 @@
             const grid = document.getElementById('auction-grid');
             if (grid) {
                 grid.innerHTML = list.map(a => {
-                    const images = (a.images && a.images.length) ? a.images : [''];
+                    let images = [''];
+                    if (a.courseId && allCourses && allCourses.length) {
+                        const linkedCourse = allCourses.find(c => c.id === a.courseId);
+                        if (linkedCourse) {
+                            images = [];
+                            if (linkedCourse.featured_image_url) images.push(linkedCourse.featured_image_url);
+                            if (linkedCourse.gallery && linkedCourse.gallery.length) images.push(...linkedCourse.gallery);
+                        }
+                    }
+                    if (images.length === 0) images = [''];
                     const thumb0 = images[0] || '';
                     const price = a.currentBid || a.startBid || 0;
                     const stateMatch = a.location.match(/, *([A-Za-z]{2})/);
