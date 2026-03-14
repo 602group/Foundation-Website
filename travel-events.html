@@ -426,15 +426,32 @@
     <script src="auth.js"></script>
     <script src="shared-events.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', async () => {
             AUTH.requireLogin('login.html');
             AUTH.applyGatedNav('');
 
+            let events = [];
+            let destinations = [];
+
+            // Attempt to load from live DB first for true state
+            if (typeof EPICDB !== 'undefined') {
+                try {
+                    events = await EPICDB.getEvents() || [];
+                } catch(e) { console.warn("Could not fetch events from DB"); }
+            }
+            if (events.length === 0 && typeof loadSharedEvents === 'function') {
+                events = loadSharedEvents();
+            }
+
+            if (typeof loadSharedDestinations === 'function') {
+                destinations = loadSharedDestinations();
+            }
+
             // Load and Render Events — all active events visible to all members
-            const events = loadSharedEvents().filter(e => (e.status || 'active') === 'active');
+            const activeEvents = events.filter(e => (e.status || 'active') === 'active');
             const eventsGrid = document.getElementById('frontend-events-grid');
-            if (eventsGrid && events.length > 0) {
-                eventsGrid.innerHTML = events.map(event => `
+            if (eventsGrid && activeEvents.length > 0) {
+                eventsGrid.innerHTML = activeEvents.map(event => `
                     <a href="${event.link}" style="text-decoration: none; color: inherit;">
                         <div class="event-card">
                             <div class="event-image" style="background: url('${event.image}') center/cover;"></div>
@@ -456,10 +473,10 @@
             }
 
             // Load and Render Destinations (only active ones)
-            const destinations = loadSharedDestinations().filter(d => (d.status || 'active') === 'active');
+            const activeDestinations = destinations.filter(d => (d.status || 'active') === 'active');
             const destGrid = document.getElementById('frontend-destinations-grid');
-            if (destGrid && destinations.length > 0) {
-                destGrid.innerHTML = destinations.map(dest => `
+            if (destGrid && activeDestinations.length > 0) {
+                destGrid.innerHTML = activeDestinations.map(dest => `
                     <div class="destination-card">
                         <div class="destination-image" style="background: url('${dest.image}') center/cover;"></div>
                         <h3 class="destination-name">${dest.name}</h3>
