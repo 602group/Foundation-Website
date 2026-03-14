@@ -371,6 +371,7 @@
 
     <script src="../db.js"></script>
     <script src="../auth.js"></script>
+    <script src="../shared-courses.js"></script>
     <script src="../shared-auctions.js"></script>
     <script src="../auction-gallery.js"></script>
     <script>
@@ -386,11 +387,13 @@
                 return;
             }
 
-            let auctions;
+            let auctions, allCourses = [];
             if (typeof EPICDB !== 'undefined') {
                 auctions = await EPICDB.getAuctions();
+                allCourses = await EPICDB.getCourses();
             } else {
                 auctions = loadSharedAuctions();
+                allCourses = typeof loadSharedCourses === 'function' ? loadSharedCourses() : [];
             }
             const data = auctions.find(a => a.id === auctionId);
 
@@ -415,13 +418,21 @@
                 data.description ? data.description.replace(/\n/g, '<br>') : '';
 
             // --- Images ---
-            // If data in localStorage is stale (no images), pull from defaults
-            let images = (data.images && data.images.length) ? data.images : [];
+            let images = [];
+            if (data.courseId && allCourses && allCourses.length) {
+                const linkedCourse = allCourses.find(c => c.id === data.courseId);
+                if (linkedCourse) {
+                    if (linkedCourse.featured_image_url) images.push(linkedCourse.featured_image_url);
+                    if (linkedCourse.gallery && linkedCourse.gallery.length) images.push(...linkedCourse.gallery);
+                }
+            }
+            if (images.length === 0 && data.images && data.images.length) {
+                images = data.images;
+            }
             if (!images.length && typeof getDefaultAuctions === 'function') {
                 const def = getDefaultAuctions().find(a => a.id === auctionId);
                 if (def && def.images && def.images.length) images = def.images;
             }
-            // Fallback: Pebble Beach images hardcoded if still empty
             if (!images.length) {
                 images = [
                     'https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=1200&q=90',
@@ -429,6 +440,7 @@
                     'https://images.unsplash.com/photo-1592919505780-30395071e483?w=1200&q=90'
                 ];
             }
+            
             const mainImg = document.getElementById('main-hero-img');
             const side1   = document.getElementById('side-img-1');
             const side2   = document.getElementById('side-img-2');
@@ -436,12 +448,6 @@
             if (side1)   side1.src   = images[1] || images[0] || '';
             if (side2)   side2.src   = images[2] || images[0] || '';
             if (typeof setGalleryImages === 'function') setGalleryImages(images);
-            // Also save images back to localStorage so it's not stale next time
-            if (data.images && !data.images.length) {
-                data.images = images;
-                const idx = auctions.findIndex(a => a.id === auctionId);
-                if (idx > -1) { auctions[idx] = data; saveSharedAuctions(auctions); }
-            }
 
             // --- Bid Now Link ---
             const bidLink = document.getElementById('bid-now-link');

@@ -2131,8 +2131,8 @@
             }
             tbody.innerHTML = list.map(a => {
                 let coverImg = (a.images && a.images[0]) || '';
-                if (!coverImg && a.courseId && typeof allCourses !== 'undefined') {
-                    const linkedCourse = allCourses.find(c => c.id === a.courseId);
+                if (!coverImg && a.courseId && typeof getCachedCourses === 'function') {
+                    const linkedCourse = getCachedCourses().find(c => c.id === a.courseId);
                     if (linkedCourse && linkedCourse.featured_image_url) {
                         coverImg = linkedCourse.featured_image_url;
                     } else if (linkedCourse && linkedCourse.gallery && linkedCourse.gallery.length) {

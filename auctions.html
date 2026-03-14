@@ -531,7 +531,7 @@
                 }));
             } catch (e) { }
 
-            const rawAuctions = allAuctions.filter(a => a.status === 'active');
+            const rawAuctions = allAuctions.filter(a => ['live', 'active'].includes(a.status));
 
             rawAuctions.forEach(a => {
                 let realHighest = a.startBid || 0;
@@ -589,7 +589,7 @@
 
                     const endTime = new Date(a.endDate).getTime() || 9999999999;
                     const linkUrl = 'auction-rounds/pebble-beach-round-2?id=' + a.id;
-                    const statusLabel = { active: 'Active', scheduled: 'Scheduled', pending: 'Pending', draft: 'Draft', ended: 'Ended', closed: 'Closed' }[a.status] || a.status || 'Active';
+                    const statusLabel = { active: 'Active', live: 'Live', scheduled: 'Scheduled', pending: 'Pending', draft: 'Draft', ended: 'Ended', closed: 'Closed' }[a.status] || a.status || 'Active';
                     const fmtDate = d => d ? new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'TBD';
                     const hasMultiple = images.length > 1;
                     const imgData = JSON.stringify(images).replace(/"/g, '&quot;');

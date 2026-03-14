@@ -466,6 +466,11 @@ body {
     color: #fff;
 }
 
+.card-status-badge.live {
+    background: #3b82f6;
+    color: #fff;
+}
+
 .card-status-badge.scheduled {
     background: #3b82f6;
     color: #fff;
