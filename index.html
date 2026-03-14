@@ -229,6 +229,7 @@
     <script src="auction-data.js"></script>
     <script src="db.js"></script>
     <script src="auth.js"></script>
+    <script src="shared-courses.js"></script>
     <script src="shared-auctions.js"></script>
     <script>
         AUTH.applyGatedNav('');
@@ -238,9 +239,11 @@
             // Fetch fresh from DB so bidCount and currentBid are live
             let auctions = [];
             let bidCountMap = {};
+            let allCourses = [];
             if (typeof EPICDB !== 'undefined') {
-                const [freshAuctions, freshUsers] = await Promise.all([EPICDB.getAuctions(), EPICDB.getUsers()]);
-                auctions = (freshAuctions || []).filter(a => a.status === 'active');
+                const [freshAuctions, freshUsers, freshCourses] = await Promise.all([EPICDB.getAuctions(), EPICDB.getUsers(), EPICDB.getCourses()]);
+                allCourses = freshCourses || [];
+                auctions = (freshAuctions || []).filter(a => ['live', 'active'].includes(a.status));
                 // Build real bid count per auction from user bid arrays (source of truth)
                 (freshUsers || []).forEach(u => {
                     (u.bids || []).forEach(b => {
@@ -248,14 +251,25 @@
                     });
                 });
             } else {
-                auctions = loadSharedAuctions().filter(a => a.status === 'active');
+                allCourses = typeof loadSharedCourses === 'function' ? loadSharedCourses() : [];
+                auctions = loadSharedAuctions().filter(a => ['live', 'active'].includes(a.status));
             }
             const featured = auctions.slice(0, 4);
 
             function buildCardHtml(a) {
-                const images = (a.images && a.images.length) ? a.images : [];
+                let images = [];
+                if (a.course_id && allCourses && allCourses.length) {
+                    const linkedCourse = allCourses.find(c => c.id === a.course_id);
+                    if (linkedCourse) {
+                        if (linkedCourse.featured_image_url) images.push(linkedCourse.featured_image_url);
+                        if (linkedCourse.gallery && linkedCourse.gallery.length) images.push(...linkedCourse.gallery);
+                    }
+                }
+                if (images.length === 0 && a.images && a.images.length) {
+                    images = a.images;
+                }
                 const thumb = images[0] || '';
-                const statusLabel = { active: 'Active', scheduled: 'Scheduled', pending: 'Pending', draft: 'Draft', ended: 'Ended', closed: 'Closed' }[a.status] || 'Active';
+                const statusLabel = { active: 'Active', live: 'Live', scheduled: 'Scheduled', pending: 'Pending', draft: 'Draft', ended: 'Ended', closed: 'Closed' }[a.status] || 'Active';
                 const fmtDate = d => d ? new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'TBD';
                 const linkUrl = 'auction-rounds/pebble-beach-round-2?id=' + a.id;
                 const liveBidCount = bidCountMap[a.id] || a.bidCount || 0;
