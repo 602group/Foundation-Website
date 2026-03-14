@@ -2072,6 +2072,34 @@
                     <button onclick="_newModalImages.splice(${i},1);renderNewModalImages();" style="position:absolute;top:2px;right:2px;background:rgba(0,0,0,0.6);color:#fff;border:none;border-radius:50%;width:18px;height:18px;font-size:11px;cursor:pointer;line-height:18px;padding:0;">&times;</button>
                 </div>`).join('');
         }
+        // ── In-page confirm dialog (replaces native confirm() which gets blocked) ──
+        function showConfirm(title, msg, onConfirm) {
+            let overlay = document.getElementById('confirm-overlay');
+            if (!overlay) {
+                overlay = document.createElement('div');
+                overlay.id = 'confirm-overlay';
+                overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9999;display:flex;align-items:center;justify-content:center;';
+                overlay.innerHTML = `<div style="background:#fff;border-radius:16px;padding:2rem;max-width:360px;width:90%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.3);">
+                    <div id="confirm-title" style="font-size:1.1rem;font-weight:800;margin-bottom:0.5rem;"></div>
+                    <div id="confirm-msg" style="color:#666;font-size:0.9rem;margin-bottom:1.5rem;"></div>
+                    <div style="display:flex;gap:0.75rem;justify-content:center;">
+                        <button id="confirm-cancel" style="padding:0.6rem 1.5rem;border:1.5px solid #ddd;border-radius:8px;background:#fff;cursor:pointer;font-weight:600;">Cancel</button>
+                        <button id="confirm-ok" style="padding:0.6rem 1.5rem;border:none;border-radius:8px;background:#e53e3e;color:#fff;cursor:pointer;font-weight:700;">Delete</button>
+                    </div>
+                </div>`;
+                document.body.appendChild(overlay);
+            }
+            document.getElementById('confirm-title').textContent = title;
+            document.getElementById('confirm-msg').textContent = msg;
+            overlay.style.display = 'flex';
+            const ok = document.getElementById('confirm-ok');
+            const cancel = document.getElementById('confirm-cancel');
+            const close = () => { overlay.style.display = 'none'; };
+            ok.onclick = () => { close(); onConfirm(); };
+            cancel.onclick = close;
+        }
+
+
 
 
         // Load fresh auction data from the server before rendering
@@ -3019,31 +3047,43 @@
         function deleteAuction(id) {
             const a = auctions.find(x => x.id === id);
             if (!a) return;
-            if (!confirm(`Delete "${a.title}"? This cannot be undone.`)) return;
+            showConfirm(
+                `Delete "${a.title}"?`,
+                'This cannot be undone.',
+                async () => {
+                    try {
+                        const users = JSON.parse(localStorage.getItem('epic_users') || '[]');
+                        let changed = false;
+                        users.forEach(u => {
+                            if (u.bids) {
+                                const initLen = u.bids.length;
+                                u.bids = u.bids.filter(b => typeof b !== 'object' || b === null || b.title !== a.title);
+                                if (u.bids.length !== initLen) changed = true;
+                            }
+                            if (u.purchases) {
+                                const initLen = u.purchases.length;
+                                u.purchases = u.purchases.filter(p => typeof p !== 'object' || p === null || p.title !== a.title);
+                                if (u.purchases.length !== initLen) changed = true;
+                            }
+                        });
+                        if (changed) localStorage.setItem('epic_users', JSON.stringify(users));
+                    } catch (e) { console.error('Error cascading auction delete to users:', e); }
 
-            try {
-                const users = JSON.parse(localStorage.getItem('epic_users') || '[]');
-                let changed = false;
-                users.forEach(u => {
-                    if (u.bids) {
-                        const initLen = u.bids.length;
-                        u.bids = u.bids.filter(b => typeof b !== 'object' || b === null || b.title !== a.title);
-                        if (u.bids.length !== initLen) changed = true;
-                    }
-                    if (u.purchases) {
-                        const initLen = u.purchases.length;
-                        u.purchases = u.purchases.filter(p => typeof p !== 'object' || p === null || p.title !== a.title);
-                        if (u.purchases.length !== initLen) changed = true;
-                    }
-                });
-                if (changed) localStorage.setItem('epic_users', JSON.stringify(users));
-            } catch (e) { console.error('Error cascading auction delete to users:', e); }
+                    // Remove from in-memory list and local cache
+                    auctions = auctions.filter(x => x.id !== id);
+                    try { localStorage.setItem('epic_auctions', JSON.stringify(auctions)); } catch(e) {}
 
-            auctions = auctions.filter(x => x.id !== id);
-            saveSharedAuctions(auctions);
-            renderTable();
-            showToast('🗑️ Auction deleted');
+                    // ✅ Actually delete from Postgres too so it doesn't come back on refresh
+                    if (typeof EPICDB !== 'undefined' && EPICDB.deleteAuction) {
+                        try { await EPICDB.deleteAuction(id); } catch(e) { console.warn('DB delete failed:', e); }
+                    }
+
+                    renderTable();
+                    showToast('🗑️ Auction deleted');
+                }
+            );
         }
+
 
         // ══════════════════════════════════════════════
         // SORT (column headers)

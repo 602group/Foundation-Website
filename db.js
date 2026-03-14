@@ -87,6 +87,16 @@ const EPICDB = (() => {
         return apiPost('/auctions', auction);
     }
 
+    async function deleteAuction(auctionId) {
+        try {
+            const r = await fetch(BASE + '/auctions?id=' + encodeURIComponent(auctionId), { method: 'DELETE' });
+            return r.json();
+        } catch (e) {
+            console.warn('EPICDB.deleteAuction failed', e);
+            return null;
+        }
+    }
+
     // ── Courses ─────────────────────────────────────────────────
     async function getCourses() {
         const remote = await apiGet('/courses');
@@ -213,7 +223,7 @@ const EPICDB = (() => {
         await getCourses();
     }
 
-    return { init, getUsers, saveUser, createUser, getAuctions, saveAuction, getEvents, saveEvent, getCourses, saveCourse, deleteCourse, syncToServer };
+    return { init, getUsers, saveUser, createUser, getAuctions, saveAuction, deleteAuction, getEvents, saveEvent, getCourses, saveCourse, deleteCourse, syncToServer };
 })();
 
 // Auto-init on every page load

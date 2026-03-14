@@ -53,6 +53,13 @@ module.exports = async function handler(req, res) {
             return res.status(200).json(auction);
         }
 
+        if (req.method === 'DELETE') {
+            const { id } = req.query;
+            if (!id) return res.status(400).json({ error: 'Missing id query param' });
+            await client.query('DELETE FROM epic_auctions WHERE id = $1', [id]);
+            return res.status(200).json({ deleted: id });
+        }
+
         return res.status(405).json({ error: 'Method not allowed' });
     } catch (err) {
         console.error('auctions API error:', err);
