@@ -1474,9 +1474,32 @@
             document.getElementById('d-visibility').value = e.visibility || 'all';
             document.getElementById('d-title').value = e.title;
             document.getElementById('d-location').value = e.location;
-            // Use explicitly stored start/end dates if available
-            document.getElementById('d-date-start').value = e.dateStart || '';
-            document.getElementById('d-date-end').value = e.dateEnd || '';
+            // Use explicitly stored start/end dates if available, otherwise parse legacy string
+            let ds = e.dateStart || '';
+            let de = e.dateEnd || '';
+            
+            if (!ds && e.date) {
+                const str = e.date;
+                const yearMatch = str.match(/\d{4}/);
+                const year = yearMatch ? yearMatch[0] : new Date().getFullYear();
+                const months = str.match(/[A-Za-z]+/g) || [];
+                const days = str.match(/\b\d{1,2}\b/g) || [];
+
+                if (months.length > 0 && days.length > 0) {
+                    const toISO = (m, d, y) => {
+                        const dateObj = new Date(`${m} ${d}, ${y}`);
+                        return isNaN(dateObj) ? '' : dateObj.toISOString().slice(0, 10);
+                    };
+                    const firstMonth = months[0];
+                    const lastMonth = months.length > 1 ? months[months.length - 1] : firstMonth;
+                    
+                    ds = toISO(firstMonth, days[0], year);
+                    de = toISO(lastMonth, days.length > 1 ? days[1] : days[0], year);
+                }
+            }
+            
+            document.getElementById('d-date-start').value = ds;
+            document.getElementById('d-date-end').value = de;
             document.getElementById('d-price').value = e.price;
             document.getElementById('d-allowGuests').checked = e.allowGuests !== false;
             document.getElementById('d-spots').value = e.spots;
