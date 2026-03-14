@@ -304,25 +304,33 @@
             <!-- Media -->
             <div class="drawer-panel" id="tab-media">
                 <div class="form-section">
-                    <div class="form-section-title">Featured Image</div>
-                    <div class="form-group"><label>Featured Image URL *</label><input type="url" id="f-featured-img" placeholder="https://…" oninput="previewFeatured()"></div>
-                    <img id="featured-img-preview" src="" alt="Preview" style="width:100%;max-height:180px;object-fit:cover;border-radius:10px;margin-top:0.5rem;display:none;">
+                    <div class="form-section-title">Course Images</div>
+                    <p style="font-size:0.83rem;color:#888;margin-bottom:1rem;">
+                        Upload course photos here. Drag thumbnails to reorder.
+                        The <strong>first image</strong> is the primary header / cover photo.
+                    </p>
+                    <div id="courseImgGrid" style="display:flex;flex-wrap:wrap;gap:0.72rem;margin-bottom:1.1rem;min-height:80px;"></div>
+                    <label id="courseImgUploadZone"
+                        style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.5rem;
+                               padding:1.4rem 1rem;border:2px dashed #d4d4d4;border-radius:12px;
+                               cursor:pointer;font-size:0.85rem;color:#999;transition:border-color 0.2s,background 0.2s;"
+                        ondragover="event.preventDefault();this.style.borderColor='#4A90E2';this.style.background='#f0f7ff'"
+                        ondragleave="this.style.borderColor='#d4d4d4';this.style.background=''"
+                        ondrop="courseImgZoneDrop(event)" onmouseover="this.style.borderColor='#aaa'"
+                        onmouseout="this.style.borderColor='#d4d4d4'">
+                        <input type="file" accept="image/*" multiple style="display:none" onchange="courseImgZoneAdd(this)">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="1.8">
+                            <rect x="3" y="3" width="18" height="18" rx="2" />
+                            <circle cx="8.5" cy="8.5" r="1.5" />
+                            <polyline points="21 15 16 10 5 21" />
+                        </svg>
+                        <span>Drop images here or <strong style="color:#4A90E2;">click to upload</strong></span>
+                        <span style="font-size:0.76rem;">PNG, JPG — multiple files supported</span>
+                    </label>
                 </div>
                 <div class="form-section">
-                    <div class="form-section-title">Logo</div>
+                    <div class="form-section-title">Logo & Documents</div>
                     <div class="form-group"><label>Logo URL</label><input type="url" id="f-logo" placeholder="https://…"></div>
-                </div>
-                <div class="form-section">
-                    <div class="form-section-title">Gallery Images</div>
-                    <div class="image-preview-strip" id="gallery-strip"></div>
-                    <div style="margin-top:0.75rem;display:flex;gap:0.5rem;align-items:center;">
-                        <input type="url" id="gallery-url-input" placeholder="Paste image URL and click Add" style="flex:1;padding:0.6rem 0.8rem;border:1px solid #e0e0e0;border-radius:8px;font-family:'Poppins',sans-serif;font-size:0.88rem;outline:none;">
-                        <button class="btn-secondary" onclick="addGalleryImage()" style="padding:0.6rem 1rem;white-space:nowrap;">Add</button>
-                    </div>
-                </div>
-                <div class="form-section">
-                    <div class="form-section-title">Other Media</div>
-                    <div class="form-group"><label>Course Map URL</label><input type="url" id="f-map-url" placeholder="https://…"></div>
                     <div class="form-group"><label>Scorecard PDF / File URL</label><input type="url" id="f-scorecard" placeholder="https://…"></div>
                 </div>
             </div>
