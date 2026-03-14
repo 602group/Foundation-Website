@@ -1654,34 +1654,7 @@
                     </div>
                 </div>
 
-                <div class="form-section">
-                    <div class="form-section-title">Auction Images</div>
-                    <p style="font-size:0.83rem;color:#888;margin-bottom:1rem;">
-                        Upload multiple images. Drag thumbnails to reorder. Click <strong>Replace</strong> to swap one
-                        image.
-                        The <strong>first image</strong> is always the cover / header image.
-                    </p>
-                    <div id="imgMgrGrid"
-                        style="display:flex;flex-wrap:wrap;gap:0.72rem;margin-bottom:1.1rem;min-height:80px;"></div>
-                    <label id="imgUploadZone"
-                        style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.5rem;
-                               padding:1.4rem 1rem;border:2px dashed #d4d4d4;border-radius:12px;
-                               cursor:pointer;font-size:0.85rem;color:#999;transition:border-color 0.2s,background 0.2s;"
-                        ondragover="event.preventDefault();this.style.borderColor='#4A90E2';this.style.background='#f0f7ff'"
-                        ondragleave="this.style.borderColor='#d4d4d4';this.style.background=''"
-                        ondrop="imgZoneDrop(event)" onmouseover="this.style.borderColor='#aaa'"
-                        onmouseout="this.style.borderColor='#d4d4d4'">
-                        <input type="file" accept="image/*" multiple style="display:none" onchange="imgZoneAdd(this)">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="1.8">
-                            <rect x="3" y="3" width="18" height="18" rx="2" />
-                            <circle cx="8.5" cy="8.5" r="1.5" />
-                            <polyline points="21 15 16 10 5 21" />
-                        </svg>
-                        <span>Drop images here or <strong style="color:#4A90E2;">click to upload</strong></span>
-                        <span style="font-size:0.76rem;">PNG, JPG — multiple files supported</span>
-                    </label>
                 </div>
-            </div>
 
             <!-- PRICING TAB -->
 
@@ -1953,28 +1926,6 @@
                     
                 </div>
 
-                <!-- Images -->
-                <div style="margin-bottom:1.4rem;border-top:1px solid #f0f0f0;padding-top:1.2rem;">
-                    <div
-                        style="font-size:0.7rem;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:#aaa;margin-bottom:0.9rem;">
-                        Images</div>
-                    <div id="new-img-grid" style="display:flex;flex-wrap:wrap;gap:0.6rem;margin-bottom:0.8rem;"></div>
-                    <label
-                        style="display:flex;align-items:center;gap:0.6rem;padding:0.75rem 1rem;border:2px dashed #ddd;border-radius:10px;cursor:pointer;font-size:0.85rem;color:#888;"
-                        onmouseover="this.style.borderColor='#aaa'" onmouseout="this.style.borderColor='#ddd'">
-                        <input type="file" accept="image/*" multiple style="display:none"
-                            onchange="newModalAddImages(this)">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2">
-                            <rect x="3" y="3" width="18" height="18" rx="2" />
-                            <circle cx="8.5" cy="8.5" r="1.5" />
-                            <polyline points="21 15 16 10 5 21" />
-                        </svg>
-                        Click to upload images — first image = cover
-                    </label>
-                    <input type="hidden" id="new-imageUrl">
-                </div>
-
                 <!-- Admin -->
                 <div
                     style="margin-bottom:1rem;background:#fffbe6;border-radius:10px;padding:1rem 1.1rem;border:1.5px solid #ffe082;">
@@ -2229,8 +2180,7 @@
             const a = auctions.find(x => x.id === id);
             if (!a) return;
             editingId = id;
-            _drawerImages = [...(a.images || [])];
-            renderImgMgrGrid();
+            
             
             document.getElementById('drawerTitle').textContent = 'Edit: ' + a.title.substring(0, 40) + (a.title.length > 40 ? '\u2026' : '');
 
@@ -2734,7 +2684,7 @@
                 startDate: getVal('edit-startDate'),
                 endDate: getVal('edit-endDate'),
                 extension: parseInt(getVal('edit-extension')) || 2,
-                images: [..._drawerImages],
+                
                 thirdPartyUrl: getVal('gs-itemUrl') || getVal('admin-thirdPartyUrl'),
                 externalAuctionId: getVal('gs-itemId') || getVal('admin-externalAuctionId'),
                 // GiveSmart canonical fields
@@ -2953,133 +2903,6 @@
             return prefix + String(maxSeq + 1).padStart(5, '0');
         }
 
-        // ── New Modal Image Manager ────────────────────────────────────
-        let _newModalImages = []; // array of { dataUrl, name }
-
-        function newModalAddImages(input) {
-            const files = Array.from(input.files);
-            files.forEach(file => {
-                const reader = new FileReader();
-                reader.onload = e => {
-                    _newModalImages.push({ dataUrl: e.target.result, name: file.name });
-                    renderNewModalImages();
-                };
-                reader.readAsDataURL(file);
-            });
-            input.value = '';
-        }
-
-        function renderNewModalImages() {
-            const grid = document.getElementById('new-img-grid');
-            if (!grid) return;
-            if (_newModalImages.length === 0) {
-                grid.innerHTML = '';
-                document.getElementById('new-imageUrl').value = '';
-                return;
-            }
-            grid.innerHTML = _newModalImages.map((img, i) => `
-                <div style="position:relative;width:86px;height:86px;flex-shrink:0;border-radius:9px;overflow:hidden;
-                            border:${i === 0 ? '2.5px solid #4A90E2' : '2px solid #e5e5e5'};">
-                    <img src="${img.dataUrl}" style="width:100%;height:100%;object-fit:cover;display:block;">
-                    ${i === 0 ? '<div style="position:absolute;bottom:0;left:0;right:0;background:rgba(74,144,226,0.9);color:#fff;font-size:0.6rem;font-weight:800;text-align:center;padding:2px;text-transform:uppercase;letter-spacing:0.05em;">Cover</div>' : ''}
-                    <button onclick="newModalRemoveImage(${i})" title="Remove"
-                        style="position:absolute;top:3px;right:3px;width:18px;height:18px;background:rgba(0,0,0,0.6);color:#fff;
-                               border:none;border-radius:50%;font-size:11px;line-height:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;">×</button>
-                    ${i > 0 ? `<button onclick="newModalMoveToFront(${i})" title="Set as cover"
-                        style="position:absolute;top:3px;left:3px;width:18px;height:18px;background:rgba(74,144,226,0.75);color:#fff;
-                               border:none;border-radius:50%;font-size:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;" title="Make cover">★</button>`: ''}
-                </div>`).join('');
-            // Keep first image URL in the hidden input (for backward compat with card rendering)
-            document.getElementById('new-imageUrl').value = _newModalImages[0].dataUrl;
-        }
-
-        function newModalRemoveImage(idx) {
-            _newModalImages.splice(idx, 1);
-            renderNewModalImages();
-        }
-
-        function newModalMoveToFront(idx) {
-            const img = _newModalImages.splice(idx, 1)[0];
-            _newModalImages.unshift(img);
-            renderNewModalImages();
-        }
-
-        
-        // ── Edit Drawer Image Manager ──────────────────────────────────
-        let _drawerImages = []; // mirrors currentAuction.images during edit
-        let _drawerDragIdx = null;
-
-        function renderImgMgrGrid() {
-            const grid = document.getElementById('imgMgrGrid');
-            if (!grid) return;
-            if (_drawerImages.length === 0) {
-                grid.innerHTML = '<p style="color:#bbb;font-size:0.82rem;">No images yet. Upload some below.</p>';
-                return;
-            }
-            grid.innerHTML = _drawerImages.map((url, i) => `
-                <div draggable="true" data-idx="${i}"
-                    ondragstart="imgDragStart(event,${i})"
-                    ondragover="imgDragOver(event)"
-                    ondrop="imgDrop(event,${i})"
-                    ondragend="imgDragEnd()"
-                    style="position:relative;width:100px;height:100px;flex-shrink:0;border-radius:10px;
-                           overflow:hidden;border:${i === 0 ? '2.5px solid #4A90E2' : '2px solid #e5e5e5'};
-                           cursor:grab;transition:opacity 0.2s;">
-                    <img src="${url}" style="width:100%;height:100%;object-fit:cover;display:block;">
-                    ${i === 0 ? '<div style="position:absolute;bottom:0;left:0;right:0;background:rgba(74,144,226,0.88);color:#fff;font-size:0.58rem;font-weight:800;text-align:center;padding:2px;text-transform:uppercase;">Header</div>' : ''}
-                    <div style="position:absolute;top:3px;right:3px;display:flex;gap:2px;">
-                        <label title="Replace" style="width:20px;height:20px;background:rgba(0,0,0,0.55);border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;">
-                            <input type="file" accept="image/*" style="display:none" onchange="imgMgrReplace(this,${i})">
-                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-                        </label>
-                        <button onclick="imgMgrRemove(${i})" title="Remove"
-                            style="width:20px;height:20px;background:rgba(200,50,50,0.75);color:#fff;
-                                   border:none;border-radius:50%;font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;">×</button>
-                    </div>
-                </div>`).join('');
-        }
-
-        function imgDragStart(e, idx) { _drawerDragIdx = idx; e.currentTarget.style.opacity = '0.4'; }
-        function imgDragEnd() { _drawerDragIdx = null; document.querySelectorAll('#imgMgrGrid [data-idx]').forEach(el => el.style.opacity = ''); }
-        function imgDragOver(e) { e.preventDefault(); }
-        function imgDrop(e, targetIdx) {
-            e.preventDefault();
-            if (_drawerDragIdx === null || _drawerDragIdx === targetIdx) return;
-            const moved = _drawerImages.splice(_drawerDragIdx, 1)[0];
-            _drawerImages.splice(targetIdx, 0, moved);
-            renderImgMgrGrid();
-        }
-        function imgMgrRemove(idx) {
-            if (!confirm('Remove this image?')) return;
-            _drawerImages.splice(idx, 1);
-            renderImgMgrGrid();
-        }
-        function imgMgrReplace(input, idx) {
-            const file = input.files[0]; if (!file) return;
-            const reader = new FileReader();
-            reader.onload = e => { _drawerImages[idx] = e.target.result; renderImgMgrGrid(); };
-            reader.readAsDataURL(file);
-            input.value = '';
-        }
-        function imgZoneAdd(input) {
-            Array.from(input.files).forEach(file => {
-                const reader = new FileReader();
-                reader.onload = e => { _drawerImages.push(e.target.result); renderImgMgrGrid(); };
-                reader.readAsDataURL(file);
-            });
-            input.value = '';
-        }
-        function imgZoneDrop(e) {
-            e.preventDefault();
-            const zone = document.getElementById('imgUploadZone');
-            if (zone) { zone.style.borderColor = '#d4d4d4'; zone.style.background = ''; }
-            Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('image/')).forEach(file => {
-                const reader = new FileReader();
-                reader.onload = ev => { _drawerImages.push(ev.target.result); renderImgMgrGrid(); };
-                reader.readAsDataURL(file);
-            });
-        }
-
         function createAuction() {
             const title = document.getElementById('new-title').value.trim();
             const course = document.getElementById('new-course').value.trim();
@@ -3113,7 +2936,7 @@
                 startDate: document.getElementById('new-startDate').value,
                 endDate: document.getElementById('new-endDate').value,
                 extension: 2,
-                images: _newModalImages.map(i => i.dataUrl),
+                
                 donor: document.getElementById('new-donor').value.trim(),
                 adminNotes: document.getElementById('new-adminNotes').value.trim(),
                 course_id: document.getElementById('new-course_id').value.trim() || null,
