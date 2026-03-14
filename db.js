@@ -89,16 +89,31 @@ const EPICDB = (() => {
 
     // ── Courses ─────────────────────────────────────────────────
     async function getCourses() {
-        const courses = await apiGet('/courses');
-        // Treat [] from server as "no data" — fall back to local seed
-        if (courses && courses.length > 0) {
-            localStorage.setItem('epic_courses', JSON.stringify(courses));
-            return courses;
+        const remote = await apiGet('/courses');
+        let local = [];
+        try { local = JSON.parse(localStorage.getItem('epic_courses')) || []; } catch { local = []; }
+
+        if (remote && remote.length > 0) {
+            // Merge: for each remote course, prefer the local version if it's newer
+            const merged = remote.map(rc => {
+                const lc = local.find(c => c.id === rc.id);
+                if (lc && lc.updated_at && rc.updated_at && lc.updated_at > rc.updated_at) {
+                    return lc; // local is newer — keep it (e.g. unsaved image upload)
+                }
+                return rc;
+            });
+            // Also include any local-only courses not yet pushed to DB
+            local.forEach(lc => {
+                if (!merged.find(c => c.id === lc.id)) merged.push(lc);
+            });
+            localStorage.setItem('epic_courses', JSON.stringify(merged));
+            return merged;
         }
-        // Fall back to localStorage seed (which includes Pebble Beach, Augusta, Pine Valley etc.)
+
+        // No remote data — fall back to local, then seed
+        if (local.length > 0) return local;
         if (typeof loadSharedCourses === 'function') return loadSharedCourses();
-        try { return JSON.parse(localStorage.getItem('epic_courses')) || []; }
-        catch { return []; }
+        return [];
     }
 
     async function saveCourse(course) {
