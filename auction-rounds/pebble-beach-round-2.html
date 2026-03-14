@@ -415,14 +415,33 @@
                 data.description ? data.description.replace(/\n/g, '<br>') : '';
 
             // --- Images ---
-            const images = data.images && data.images.length ? data.images : [];
+            // If data in localStorage is stale (no images), pull from defaults
+            let images = (data.images && data.images.length) ? data.images : [];
+            if (!images.length && typeof getDefaultAuctions === 'function') {
+                const def = getDefaultAuctions().find(a => a.id === auctionId);
+                if (def && def.images && def.images.length) images = def.images;
+            }
+            // Fallback: Pebble Beach images hardcoded if still empty
+            if (!images.length) {
+                images = [
+                    'https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=1200&q=90',
+                    'https://images.unsplash.com/photo-1622396481328-9b1b9e839e6c?w=1200&q=90',
+                    'https://images.unsplash.com/photo-1592919505780-30395071e483?w=1200&q=90'
+                ];
+            }
             const mainImg = document.getElementById('main-hero-img');
             const side1   = document.getElementById('side-img-1');
             const side2   = document.getElementById('side-img-2');
-            if (mainImg && images[0]) mainImg.src = images[0];
-            if (side1   && images[1]) side1.src   = images[1];
-            if (side2   && images[2]) side2.src   = images[2];
+            if (mainImg) mainImg.src = images[0] || '';
+            if (side1)   side1.src   = images[1] || images[0] || '';
+            if (side2)   side2.src   = images[2] || images[0] || '';
             if (typeof setGalleryImages === 'function') setGalleryImages(images);
+            // Also save images back to localStorage so it's not stale next time
+            if (data.images && !data.images.length) {
+                data.images = images;
+                const idx = auctions.findIndex(a => a.id === auctionId);
+                if (idx > -1) { auctions[idx] = data; saveSharedAuctions(auctions); }
+            }
 
             // --- Bid Now Link ---
             const bidLink = document.getElementById('bid-now-link');
@@ -433,17 +452,37 @@
             // --- Map ---
             document.getElementById('page-auction-map-address').textContent = data.location;
             const encoded = encodeURIComponent(data.location);
-            document.getElementById('page-auction-map').innerHTML = `
-                <iframe
-                    src="https://www.openstreetmap.org/export/embed.html?bbox=-122.5,36.5,-121.8,37.0&layer=mapnik&marker=${encodeURIComponent(data.location)}&q=${encoded}"
-                    width="100%" height="400" style="border:0; border-radius:16px;"
-                    loading="lazy">
-                </iframe>
-                <p style="margin-top:0.5rem;font-size:0.82rem;color:#888;">
-                    <a href="https://maps.google.com/maps?q=${encoded}" target="_blank" rel="noopener"
-                        style="color:#000;font-weight:600;">Open in Google Maps →</a>
-                </p>
-            `;
+            const mapContainer = document.getElementById('page-auction-map');
+            // Geocode via Nominatim then build proper OSM embed with accurate marker
+            (async () => {
+                try {
+                    const geo = await fetch(`https://nominatim.openstreetmap.org/search?q=${encoded}&format=json&limit=1`);
+                    const geoJson = await geo.json();
+                    if (geoJson && geoJson[0]) {
+                        const lat = parseFloat(geoJson[0].lat);
+                        const lon = parseFloat(geoJson[0].lon);
+                        const delta = 0.04;
+                        const bbox = `${lon-delta},${lat-delta},${lon+delta},${lat+delta}`;
+                        mapContainer.innerHTML = `
+                            <iframe
+                                src="https://www.openstreetmap.org/export/embed.html?bbox=${bbox}&layer=mapnik&marker=${lat},${lon}"
+                                width="100%" height="400" style="border:0;border-radius:16px;"
+                                loading="lazy" title="Map of ${data.location}">
+                            </iframe>
+                            <p style="margin-top:0.5rem;font-size:0.82rem;color:#888;">
+                                <a href="https://maps.google.com/maps?q=${encoded}" target="_blank" rel="noopener"
+                                    style="color:#000;font-weight:600;">Open in Google Maps →</a>
+                            </p>`;
+                    } else { throw new Error('no results'); }
+                } catch {
+                    // Fallback: just show a Google Maps link
+                    mapContainer.innerHTML = `
+                        <div style="display:flex;align-items:center;justify-content:center;height:200px;background:#f4f4f4;border-radius:16px;">
+                            <a href="https://maps.google.com/maps?q=${encoded}" target="_blank" rel="noopener"
+                                style="background:#000;color:#fff;padding:0.75rem 1.5rem;border-radius:8px;font-weight:700;text-decoration:none;">Open in Google Maps →</a>
+                        </div>`;
+                }
+            })();
 
             // --- Countdown ---
             const timerEl = document.getElementById('auction-countdown');
