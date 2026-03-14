@@ -10,6 +10,35 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap"
         rel="stylesheet">
+    <style>
+        /* ── Homepage auction card carousel ─────────────────────── */
+        .card-image-carousel { cursor: pointer; }
+        .caro-slide { position: absolute; inset: 0; transition: opacity 0.35s; opacity: 0; }
+        .caro-slide:first-child { opacity: 1; }
+        .caro-slide[style*="display:block"] { opacity: 1; }
+        .card-image { position: relative; overflow: hidden; }
+        .caro-prev, .caro-next {
+            position: absolute; top: 50%; transform: translateY(-50%);
+            background: rgba(0,0,0,0.55); color: #fff; border: none;
+            width: 32px; height: 32px; border-radius: 50%;
+            font-size: 1.2rem; line-height: 1; cursor: pointer;
+            z-index: 10; display: flex; align-items: center; justify-content: center;
+            opacity: 0; transition: opacity 0.2s;
+        }
+        .card-image-carousel:hover .caro-prev,
+        .card-image-carousel:hover .caro-next { opacity: 1; }
+        .caro-prev { left: 8px; }
+        .caro-next { right: 8px; }
+        .caro-dots {
+            position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%);
+            display: flex; gap: 5px; z-index: 10;
+        }
+        .caro-dot {
+            width: 7px; height: 7px; border-radius: 50%;
+            background: rgba(255,255,255,0.45); transition: background 0.2s;
+        }
+        .caro-dot.active { background: #fff; }
+    </style>
 </head>
 
 <body>
@@ -231,19 +260,33 @@
             const featured = auctions.slice(0, 4);
 
             function buildCardHtml(a) {
-                const thumb = a.images && a.images[0] ? a.images[0] : '';
-                const imgStyle = thumb ? `background-image:url(${thumb});background-size:cover;background-position:center;` : '';
-                const placeholderHtml = thumb ? '' : `<span style="font-size:2.5rem;opacity:0.25;z-index:1;">♟</span>`;
+                const images = (a.images && a.images.length) ? a.images : [];
+                const thumb = images[0] || '';
                 const statusLabel = { active: 'Active', scheduled: 'Scheduled', pending: 'Pending', draft: 'Draft', ended: 'Ended', closed: 'Closed' }[a.status] || 'Active';
                 const fmtDate = d => d ? new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'TBD';
                 const linkUrl = 'auction-rounds/pebble-beach-round-2?id=' + a.id;
                 const liveBidCount = bidCountMap[a.id] || a.bidCount || 0;
+
+                // Build carousel slides
+                const carouselImgs = images.length
+                    ? images.map((src, i) => `<div class="caro-slide" style="display:${i===0?'block':'none'};width:100%;height:100%;background:url(${src}) center/cover no-repeat;"></div>`).join('')
+                    : `<div class="caro-slide" style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:#111;"><span style="font-size:2.5rem;opacity:0.25;">&#x26F3;</span></div>`;
+                const dots = images.length > 1
+                    ? `<div class="caro-dots">${images.map((_,i) => `<span class="caro-dot${i===0?' active':''}"></span>`).join('')}</div>`
+                    : '';
+                const arrows = images.length > 1
+                    ? `<button class="caro-prev" onclick="event.preventDefault();caroStep(this,-1)" aria-label="Prev">&#8249;</button>
+                       <button class="caro-next" onclick="event.preventDefault();caroStep(this,1)" aria-label="Next">&#8250;</button>`
+                    : '';
+
                 return `
                 <a href="${linkUrl}" class="auction-card-link" style="text-decoration:none;color:inherit;">
                     <div class="auction-card">
-                        <div class="card-image" style="${imgStyle}">
-                            ${placeholderHtml}
-                            <span class="card-status-badge ${(a.status || 'active').toLowerCase()}">${statusLabel}</span>
+                        <div class="card-image card-image-carousel" style="position:relative;overflow:hidden;">
+                            ${carouselImgs}
+                            <span class="card-status-badge ${(a.status||'active').toLowerCase()}">${statusLabel}</span>
+                            ${arrows}
+                            ${dots}
                         </div>
                         <div class="card-content">
                             <h3 class="card-title">${a.title}</h3>
@@ -252,12 +295,6 @@
                                 <span class="card-date-tag">Closes: ${fmtDate(a.endDate)}</span>
                             </div>
                             <div class="card-footer">
-                                <!-- BID INFO HIDDEN — redirecting to 3rd party; code preserved below
-                                <div class="price-info">
-                                    <span class="current-bid">$${a.currentBid ? a.currentBid.toLocaleString() : a.startBid.toLocaleString()}</span>
-                                    <span class="bid-label">${liveBidCount} bid${liveBidCount !== 1 ? 's' : ''} · Current Bid</span>
-                                </div>
-                                -->
                                 <div class="card-countdown" id="cd-${a.id}" style="font-size:0.75rem;color:#888;font-weight:600;"></div>
                                 <span class="card-bid-cta">View Item →</span>
                             </div>
@@ -354,6 +391,25 @@
         });
     </script>
 
+    <script>
+        // ── Carousel step function for homepage auction cards ─────
+        function caroStep(btn, dir) {
+            const container = btn.closest('.card-image-carousel');
+            if (!container) return;
+            const slides = container.querySelectorAll('.caro-slide');
+            const dots   = container.querySelectorAll('.caro-dot');
+            if (!slides.length) return;
+            let cur = 0;
+            slides.forEach((s, i) => { if (s.style.display !== 'none') cur = i; });
+            const next = (cur + dir + slides.length) % slides.length;
+            slides[cur].style.display = 'none';
+            slides[next].style.display = 'block';
+            if (dots.length) {
+                dots[cur].classList.remove('active');
+                dots[next].classList.add('active');
+            }
+        }
+    </script>
 </body>
 
 </html>

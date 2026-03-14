@@ -19,19 +19,12 @@
         <a href="/" class="logo">EPIC Foundation</a>
         <nav class="nav-menu">
             <a href="auctions.html" class="nav-link member-only-link" style="display:none;">Auction</a>
-            <div class="nav-dropdown member-only-link" style="display:none;position:relative;">
-                <a href="travel-events.html" class="nav-link" style="display:flex;align-items:center;gap:4px;">Travel &amp; Events <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M7 10l5 5 5-5z"/></svg></a>
-                <div class="nav-dropdown-menu" style="position:absolute;top:100%;left:0;background:#111;border-radius:10px;min-width:160px;padding:0.5rem 0;z-index:200;display:none;box-shadow:0 8px 24px rgba(0,0,0,0.4);">
-                    <a href="travel-events.html#trips" style="display:block;padding:0.65rem 1.1rem;color:#fff;text-decoration:none;font-size:0.88rem;font-weight:600;" onmouseover="this.style.background='#222'" onmouseout="this.style.background=''">&#x26F3; Trips</a>
-                    <a href="travel-events.html#events" style="display:block;padding:0.65rem 1.1rem;color:#fff;text-decoration:none;font-size:0.88rem;font-weight:600;" onmouseover="this.style.background='#222'" onmouseout="this.style.background=''">&#x1F3DF; Events</a>
-                </div>
-            </div>
+            <a href="travel-events.html" class="nav-link member-only-link" style="display:none;">Travel &amp; Events</a>
             <a href="about.html" class="nav-link">About Us</a>
             <a href="contact.html" class="nav-link">Contact Us</a>
             <a href="donate.html" class="nav-link" style="color:#fff;font-weight:700;">Donate &#9829;</a>
             <button class="login-btn">Login</button>
         </nav>
-        <script>document.querySelectorAll('.nav-dropdown').forEach(d=>{d.addEventListener('mouseenter',()=>d.querySelector('.nav-dropdown-menu').style.display='block');d.addEventListener('mouseleave',()=>d.querySelector('.nav-dropdown-menu').style.display='none');});</script>
     </header>
 
     <!-- Hero Section -->
