@@ -417,7 +417,8 @@
         let allAuctions = [];
         let currentStatusFilter = 'all';
         let editingCourseId = null;
-        let galleryImages = [];
+        let _courseImages = [];
+            renderCourseImgGrid();
 
         const AMENITY_LABELS = {
             driving_range: 'Driving Range',
@@ -537,7 +538,8 @@
         // ── Drawer Open/Close ─────────────────────────────────────────────────
         function openAddDrawer() {
             editingCourseId = null;
-            galleryImages = [];
+            _courseImages = [];
+            renderCourseImgGrid();
             clearForm();
             document.getElementById('drawer-title').textContent = 'Add New Course';
             document.getElementById('drawer-delete-btn').style.display = 'none';
@@ -551,7 +553,6 @@
             const course = allCourses.find(c => c.id === courseId);
             if (!course) return;
             editingCourseId = courseId;
-            galleryImages = [...(course.gallery || [])];
             fillForm(course);
             document.getElementById('drawer-title').textContent = course.name || 'Edit Course';
             document.getElementById('drawer-delete-btn').style.display = '';
@@ -678,7 +679,8 @@
             document.getElementById('f-status').value = 'draft';
             document.getElementById('f-accent-color').value = '#1a5276';
             document.getElementById('featured-img-preview').style.display = 'none';
-            galleryImages = [];
+            _courseImages = [];
+            renderCourseImgGrid();
             renderGalleryStrip();
             setAmenities({});
         }
@@ -694,16 +696,80 @@
             set('f-course-type', c.course_type); set('f-access', c.public_private);
             set('f-resort', c.resort_course ? 'true' : 'false');
             set('f-designer', c.designer); set('f-year', c.year_opened);
-            set('f-featured-img', c.featured_image_url); previewFeatured();
-            set('f-logo', c.logo_url); set('f-map-url', c.map_url); set('f-scorecard', c.scorecard_url);
-            set('f-website', c.website_url); set('f-booking', c.booking_url);
-            set('f-gmaps', c.google_maps_url); set('f-instagram', c.instagram_url); set('f-facebook', c.facebook_url);
-            set('f-accent-color', c.accent_color || '#1a5276'); set('f-badge', c.badge_text);
-            set('f-order', c.display_order); set('f-featured', c.is_featured ? 'true' : 'false');
-            set('f-status', c.status || 'draft');
-            galleryImages = [...(c.gallery || [])];
-            renderGalleryStrip();
+            // Replace image loading logic
+            _courseImages = [];
+            if (c.featured_image_url) _courseImages.push(c.featured_image_url);
+            if (c.gallery && c.gallery.length) _courseImages.push(...c.gallery);
+            renderCourseImgGrid();
             setAmenities(c.amenities || {});
+        }
+
+        
+        // ── Course Image Manager (Drag & Drop) ──────────────────────────
+        let _courseImages = [];
+        let _courseDragIdx = null;
+
+        function renderCourseImgGrid() {
+            const grid = document.getElementById('courseImgGrid');
+            if (!grid) return;
+            if (_courseImages.length === 0) {
+                grid.innerHTML = '<p style="color:#bbb;font-size:0.82rem;">No images yet. Upload some below.</p>';
+                return;
+            }
+            grid.innerHTML = _courseImages.map((url, i) => `
+                <div draggable="true" data-idx="${i}"
+                    ondragstart="courseImgDragStart(event,${i})"
+                    ondragover="courseImgDragOver(event)"
+                    ondrop="courseImgDrop(event,${i})"
+                    ondragend="courseImgDragEnd()"
+                    style="position:relative;width:120px;height:90px;flex-shrink:0;border-radius:10px;
+                           overflow:hidden;border:${i === 0 ? '3px solid #4A90E2' : '2px solid #e5e5e5'};
+                           cursor:grab;transition:opacity 0.2s;">
+                    <img src="${url}" style="width:100%;height:100%;object-fit:cover;display:block;">
+                    ${i === 0 ? '<div style="position:absolute;bottom:0;left:0;right:0;background:rgba(74,144,226,0.9);color:#fff;font-size:0.58rem;font-weight:800;text-align:center;padding:3px;text-transform:uppercase;">Cover</div>' : ''}
+                    <div style="position:absolute;top:4px;right:4px;display:flex;gap:3px;">
+                        <button onclick="courseImgRemove(${i})" title="Remove"
+                            style="width:22px;height:22px;background:rgba(200,50,50,0.8);color:#fff;
+                                   border:none;border-radius:50%;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;">×</button>
+                    </div>
+                    <div style="position:absolute;bottom:4px;left:4px;" title="Drag to reorder">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="white" opacity="0.8"><circle cx="9" cy="5" r="1.5"/><circle cx="15" cy="5" r="1.5"/><circle cx="9" cy="12" r="1.5"/><circle cx="15" cy="12" r="1.5"/><circle cx="9" cy="19" r="1.5"/><circle cx="15" cy="19" r="1.5"/></svg>
+                    </div>
+                </div>`).join('');
+        }
+
+        function courseImgDragStart(e, idx) { _courseDragIdx = idx; e.currentTarget.style.opacity = '0.4'; }
+        function courseImgDragEnd() { _courseDragIdx = null; document.querySelectorAll('#courseImgGrid [data-idx]').forEach(el => el.style.opacity = ''); }
+        function courseImgDragOver(e) { e.preventDefault(); }
+        function courseImgDrop(e, targetIdx) {
+            e.preventDefault();
+            if (_courseDragIdx === null || _courseDragIdx === targetIdx) return;
+            const moved = _courseImages.splice(_courseDragIdx, 1)[0];
+            _courseImages.splice(targetIdx, 0, moved);
+            renderCourseImgGrid();
+        }
+        function courseImgRemove(idx) {
+            if (!confirm('Remove this image?')) return;
+            _courseImages.splice(idx, 1);
+            renderCourseImgGrid();
+        }
+        function courseImgZoneAdd(input) {
+            Array.from(input.files).forEach(file => {
+                const reader = new FileReader();
+                reader.onload = e => { _courseImages.push(e.target.result); renderCourseImgGrid(); };
+                reader.readAsDataURL(file);
+            });
+            input.value = '';
+        }
+        function courseImgZoneDrop(e) {
+            e.preventDefault();
+            const zone = document.getElementById('courseImgUploadZone');
+            if (zone) { zone.style.borderColor = '#d4d4d4'; zone.style.background = ''; }
+            Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('image/')).forEach(file => {
+                const reader = new FileReader();
+                reader.onload = ev => { _courseImages.push(ev.target.result); renderCourseImgGrid(); };
+                reader.readAsDataURL(file);
+            });
         }
 
         // ── Collect Form ──────────────────────────────────────────────────────
@@ -731,9 +797,9 @@
                 resort_course: document.getElementById('f-resort').value === 'true',
                 designer: g('f-designer'),
                 year_opened: parseInt(g('f-year')) || null,
-                featured_image_url: g('f-featured-img'),
+                featured_image_url: _courseImages.length > 0 ? _courseImages[0] : '',
+                gallery: _courseImages.length > 1 ? _courseImages.slice(1) : [],
                 logo_url: g('f-logo'),
-                gallery: [...galleryImages],
                 map_url: g('f-map-url'),
                 scorecard_url: g('f-scorecard'),
                 website_url: g('f-website'),
