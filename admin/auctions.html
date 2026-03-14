@@ -2670,12 +2670,13 @@
         }
 
         function switchTab(tab, btn) {
-            const body = document.querySelector('.drawer-body');
-            if (body) { body.querySelectorAll('.drawer-panel').forEach(p => p.classList.remove('active')); body.scrollTop = 0; }
+            document.querySelectorAll('#editDrawer .drawer-panel').forEach(p => p.classList.remove('active'));
             document.querySelectorAll('.drawer-tab').forEach(b => b.classList.remove('active'));
             const panel = document.getElementById('panel-' + tab);
             if (panel) panel.classList.add('active');
-            btn.classList.add('active');
+            if (btn) btn.classList.add('active');
+            const body = document.querySelector('#editDrawer .drawer-body');
+            if (body) body.scrollTop = 0;
             if (tab === 'preview') updatePreview();
             if (tab === 'tasks') renderAuctionTasks();
         }
