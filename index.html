@@ -268,46 +268,48 @@
                 if (images.length === 0 && a.images && a.images.length) {
                     images = a.images;
                 }
-                const thumb = images[0] || '';
-                const statusLabel = { active: 'Active', live: 'Live', scheduled: 'Scheduled', pending: 'Pending', draft: 'Draft', ended: 'Ended', closed: 'Closed' }[a.status] || 'Active';
-                const fmtDate = d => d ? new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'TBD';
+                const thumb0 = images[0] || '';
+                const price = a.startBid || 0;
+                const state = (a.location || '').split(',').pop().trim().toLowerCase();
+                const archClass = a.attributes ? a.attributes.replace(/[^a-zA-Z0-9]/g, '').toLowerCase() : 'other';
+                const rankClass = a.title.toLowerCase().includes('top 100') ? 'top100' : 'other';
+                const endTime = new Date(a.endDate).getTime() || 9999999999;
                 const linkUrl = 'auction-rounds/pebble-beach-round-2?id=' + a.id;
-                const liveBidCount = bidCountMap[a.id] || a.bidCount || 0;
-
-                // Build carousel slides
-                const carouselImgs = images.length
-                    ? images.map((src, i) => `<div class="caro-slide" style="display:${i===0?'block':'none'};width:100%;height:100%;background:url(${src}) center/cover no-repeat;"></div>`).join('')
-                    : `<div class="caro-slide" style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:#111;"><span style="font-size:2.5rem;opacity:0.25;">&#x26F3;</span></div>`;
-                const dots = images.length > 1
-                    ? `<div class="caro-dots">${images.map((_,i) => `<span class="caro-dot${i===0?' active':''}"></span>`).join('')}</div>`
-                    : '';
-                const arrows = images.length > 1
-                    ? `<button class="caro-prev" onclick="event.preventDefault();caroStep(this,-1)" aria-label="Prev">&#8249;</button>
-                       <button class="caro-next" onclick="event.preventDefault();caroStep(this,1)" aria-label="Next">&#8250;</button>`
-                    : '';
+                const statusLabel = { active: 'Active', live: 'Live', scheduled: 'Scheduled', pending: 'Pending', draft: 'Draft', ended: 'Ended', closed: 'Closed' }[a.status] || a.status || 'Active';
+                const fmtDate = d => d ? new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'TBD';
+                const hasMultiple = images.length > 1;
+                const imgData = JSON.stringify(images).replace(/"/g, '&quot;');
 
                 return `
-                <a href="${linkUrl}" class="auction-card-link" style="text-decoration:none;color:inherit;">
-                    <div class="auction-card">
-                        <div class="card-image card-image-carousel" style="position:relative;overflow:hidden;">
-                            ${carouselImgs}
-                            <span class="card-status-badge ${(a.status||'active').toLowerCase()}">${statusLabel}</span>
-                            ${arrows}
-                            ${dots}
-                        </div>
+                <div class="auction-card" data-auction-id="${a.id}" data-price="${price}" data-state="${state}" data-architect="${archClass}" data-rank="${rankClass}" data-end-time="${endTime}">
+                    <!-- Carousel image area -->
+                    <div class="card-image-carousel" data-images="${imgData}" data-idx="0" onclick="window.location.href='${linkUrl}'"
+                        style="position:relative;overflow:hidden;height:220px;background:#1a1a1a;cursor:pointer;">
+                        <img class="carousel-slide active-slide" src="${thumb0}" alt="${a.title}"
+                            style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:opacity 0.3s;">
+                        <span class="card-status-badge ${(a.status||'active').toLowerCase()}">${statusLabel}</span>
+                        ` + (hasMultiple ? 
+                        '<button class="carousel-arrow carousel-prev" onclick="carouselPrev(event,this)" aria-label="Previous image" style="position:absolute;left:8px;top:50%;transform:translateY(-50%);background:rgba(0,0,0,0.55);border:none;color:#fff;width:32px;height:32px;border-radius:50%;font-size:1.1rem;cursor:pointer;display:none;align-items:center;justify-content:center;z-index:10;backdrop-filter:blur(4px);">&#8249;</button>' +
+                        '<button class="carousel-arrow carousel-next" onclick="carouselNext(event,this)" aria-label="Next image" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:rgba(0,0,0,0.55);border:none;color:#fff;width:32px;height:32px;border-radius:50%;font-size:1.1rem;cursor:pointer;display:none;align-items:center;justify-content:center;z-index:10;backdrop-filter:blur(4px);">&#8250;</button>' +
+                        '<div class="carousel-dots" style="position:absolute;bottom:8px;left:50%;transform:translateX(-50%);display:flex;gap:4px;z-index:10;">' +
+                            images.map((_,i) => '<span class="cdot' + (i===0?' cdot-active':'') + '" style="width:6px;height:6px;border-radius:50%;background:' + (i===0?'#fff':'rgba(255,255,255,0.45)') + ';transition:background 0.2s;"></span>').join('') +
+                        '</div>' : '') + `
+                    </div>
+                    <a href="${linkUrl}" style="text-decoration:none;color:inherit;display:flex;flex-direction:column;flex:1;">
                         <div class="card-content">
                             <h3 class="card-title">${a.title}</h3>
                             <p class="card-location">${a.location}</p>
                             <div class="card-dates">
+                                <span class="card-date-tag">Opens: ${fmtDate(a.startDate)}</span>
                                 <span class="card-date-tag">Closes: ${fmtDate(a.endDate)}</span>
                             </div>
                             <div class="card-footer">
-                                <div class="card-countdown" id="cd-${a.id}" style="font-size:0.75rem;color:#888;font-weight:600;"></div>
-                                <span class="card-bid-cta">View Item →</span>
+                                <div id="countdown-${a.id}" class="card-countdown" style="font-size:0.75rem;color:#888;font-weight:600;"></div>
+                                <span class="card-bid-cta">View Item &rarr;</span>
                             </div>
                         </div>
-                    </div>
-                </a>`;
+                    </a>
+                </div>`;
             }
 
             const featGrid = document.getElementById('featured-auctions-grid');
@@ -324,6 +326,46 @@
                     : '<p style="grid-column:1/-1;text-align:center;color:#888;">More auctions coming soon.</p>';
                 otherSec.style.display = '';
             }
+
+            // Carousel hover behaviour
+            document.querySelectorAll('.card-image-carousel').forEach(el => {
+                if (el.dataset.images === '[""]' || !el.dataset.images) return;
+                const imgs = JSON.parse(el.dataset.images.replace(/&quot;/g,'"'));
+                if (imgs.length <= 1) return;
+                el.addEventListener('mouseenter', () => {
+                    el.querySelectorAll('.carousel-arrow').forEach(a => a.style.display = 'flex');
+                });
+                el.addEventListener('mouseleave', () => {
+                    el.querySelectorAll('.carousel-arrow').forEach(a => a.style.display = 'none');
+                });
+            });
+
+            // Carousel navigation functions
+            if (!window.carouselPrev) {
+                window.carouselPrev = function(e, btn) {
+                    e.stopPropagation();
+                    const wrap = btn.closest('.card-image-carousel');
+                    moveCarousel(wrap, -1);
+                };
+                window.carouselNext = function(e, btn) {
+                    e.stopPropagation();
+                    const wrap = btn.closest('.card-image-carousel');
+                    moveCarousel(wrap, 1);
+                };
+                function moveCarousel(wrap, dir) {
+                    const imgs = JSON.parse(wrap.dataset.images.replace(/&quot;/g,'"'));
+                    let idx = parseInt(wrap.dataset.idx) || 0;
+                    idx = (idx + dir + imgs.length) % imgs.length;
+                    wrap.dataset.idx = idx;
+                    const slide = wrap.querySelector('.carousel-slide');
+                    if (slide) { slide.style.opacity = '0'; setTimeout(() => { slide.src = imgs[idx]; slide.style.opacity = '1'; }, 150); }
+                    wrap.querySelectorAll('.cdot').forEach((d, i) => {
+                        d.style.background = i === idx ? '#fff' : 'rgba(255,255,255,0.45)';
+                        d.classList.toggle('cdot-active', i === idx);
+                    });
+                }
+            }
+
         }
         renderPublicAuctions().then(() => initCountdowns());
         function initCountdowns() {
