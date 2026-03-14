@@ -1967,7 +1967,7 @@
         function filterCourseOptions(prefix) {
             const q = document.getElementById(prefix + '-course-search').value.toLowerCase();
             const dd = document.getElementById(prefix + '-course-dropdown');
-            const courses = getCachedCourses().filter(c => c.status === 'active');
+            const courses = getCachedCourses();
             const matches = q ? courses.filter(c => (c.name + ' ' + c.city + ' ' + c.state).toLowerCase().includes(q)) : courses;
             if (!matches.length) { dd.innerHTML = '<div style="padding:0.8rem;color:#aaa;font-size:0.84rem;">No courses found</div>'; }
             else {
