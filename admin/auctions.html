@@ -2798,38 +2798,70 @@
         `).join('') + (editImages.length < 10 ? '' : '');
         }
 
-        function addImageFile(fileInput) {
-            const file = fileInput.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = e => {
-                editImages.push(e.target.result);
-                renderImageStrip();
-                // Reset label text back
-                fileInput.closest('label').childNodes.forEach(n => {
-                    if (n.nodeType === Node.TEXT_NODE) n.textContent = ' 📁 Choose file (PNG, JPG, PDF)';
-                });
-                fileInput.value = '';
-            };
-            reader.readAsDataURL(file);
+        function resizeImage(file, maxDist) {
+            return new Promise(resolve => {
+                const reader = new FileReader();
+                reader.onload = e => {
+                    const img = new Image();
+                    img.onload = () => {
+                        let w = img.width;
+                        let h = img.height;
+                        if (w > maxDist || h > maxDist) {
+                            const ratio = Math.min(maxDist / w, maxDist / h);
+                            w = Math.floor(w * ratio);
+                            h = Math.floor(h * ratio);
+                        }
+                        const canvas = document.createElement('canvas');
+                        canvas.width = w;
+                        canvas.height = h;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, w, h);
+                        resolve(canvas.toDataURL('image/jpeg', 0.8));
+                    };
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            });
         }
 
-        function handleNewAuctionImage(fileInput) {
+        async function addImageFile(fileInput) {
             const file = fileInput.files[0];
             if (!file) return;
-            const reader = new FileReader();
-            reader.onload = e => {
-                document.getElementById('new-imageUrl').value = e.target.result;
-                const preview = document.getElementById('new-image-preview');
-                if (preview && file.type.startsWith('image/')) {
-                    preview.src = e.target.result;
-                    preview.style.display = 'block';
-                }
-                fileInput.closest('label').childNodes.forEach(n => {
-                    if (n.nodeType === Node.TEXT_NODE) n.textContent = ' ' + file.name;
-                });
-            };
-            reader.readAsDataURL(file);
+            
+            if (file.type.startsWith('image/')) {
+                const base64 = await resizeImage(file, 1200);
+                editImages.push(base64);
+            } else {
+                const reader = new FileReader();
+                await new Promise(r => { reader.onload = e => { editImages.push(e.target.result); r(); }; reader.readAsDataURL(file); });
+            }
+            
+            renderImageStrip();
+            fileInput.closest('label').childNodes.forEach(n => {
+                if (n.nodeType === Node.TEXT_NODE) n.textContent = ' 📁 Choose file (PNG, JPG, PDF)';
+            });
+            fileInput.value = '';
+        }
+
+        async function handleNewAuctionImage(fileInput) {
+            const file = fileInput.files[0];
+            if (!file) return;
+            let base64 = '';
+            if (file.type.startsWith('image/')) {
+                base64 = await resizeImage(file, 1200);
+            } else {
+                const reader = new FileReader();
+                base64 = await new Promise(r => { reader.onload = e => r(e.target.result); reader.readAsDataURL(file); });
+            }
+            document.getElementById('new-imageUrl').value = base64;
+            const preview = document.getElementById('new-image-preview');
+            if (preview && file.type.startsWith('image/')) {
+                preview.src = base64;
+                preview.style.display = 'block';
+            }
+            fileInput.closest('label').childNodes.forEach(n => {
+                if (n.nodeType === Node.TEXT_NODE) n.textContent = ' ' + file.name;
+            });
         }
 
         function removeImage(i) {

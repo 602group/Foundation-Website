@@ -288,12 +288,12 @@
                         <img class="carousel-slide active-slide" src="${thumb0}" alt="${a.title}"
                             style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:opacity 0.3s;">
                         <span class="card-status-badge ${(a.status||'active').toLowerCase()}">${statusLabel}</span>
-                        ` + (hasMultiple ? 
+                        ${hasMultiple ? 
                         '<button class="carousel-arrow carousel-prev" onclick="carouselPrev(event,this)" aria-label="Previous image" style="position:absolute;left:8px;top:50%;transform:translateY(-50%);background:rgba(0,0,0,0.55);border:none;color:#fff;width:32px;height:32px;border-radius:50%;font-size:1.1rem;cursor:pointer;display:none;align-items:center;justify-content:center;z-index:10;backdrop-filter:blur(4px);">&#8249;</button>' +
                         '<button class="carousel-arrow carousel-next" onclick="carouselNext(event,this)" aria-label="Next image" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:rgba(0,0,0,0.55);border:none;color:#fff;width:32px;height:32px;border-radius:50%;font-size:1.1rem;cursor:pointer;display:none;align-items:center;justify-content:center;z-index:10;backdrop-filter:blur(4px);">&#8250;</button>' +
                         '<div class="carousel-dots" style="position:absolute;bottom:8px;left:50%;transform:translateX(-50%);display:flex;gap:4px;z-index:10;">' +
                             images.map((_,i) => '<span class="cdot' + (i===0?' cdot-active':'') + '" style="width:6px;height:6px;border-radius:50%;background:' + (i===0?'#fff':'rgba(255,255,255,0.45)') + ';transition:background 0.2s;"></span>').join('') +
-                        '</div>' : '') + `
+                        '</div>' : ''}
                     </div>
                     <a href="${linkUrl}" style="text-decoration:none;color:inherit;display:flex;flex-direction:column;flex:1;">
                         <div class="card-content">

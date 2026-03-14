@@ -764,25 +764,53 @@
             _courseImages.splice(idx, 1);
             renderCourseImgGrid();
         }
-        function courseImgZoneAdd(input) {
-            Array.from(input.files).forEach(file => {
+                function resizeImage(file, maxDist) {
+            return new Promise(resolve => {
                 const reader = new FileReader();
-                reader.onload = e => { _courseImages.push(e.target.result); renderCourseImgGrid(); };
+                reader.onload = e => {
+                    const img = new Image();
+                    img.onload = () => {
+                        let w = img.width;
+                        let h = img.height;
+                        if (w > maxDist || h > maxDist) {
+                            const ratio = Math.min(maxDist / w, maxDist / h);
+                            w = Math.floor(w * ratio);
+                            h = Math.floor(h * ratio);
+                        }
+                        const canvas = document.createElement('canvas');
+                        canvas.width = w;
+                        canvas.height = h;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, w, h);
+                        resolve(canvas.toDataURL('image/jpeg', 0.8));
+                    };
+                    img.src = e.target.result;
+                };
                 reader.readAsDataURL(file);
             });
+        }
+        
+        async function courseImgZoneAdd(input) {
+            for (let file of input.files) {
+                if (!file.type.startsWith('image/')) continue;
+                const base64 = await resizeImage(file, 1200);
+                _courseImages.push(base64);
+            }
+            renderCourseImgGrid();
             input.value = '';
         }
-        function courseImgZoneDrop(e) {
+        
+        async function courseImgZoneDrop(e) {
             e.preventDefault();
             const zone = document.getElementById('courseImgUploadZone');
             if (zone) { zone.style.borderColor = '#d4d4d4'; zone.style.background = ''; }
-            Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('image/')).forEach(file => {
-                const reader = new FileReader();
-                reader.onload = ev => { _courseImages.push(ev.target.result); renderCourseImgGrid(); };
-                reader.readAsDataURL(file);
-            });
+            for (let file of e.dataTransfer.files) {
+                if (!file.type.startsWith('image/')) continue;
+                const base64 = await resizeImage(file, 1200);
+                _courseImages.push(base64);
+            }
+            renderCourseImgGrid();
         }
-
         // ── Collect Form ──────────────────────────────────────────────────────
         function collectForm() {
             const g = id => document.getElementById(id)?.value.trim() || '';
