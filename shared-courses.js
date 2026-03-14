@@ -5,12 +5,14 @@
  */
 
 const COURSES_STORE_KEY = 'epic_courses';
-const COURSES_VERSION = '1';
+const COURSES_VERSION = '2';
 
 function loadSharedCourses() {
     try {
+        const storedVer = localStorage.getItem(COURSES_STORE_KEY + '_ver');
         const raw = localStorage.getItem(COURSES_STORE_KEY);
-        if (!raw || raw === '[]') {
+        // Re-seed if empty OR if version is outdated
+        if (!raw || raw === '[]' || storedVer !== COURSES_VERSION) {
             const defaults = getDefaultCourses();
             localStorage.setItem(COURSES_STORE_KEY, JSON.stringify(defaults));
             localStorage.setItem(COURSES_STORE_KEY + '_ver', COURSES_VERSION);

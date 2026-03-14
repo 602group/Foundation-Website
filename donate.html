@@ -542,8 +542,8 @@
     <header class="page-header">
         <a href="index.html" class="logo">EPIC Foundation</a>
         <nav class="nav-menu">
-            <a href="auctions.html" class="nav-link">Auctions</a>
-            <a href="travel-events.html" class="nav-link">Travel &amp; Events</a>
+            <a href="auctions.html" class="nav-link member-only-link" style="display:none;">Auction</a>
+            <a href="travel-events.html" class="nav-link member-only-link" style="display:none;">Travel &amp; Events</a>
             <a href="about.html" class="nav-link">About Us</a>
             <a href="contact.html" class="nav-link">Contact Us</a>
             <button class="login-btn">Login</button>
@@ -794,7 +794,7 @@
     <script src="auth.js"></script>
     <script src="shared-auctions.js"></script>
     <script>
-        AUTH.applyHeader('');
+        AUTH.applyGatedNav('');
 
         // ── Type tile selection ─────────────────────────────────
         document.querySelectorAll('.type-tile').forEach(tile => {

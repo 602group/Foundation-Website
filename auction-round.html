@@ -468,7 +468,7 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', async () => {
-            AUTH.applyHeader('');
+            AUTH.applyGatedNav('');
 
             const urlParams = new URLSearchParams(window.location.search);
             const auctionId = urlParams.get('id');
