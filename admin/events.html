@@ -1325,19 +1325,38 @@
 
         // ── Render ────────────────────────────────────────────────────────────
         document.addEventListener('DOMContentLoaded', async () => {
-            // Fetch fresh data from server before rendering
-            if (typeof EPICDB !== 'undefined') {
-                const [freshEvents, freshUsers] = await Promise.all([EPICDB.getEvents(), EPICDB.getUsers()]);
-                if (freshEvents && freshEvents.length) saveSharedEvents(freshEvents);
-                adminUsers = freshUsers || [];
-                // Also seed localStorage for functions that still read it
-                if (adminUsers.length) localStorage.setItem('epic_users', JSON.stringify(adminUsers));
-            } else {
-                adminUsers = JSON.parse(localStorage.getItem('epic_users') || '[]');
-            }
+            // Render immediately from localStorage so the table is never blank
             recomputeAllSpotsSold();
             renderEvents();
             renderDestinations();
+
+            // Then fetch fresh data from Postgres in the background
+            if (typeof EPICDB !== 'undefined') {
+                try {
+                    const [freshEvents, freshUsers] = await Promise.all([EPICDB.getEvents(), EPICDB.getUsers()]);
+                    // Only overwrite localStorage if Postgres has data
+                    if (freshEvents && freshEvents.length) {
+                        saveSharedEvents(freshEvents);
+                        recomputeAllSpotsSold();
+                        renderEvents();
+                    } else if (freshEvents && freshEvents.length === 0) {
+                        // Postgres is empty — push localStorage events up to sync
+                        const local = loadSharedEvents();
+                        for (const ev of local) {
+                            await EPICDB.saveEvent(ev).catch(() => {});
+                        }
+                    }
+                    adminUsers = freshUsers || [];
+                    if (adminUsers.length) {
+                        localStorage.setItem('epic_users', JSON.stringify(adminUsers));
+                        renderEvents(); // refresh spots sold
+                    }
+                } catch (err) {
+                    console.warn('EPICDB fetch failed, using localStorage:', err);
+                }
+            } else {
+                adminUsers = JSON.parse(localStorage.getItem('epic_users') || '[]');
+            }
         });
 
         function renderEvents() {
