@@ -56,7 +56,7 @@ const EPICDB = (() => {
     async function getUsers() {
         const users = await apiGet('/users');
         if (users) {
-            try { localStorage.setItem('epic_users', JSON.stringify(users)); } catch(e) { console.warn('Bypassing local cache for ' + 'localStorage.setItem('epic_users', JSON.stringify(users));'); }
+            try { localStorage.setItem('epic_users', JSON.stringify(users)); } catch(e) { console.warn('localStorage quota exceeded for epic_users'); }
             return users;
         }
         // Fallback to localStorage if API fails
@@ -76,7 +76,7 @@ const EPICDB = (() => {
     async function getAuctions() {
         const auctions = await apiGet('/auctions');
         if (auctions) {
-            try { localStorage.setItem('epic_auctions', JSON.stringify(auctions)); } catch(e) { console.warn('Bypassing local cache for ' + 'localStorage.setItem('epic_auctions', JSON.stringify(auctions));'); }
+            try { localStorage.setItem('epic_auctions', JSON.stringify(auctions)); } catch(e) { console.warn('localStorage quota exceeded for epic_auctions'); }
             return auctions;
         }
         try { return JSON.parse(localStorage.getItem('epic_auctions')) || []; }
@@ -94,12 +94,22 @@ const EPICDB = (() => {
         try { local = JSON.parse(localStorage.getItem('epic_courses')) || []; } catch { local = []; }
 
         if (remote && remote.length > 0) {
-            // Merge: for each remote course, prefer the local version if it's newer
+            // Merge: always preserve local images even if the DB saved without them
             const merged = remote.map(rc => {
                 const lc = local.find(c => c.id === rc.id);
-                if (lc && lc.updated_at && rc.updated_at && lc.updated_at > rc.updated_at) {
-                    return lc; // local is newer — keep it (e.g. unsaved image upload)
+                if (!lc) return rc;
+                
+                // If DB version has no images but local does, keep local images
+                const hasRemoteImages = (rc.featured_image_url && rc.featured_image_url.startsWith('data:')) || 
+                                        (rc.gallery && rc.gallery.some(g => g && g.startsWith('data:')));
+                const hasLocalImages  = (lc.featured_image_url && lc.featured_image_url.startsWith('data:')) || 
+                                        (lc.gallery && lc.gallery.some(g => g && g.startsWith('data:')));
+
+                if (hasLocalImages && !hasRemoteImages) {
+                    return { ...rc, featured_image_url: lc.featured_image_url, gallery: lc.gallery };
                 }
+
+                if (lc.updated_at && rc.updated_at && lc.updated_at > rc.updated_at) return lc;
                 return rc;
             });
             // Also include any local-only courses not yet pushed to DB
@@ -114,7 +124,23 @@ const EPICDB = (() => {
                 });
             }
 
-            try { localStorage.setItem('epic_courses', JSON.stringify(merged)); } catch(e) { console.warn('Bypassing local cache for ' + 'localStorage.setItem('epic_courses', JSON.stringify(merged));'); }
+            // Final guardrail: restore images from dedicated per-course localStorage keys
+            // These are saved by admin/courses.html saveCourse() as 'epic_imgs_[courseId]'
+            merged.forEach(c => {
+                const hasImages = (c.featured_image_url && c.featured_image_url.startsWith('data:')) ||
+                                  (c.gallery && c.gallery.some(g => g && g.startsWith('data:')));
+                if (!hasImages) {
+                    try {
+                        const saved = JSON.parse(localStorage.getItem('epic_imgs_' + c.id));
+                        if (saved && (saved.featured_image_url || (saved.gallery && saved.gallery.length))) {
+                            c.featured_image_url = saved.featured_image_url;
+                            c.gallery = saved.gallery;
+                        }
+                    } catch(e) {}
+                }
+            });
+
+            try { localStorage.setItem('epic_courses', JSON.stringify(merged)); } catch(e) { console.warn('localStorage quota exceeded for epic_courses'); }
             return merged;
         }
 
@@ -125,7 +151,7 @@ const EPICDB = (() => {
                     if (!local.find(c => c.id === def.id)) local.push(def);
                 });
             }
-            try { localStorage.setItem('epic_courses', JSON.stringify(local)); } catch(e) { console.warn('Bypassing local cache for ' + 'localStorage.setItem('epic_courses', JSON.stringify(local));'); }
+            try { localStorage.setItem('epic_courses', JSON.stringify(local)); } catch(e) { console.warn('localStorage quota exceeded for epic_courses'); }
             return local;
         }
         if (typeof loadSharedCourses === 'function') return loadSharedCourses();
