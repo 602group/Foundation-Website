@@ -1,6 +1,9 @@
 // api/courses.js - Vercel serverless function for golf course data
 const { Pool } = require('pg');
 
+// Increase body size limit to 10MB to support base64-encoded course images
+module.exports.config = { api: { bodyParser: { sizeLimit: '10mb' } } };
+
 const pool = new Pool({ connectionString: process.env.DATABASE_URL, ssl: { rejectUnauthorized: false } });
 
 async function ensureTable(client) {

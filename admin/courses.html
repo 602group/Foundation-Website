@@ -858,7 +858,7 @@
         }
 
         // ── Save ──────────────────────────────────────────────────────────────
-        function saveCourse() {
+        async function saveCourse() {
             const course = collectForm();
             if (!course.name) { showToast('Course Name is required.'); switchTabById('tab-basic'); return; }
             if (!course.city || !course.state) { showToast('City and State are required.'); switchTabById('tab-location'); return; }
@@ -868,13 +868,29 @@
             if (idx > -1) allCourses[idx] = course;
             else allCourses.push(course);
 
-            saveSharedCourses(allCourses);
+            // Save to localStorage immediately so UI feels instant
+            localStorage.setItem(COURSES_STORE_KEY, JSON.stringify(allCourses));
+
+            // Save to the database and wait for confirmation
+            if (typeof EPICDB !== 'undefined' && EPICDB.saveCourse) {
+                try {
+                    const result = await EPICDB.saveCourse(course);
+                    if (!result || result.error) {
+                        showToast('⚠️ Saved locally, but database sync failed: ' + (result && result.error ? result.error : 'Unknown error. Check console.'), 6000);
+                    }
+                } catch (e) {
+                    console.error('saveCourse DB error:', e);
+                    showToast('⚠️ Saved locally, but database sync failed. Data will not persist after refresh.', 6000);
+                }
+            }
+
             closeDrawer();
             renderStats();
             renderTable();
             showToast(editingCourseId ? '✅ Course updated.' : '✅ Course created.');
             logActivity('course', `Course "${course.name}" ${editingCourseId ? 'updated' : 'created'}.`);
         }
+
 
         // ── Archive ───────────────────────────────────────────────────────────
         function confirmArchiveCourse() {
