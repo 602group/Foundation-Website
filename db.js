@@ -15,9 +15,11 @@ const EPICDB = (() => {
     // ── Core fetch helpers ──────────────────────────────────────
     async function apiGet(path) {
         try {
-            const r = await fetch(BASE + path);
+            const separator = path.includes('?') ? '&' : '?';
+            const cacheBustPath = path + separator + 't=' + Date.now();
+            const r = await fetch(BASE + cacheBustPath);
             if (!r.ok) throw new Error('API error ' + r.status);
-            return r.json();
+            return await r.json();
         } catch (e) {
             console.warn('EPICDB.apiGet failed', path, e);
             return null;
