@@ -555,8 +555,8 @@
             if (grid) {
                 grid.innerHTML = list.map(a => {
                     let images = [''];
-                    if (a.courseId && allCourses && allCourses.length) {
-                        const linkedCourse = allCourses.find(c => c.id === a.courseId);
+                    if (a.course_id && allCourses && allCourses.length) {
+                        const linkedCourse = allCourses.find(c => c.id === a.course_id);
                         if (linkedCourse) {
                             images = [];
                             if (linkedCourse.featured_image_url) images.push(linkedCourse.featured_image_url);

@@ -419,8 +419,8 @@
 
             // --- Images ---
             let images = [];
-            if (data.courseId && allCourses && allCourses.length) {
-                const linkedCourse = allCourses.find(c => c.id === data.courseId);
+            if (data.course_id && allCourses && allCourses.length) {
+                const linkedCourse = allCourses.find(c => c.id === data.course_id);
                 if (linkedCourse) {
                     if (linkedCourse.featured_image_url) images.push(linkedCourse.featured_image_url);
                     if (linkedCourse.gallery && linkedCourse.gallery.length) images.push(...linkedCourse.gallery);
