@@ -11,14 +11,31 @@ function loadSharedCourses() {
     try {
         const storedVer = localStorage.getItem(COURSES_STORE_KEY + '_ver');
         const raw = localStorage.getItem(COURSES_STORE_KEY);
-        // Re-seed if empty OR if version is outdated
-        if (!raw || raw === '[]' || storedVer !== COURSES_VERSION) {
-            const defaults = getDefaultCourses();
+        const defaults = getDefaultCourses();
+
+        // If completely empty, seed everything
+        if (!raw || raw === '[]') {
             localStorage.setItem(COURSES_STORE_KEY, JSON.stringify(defaults));
             localStorage.setItem(COURSES_STORE_KEY + '_ver', COURSES_VERSION);
             return defaults;
         }
-        return JSON.parse(raw);
+
+        let local = JSON.parse(raw);
+        
+        // If version is outdated, merge any missing defaults into existing data instead of wiping it
+        if (storedVer !== COURSES_VERSION) {
+            let changed = false;
+            defaults.forEach(def => {
+                if (!local.find(c => c.id === def.id)) {
+                    local.push(def);
+                    changed = true;
+                }
+            });
+            if (changed) localStorage.setItem(COURSES_STORE_KEY, JSON.stringify(local));
+            localStorage.setItem(COURSES_STORE_KEY + '_ver', COURSES_VERSION);
+        }
+
+        return local;
     } catch {
         return getDefaultCourses();
     }

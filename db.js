@@ -106,12 +106,28 @@ const EPICDB = (() => {
             local.forEach(lc => {
                 if (!merged.find(c => c.id === lc.id)) merged.push(lc);
             });
+            
+            // Ensure any new codebase defaults (like Torrey Pines) exist
+            if (typeof getDefaultCourses === 'function') {
+                getDefaultCourses().forEach(def => {
+                    if (!merged.find(c => c.id === def.id)) merged.push(def);
+                });
+            }
+
             localStorage.setItem('epic_courses', JSON.stringify(merged));
             return merged;
         }
 
         // No remote data — fall back to local, then seed
-        if (local.length > 0) return local;
+        if (local.length > 0) {
+            if (typeof getDefaultCourses === 'function') {
+                getDefaultCourses().forEach(def => {
+                    if (!local.find(c => c.id === def.id)) local.push(def);
+                });
+            }
+            localStorage.setItem('epic_courses', JSON.stringify(local));
+            return local;
+        }
         if (typeof loadSharedCourses === 'function') return loadSharedCourses();
         return [];
     }
