@@ -1504,6 +1504,22 @@
             document.getElementById('d-costStaff').value = e.costStaff || 0;
             document.getElementById('d-costMisc').value = e.costMisc || 0;
 
+            // Course selection
+            document.getElementById('d-course_id').value = e.course_id || '';
+            if (e.course_id) {
+                getCachedCoursesForEvents().then(courses => {
+                    const c = courses.find(x => x.id === e.course_id);
+                    if (c) {
+                        document.getElementById('d-course-search').value = c.name;
+                        renderEventCoursePreview(c, 'd');
+                    } else {
+                        clearEventCourse('d');
+                    }
+                });
+            } else {
+                clearEventCourse('d');
+            }
+
             // Build P&L table
             renderPL(e);
 
@@ -1747,6 +1763,7 @@
                 visibility: document.getElementById('d-visibility').value || 'all',
                 title: document.getElementById('d-title').value,
                 location: document.getElementById('d-location').value,
+                course_id: document.getElementById('d-course_id').value.trim() || null,
                 date: dateRange,
                 dateStart: ds,
                 dateEnd: de,
@@ -1875,6 +1892,7 @@
                 eventType: document.getElementById('new-eventType').value,
                 status: document.getElementById('new-status').value,
                 location: document.getElementById('new-location').value,
+                course_id: document.getElementById('evt-course_id').value.trim() || null,
                 mapAddress: document.getElementById('new-mapAddress').value,
                 date: dateRange,
                 dateStart: startRaw,
@@ -1921,6 +1939,7 @@
                     eventType: document.getElementById('new-eventType').value,
                     status: document.getElementById('new-status').value,
                     location: document.getElementById('new-location').value,
+                    course_id: document.getElementById('evt-course_id').value.trim() || null,
                     mapAddress: document.getElementById('new-mapAddress').value,
                     date: dateRange,
                     dateStart: startRaw,
