@@ -515,7 +515,6 @@
         AUTH.applyGatedNav('');
 
         (async function renderAuctions() {
-            // Fetch fresh data from server so admin changes are reflected immediately
             let allAuctions, allUsers;
             if (typeof EPICDB !== 'undefined') {
                 [allAuctions, allUsers] = await Promise.all([EPICDB.getAuctions(), EPICDB.getUsers()]);
@@ -524,7 +523,6 @@
                 allUsers = [];
             }
 
-            // Precompute real bid counts from users
             const auctionBidCounts = {};
             try {
                 allUsers.forEach(u => (u.bids || []).forEach(b => {
@@ -532,10 +530,8 @@
                 }));
             } catch (e) { }
 
-            // Show all active auctions to members
             const rawAuctions = allAuctions.filter(a => a.status === 'active');
 
-            // Reconcile currentBids from the already-fetched allUsers (from server)
             rawAuctions.forEach(a => {
                 let realHighest = a.startBid || 0;
                 let realHighestBidder = '';
@@ -552,11 +548,13 @@
                     if (realHighestBidder) a.highestBidder = realHighestBidder;
                 }
             });
+
             const list = rawAuctions;
             const grid = document.getElementById('auction-grid');
             if (grid) {
                 grid.innerHTML = list.map(a => {
-                    const thumb = a.images && a.images[0] ? a.images[0] : '';
+                    const images = (a.images && a.images.length) ? a.images : [''];
+                    const thumb0 = images[0] || '';
                     const price = a.currentBid || a.startBid || 0;
                     const stateMatch = a.location.match(/, *([A-Za-z]{2})/);
                     const state = stateMatch ? stateMatch[1].toLowerCase() : '';
@@ -581,19 +579,29 @@
 
                     const endTime = new Date(a.endDate).getTime() || 9999999999;
                     const linkUrl = 'auction-rounds/pebble-beach-round-2?id=' + a.id;
-
                     const statusLabel = { active: 'Active', scheduled: 'Scheduled', pending: 'Pending', draft: 'Draft', ended: 'Ended', closed: 'Closed' }[a.status] || a.status || 'Active';
-                    const imgStyle = thumb ? `background-image:url(${thumb});background-size:cover;background-position:center;` : '';
-                    const placeholderHtml = thumb ? '' : `<span class="card-image-placeholder">♟</span>`;
                     const fmtDate = d => d ? new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'TBD';
+                    const hasMultiple = images.length > 1;
+                    const imgData = JSON.stringify(images).replace(/"/g, '&quot;');
 
                     return `
                 <div class="auction-card" data-auction-id="${a.id}" data-price="${price}" data-state="${state}" data-architect="${archClass}" data-rank="${rankClass}" data-end-time="${endTime}">
-                    <a href="${linkUrl}" style="text-decoration:none;color:inherit;display:flex;flex-direction:column;height:100%;">
-                        <div class="card-image" style="${imgStyle}">
-                            ${placeholderHtml}
-                            <span class="card-status-badge ${(a.status || 'active').toLowerCase()}">${statusLabel}</span>
-                        </div>
+                    <!-- Carousel image area (not wrapped in link so arrows can intercept clicks) -->
+                    <div class="card-image-carousel" data-images="${imgData}" data-idx="0" onclick="window.location.href='${linkUrl}'"
+                        style="position:relative;overflow:hidden;height:220px;background:#1a1a1a;cursor:pointer;">
+                        <img class="carousel-slide active-slide" src="${thumb0}" alt="${a.title}"
+                            style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:opacity 0.3s;">
+                        <span class="card-status-badge ${(a.status||'active').toLowerCase()}">${statusLabel}</span>
+                        ${hasMultiple ? `
+                        <button class="carousel-arrow carousel-prev" onclick="carouselPrev(event,this)" aria-label="Previous image"
+                            style="position:absolute;left:8px;top:50%;transform:translateY(-50%);background:rgba(0,0,0,0.55);border:none;color:#fff;width:32px;height:32px;border-radius:50%;font-size:1.1rem;cursor:pointer;display:none;align-items:center;justify-content:center;z-index:10;backdrop-filter:blur(4px);">&#8249;</button>
+                        <button class="carousel-arrow carousel-next" onclick="carouselNext(event,this)" aria-label="Next image"
+                            style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:rgba(0,0,0,0.55);border:none;color:#fff;width:32px;height:32px;border-radius:50%;font-size:1.1rem;cursor:pointer;display:none;align-items:center;justify-content:center;z-index:10;backdrop-filter:blur(4px);">&#8250;</button>
+                        <div class="carousel-dots" style="position:absolute;bottom:8px;left:50%;transform:translateX(-50%);display:flex;gap:4px;z-index:10;">
+                            ${images.map((_,i) => `<span class="cdot${i===0?' cdot-active':''}" style="width:6px;height:6px;border-radius:50%;background:${i===0?'#fff':'rgba(255,255,255,0.45)'};transition:background 0.2s;"></span>`).join('')}
+                        </div>` : ''}
+                    </div>
+                    <a href="${linkUrl}" style="text-decoration:none;color:inherit;display:flex;flex-direction:column;flex:1;">
                         <div class="card-content">
                             <h3 class="card-title">${a.title}</h3>
                             <p class="card-location">${a.location}</p>
@@ -602,41 +610,54 @@
                                 <span class="card-date-tag">Closes: ${fmtDate(a.endDate)}</span>
                             </div>
                             <div class="card-footer">
-                                <!-- BID INFO HIDDEN — redirecting to 3rd party; code preserved below
-                                <div class="price-info">
-                                    <div class="current-bid">$${price.toLocaleString()}</div>
-                                    <div class="bid-label">${(auctionBidCounts[a.id] ?? a.bidCount ?? 0)} bids · Current Bid</div>
-                                </div>
-                                -->
                                 <div id="countdown-${a.id}" class="card-countdown" style="font-size:0.75rem;color:#888;font-weight:600;"></div>
-                                <span class="card-bid-cta">View Item →</span>
-                                <div id="countdown-${a.id}" class="card-countdown" style="font-size:0.75rem;color:#888;font-weight:600;"></div>
-                                <span class="card-bid-cta">View Item →</span>
+                                <span class="card-bid-cta">View Item &rarr;</span>
                             </div>
                         </div>
                     </a>
                 </div>`;
                 }).join('');
 
-                // Init filters now that cards exist in the DOM
-                if (typeof initFilters === 'function') initFilters();
-                // Init countdown timers
-                list.forEach(a => {
-                    const el = document.getElementById('countdown-' + a.id);
-                    if (!el || !a.endDate) return;
-                    const endDate = new Date(a.endDate);
-                    function tick() {
-                        const diff = endDate - new Date();
-                        if (diff <= 0) { el.textContent = 'Closed'; return; }
-                        const d = Math.floor(diff / 86400000);
-                        const h = Math.floor((diff % 86400000) / 3600000);
-                        const m = Math.floor((diff % 3600000) / 60000);
-                        el.textContent = d > 0 ? d + 'd ' + h + 'h remaining' : h + 'h ' + m + 'm remaining';
-                    }
-                    tick();
-                    setInterval(tick, 60000);
+                // Carousel hover behaviour
+                document.querySelectorAll('.card-image-carousel').forEach(el => {
+                    if (el.dataset.images === '[""]' || !el.dataset.images) return;
+                    const imgs = JSON.parse(el.dataset.images.replace(/&quot;/g,'"'));
+                    if (imgs.length <= 1) return;
+                    el.addEventListener('mouseenter', () => {
+                        el.querySelectorAll('.carousel-arrow').forEach(a => a.style.display = 'flex');
+                    });
+                    el.addEventListener('mouseleave', () => {
+                        el.querySelectorAll('.carousel-arrow').forEach(a => a.style.display = 'none');
+                    });
                 });
-                // Init countdown timers
+
+                // Carousel navigation functions
+                window.carouselPrev = function(e, btn) {
+                    e.stopPropagation();
+                    const wrap = btn.closest('.card-image-carousel');
+                    moveCarousel(wrap, -1);
+                };
+                window.carouselNext = function(e, btn) {
+                    e.stopPropagation();
+                    const wrap = btn.closest('.card-image-carousel');
+                    moveCarousel(wrap, 1);
+                };
+                function moveCarousel(wrap, dir) {
+                    const imgs = JSON.parse(wrap.dataset.images.replace(/&quot;/g,'"'));
+                    let idx = parseInt(wrap.dataset.idx) || 0;
+                    idx = (idx + dir + imgs.length) % imgs.length;
+                    wrap.dataset.idx = idx;
+                    const slide = wrap.querySelector('.carousel-slide');
+                    if (slide) { slide.style.opacity = '0'; setTimeout(() => { slide.src = imgs[idx]; slide.style.opacity = '1'; }, 150); }
+                    wrap.querySelectorAll('.cdot').forEach((d, i) => {
+                        d.style.background = i === idx ? '#fff' : 'rgba(255,255,255,0.45)';
+                        d.classList.toggle('cdot-active', i === idx);
+                    });
+                }
+
+                if (typeof initFilters === 'function') initFilters();
+
+                // Countdown timers
                 list.forEach(a => {
                     const el = document.getElementById('countdown-' + a.id);
                     if (!el || !a.endDate) return;

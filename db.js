@@ -87,6 +87,31 @@ const EPICDB = (() => {
         return apiPost('/auctions', auction);
     }
 
+    // ── Courses ─────────────────────────────────────────────────
+    async function getCourses() {
+        const courses = await apiGet('/courses');
+        if (courses) {
+            localStorage.setItem('epic_courses', JSON.stringify(courses));
+            return courses;
+        }
+        try { return JSON.parse(localStorage.getItem('epic_courses')) || []; }
+        catch { return []; }
+    }
+
+    async function saveCourse(course) {
+        return apiPost('/courses', course);
+    }
+
+    async function deleteCourse(courseId) {
+        try {
+            const r = await fetch(BASE + '/courses?id=' + encodeURIComponent(courseId), { method: 'DELETE' });
+            return r.json();
+        } catch (e) {
+            console.warn('EPICDB.deleteCourse failed', e);
+            return null;
+        }
+    }
+
     // ── Events ──────────────────────────────────────────────────
     async function getEvents() {
         const events = await apiGet('/events');
@@ -125,9 +150,10 @@ const EPICDB = (() => {
         await getUsers();
         await getAuctions();
         await getEvents();
+        await getCourses();
     }
 
-    return { init, getUsers, saveUser, createUser, getAuctions, saveAuction, getEvents, saveEvent, syncToServer };
+    return { init, getUsers, saveUser, createUser, getAuctions, saveAuction, getEvents, saveEvent, getCourses, saveCourse, deleteCourse, syncToServer };
 })();
 
 // Auto-init on every page load

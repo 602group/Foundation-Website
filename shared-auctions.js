@@ -66,9 +66,16 @@ function getDefaultAuctions() {
             endDate: '2026-10-30T19:00',
             extension: 2,
             images: [
-                'https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=800&q=80',
-                'https://images.unsplash.com/photo-1592919505780-30395071e483?w=800&q=80',
-                'https://images.unsplash.com/photo-1622396481328-9b1b9e839e6c?w=800&q=80'
+                // Hero gallery (3 main)
+                'https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=1200&q=90',
+                'https://images.unsplash.com/photo-1622396481328-9b1b9e839e6c?w=1200&q=90',
+                'https://images.unsplash.com/photo-1592919505780-30395071e483?w=1200&q=90',
+                // Extended gallery (5 additional)
+                'https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=1200&q=90',
+                'https://images.unsplash.com/photo-1633335925463-2157d1268d42?w=1200&q=90',
+                'https://images.unsplash.com/photo-1516486392848-8b67ef89f68c?w=1200&q=90',
+                'https://images.unsplash.com/photo-1506966953602-c20cc11f75e3?w=1200&q=90',
+                'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=1200&q=90'
             ],
             createdAt: '2026-01-01T00:00:00Z'
         },

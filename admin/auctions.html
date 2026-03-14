@@ -796,6 +796,27 @@
         }
 
         /* Save toast */
+        /* ── COURSE SELECTOR ── */
+        .course-selector-wrap { position:relative; }
+        .course-search-input { width:100%; padding:0.6rem 0.8rem; border:1px solid #e0e0e0; border-radius:8px; font-family:'Poppins',sans-serif; font-size:0.88rem; outline:none; transition:border 0.2s; background:white; }
+        .course-search-input:focus { border-color:#4A90E2; box-shadow:0 0 0 3px rgba(74,144,226,0.1); }
+        .course-dropdown { position:absolute; top:100%; left:0; right:0; background:white; border:1px solid #e0e0e0; border-radius:8px; box-shadow:0 8px 24px rgba(0,0,0,0.12); z-index:200; max-height:220px; overflow-y:auto; display:none; margin-top:2px; }
+        .course-dropdown.open { display:block; }
+        .course-option { padding:0.6rem 0.9rem; cursor:pointer; font-size:0.86rem; display:flex; align-items:center; gap:0.6rem; border-bottom:1px solid #f5f5f5; }
+        .course-option:last-child { border-bottom:none; }
+        .course-option:hover { background:#f8f9fa; }
+        .course-option img { width:40px; height:30px; object-fit:cover; border-radius:4px; background:#eee; flex-shrink:0; }
+        .course-option-info strong { display:block; font-size:0.85rem; }
+        .course-option-info span { font-size:0.75rem; color:#888; }
+        .course-preview-card { background:#f8f9fa; border-radius:10px; padding:0.9rem; display:flex; gap:0.85rem; align-items:center; margin-top:0.6rem; border:1px solid #e8e8e8; }
+        .course-preview-card img { width:72px; height:52px; object-fit:cover; border-radius:7px; flex-shrink:0; background:#eee; }
+        .course-preview-info { flex:1; }
+        .course-preview-info strong { display:block; font-size:0.88rem; font-weight:700; margin-bottom:2px; }
+        .course-preview-info span { font-size:0.77rem; color:#666; }
+        .course-preview-info .stats { margin-top:4px; font-size:0.74rem; color:#888; }
+        .course-preview-remove { background:none; border:none; color:#aaa; cursor:pointer; font-size:0.78rem; margin-left:auto; flex-shrink:0; padding:0.2rem 0.5rem; border-radius:5px; }
+        .course-preview-remove:hover { background:#fee2e2; color:#e74c3c; }
+
         .toast {
             position: fixed;
             bottom: 2rem;
@@ -1326,6 +1347,7 @@
                 Dashboard</a>
             <a href="auctions.html" class="nav-item active" data-section="auctions"><span class="nav-icon">⛳</span>
                 Auctions</a>
+            <a href="courses.html" class="nav-item" data-section="courses"><span class="nav-icon">🏌️</span> Courses</a>
             <a href="users.html" class="nav-item" data-section="users"><span class="nav-icon">👥</span> Users</a>
             <a href="events.html" class="nav-item" data-section="events"><span class="nav-icon">✈️</span> Events &amp;
                 Trips</a>
@@ -1693,6 +1715,18 @@
                         <label>Course Website</label>
                         <input type="url" id="edit-courseUrl" placeholder="https://…">
                     </div>
+                </div>
+
+                <!-- Associated Course (linked record) -->
+                <div class="form-section" id="associated-course-section">
+                    <div class="form-section-title">🏌️ Associated Course Record</div>
+                    <p style="font-size:0.8rem;color:#888;margin-bottom:0.75rem;">Link this auction to a Course record. The auction page will automatically pull in course details.</p>
+                    <div class="course-selector-wrap">
+                        <input type="text" id="edit-course-search" class="course-search-input" placeholder="Search courses by name…" autocomplete="off" oninput="filterCourseOptions('edit')" onfocus="showCourseDropdown('edit')">
+                        <div class="course-dropdown" id="edit-course-dropdown"></div>
+                    </div>
+                    <div id="edit-course-preview" style="display:none;"></div>
+                    <input type="hidden" id="edit-course_id" value="">
                 </div>
 
                 <div class="form-section">
@@ -2071,6 +2105,18 @@
                     </div>
                 </div>
 
+                <!-- Associated Course (Add New Modal) -->
+                <div style="margin-bottom:1.4rem;border-top:1px solid #f0f0f0;padding-top:1.2rem;">
+                    <div style="font-size:0.7rem;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:#aaa;margin-bottom:0.6rem;">🏌️ Associated Course Record</div>
+                    <p style="font-size:0.78rem;color:#aaa;margin-bottom:0.6rem;">Link to a saved course to auto-populate details on the auction page.</p>
+                    <div class="course-selector-wrap">
+                        <input type="text" id="new-course-search" class="course-search-input" placeholder="Search courses by name…" autocomplete="off" oninput="filterCourseOptions('new')" onfocus="showCourseDropdown('new')">
+                        <div class="course-dropdown" id="new-course-dropdown"></div>
+                    </div>
+                    <div id="new-course-preview" style="display:none;"></div>
+                    <input type="hidden" id="new-course_id" value="">
+                </div>
+
                 <!-- Round Details -->
                 <div style="margin-bottom:1.4rem;border-top:1px solid #f0f0f0;padding-top:1.2rem;">
                     <div
@@ -2181,6 +2227,77 @@
     <script src="../db.js"></script>
     <script src="../auth.js"></script>
     <script src="../shared-auctions.js"></script>
+    <script src="../shared-courses.js"></script>
+    <script>
+        // ── Course Selector Helpers ─────────────────────────────────────────────
+        let _coursesCache = null;
+        function getCachedCourses() {
+            if (!_coursesCache) _coursesCache = (typeof loadSharedCourses === 'function') ? loadSharedCourses() : [];
+            return _coursesCache;
+        }
+
+        function filterCourseOptions(prefix) {
+            const q = document.getElementById(prefix + '-course-search').value.toLowerCase();
+            const dd = document.getElementById(prefix + '-course-dropdown');
+            const courses = getCachedCourses().filter(c => c.status === 'active');
+            const matches = q ? courses.filter(c => (c.name + ' ' + c.city + ' ' + c.state).toLowerCase().includes(q)) : courses;
+            if (!matches.length) { dd.innerHTML = '<div style="padding:0.8rem;color:#aaa;font-size:0.84rem;">No courses found</div>'; }
+            else {
+                dd.innerHTML = matches.slice(0, 12).map(c => `
+                    <div class="course-option" onclick="selectCourse('${prefix}','${c.id}')">
+                        ${c.featured_image_url ? `<img src="${c.featured_image_url}" alt="" onerror="this.style.display='none'">` : ''}
+                        <div class="course-option-info">
+                            <strong>${c.name}</strong>
+                            <span>${c.city || ''}, ${c.state || ''} &bull; ${c.public_private || ''}</span>
+                        </div>
+                    </div>`).join('');
+            }
+            dd.classList.add('open');
+        }
+
+        function showCourseDropdown(prefix) {
+            const q = document.getElementById(prefix + '-course-search').value;
+            if (!q) filterCourseOptions(prefix);
+        }
+
+        function selectCourse(prefix, courseId) {
+            const course = getCachedCourses().find(c => c.id === courseId);
+            if (!course) return;
+            document.getElementById(prefix + '-course_id').value = courseId;
+            document.getElementById(prefix + '-course-search').value = course.name;
+            document.getElementById(prefix + '-course-dropdown').classList.remove('open');
+            renderCoursePreview(prefix, course);
+        }
+
+        function renderCoursePreview(prefix, course) {
+            const previewEl = document.getElementById(prefix + '-course-preview');
+            const stats = [course.holes ? course.holes + ' holes' : null, course.par ? 'Par ' + course.par : null, course.yardage ? course.yardage.toLocaleString() + ' yds' : null].filter(Boolean).join(' &bull; ');
+            previewEl.innerHTML = `
+                <div class="course-preview-card">
+                    ${course.featured_image_url ? `<img src="${course.featured_image_url}" alt="${course.name}" onerror="this.style.display='none'">` : ''}
+                    <div class="course-preview-info">
+                        <strong>${course.name}</strong>
+                        <span>${course.city || ''}, ${course.state || ''} &bull; ${course.public_private || ''}</span>
+                        ${stats ? `<div class="stats">${stats}</div>` : ''}
+                    </div>
+                    <button class="course-preview-remove" onclick="clearCourse('${prefix}')" title="Remove">✕ Remove</button>
+                </div>`;
+            previewEl.style.display = '';
+        }
+
+        function clearCourse(prefix) {
+            document.getElementById(prefix + '-course_id').value = '';
+            document.getElementById(prefix + '-course-search').value = '';
+            document.getElementById(prefix + '-course-preview').style.display = 'none';
+        }
+
+        // Close course dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.course-selector-wrap')) {
+                document.querySelectorAll('.course-dropdown').forEach(d => d.classList.remove('open'));
+            }
+        });
+    </script>
     <script>
         let auctions = [];
         let currentFilter = 'all';
@@ -2328,6 +2445,15 @@
             setVal('edit-yearOpened', a.yearOpened);
             setVal('edit-ranking', a.ranking);
             setVal('edit-courseUrl', a.courseUrl);
+            // Associated course record
+            document.getElementById('edit-course_id').value = a.course_id || '';
+            if (a.course_id) {
+                const linked = (typeof loadSharedCourses === 'function' ? loadSharedCourses() : []).find(c => c.id === a.course_id);
+                if (linked) renderCoursePreview('edit', linked);
+            } else {
+                document.getElementById('edit-course-search').value = '';
+                document.getElementById('edit-course-preview').style.display = 'none';
+            }
             setVal('edit-guests', a.guests);
             setVal('edit-rounds', a.rounds);
             setVal('edit-attributes', a.attributes);
@@ -2796,6 +2922,7 @@
                 adminNotes: getVal('admin-notes'),
                 // Details tab
                 visibility: getVal('edit-visibility') || 'all',
+                course_id: document.getElementById('edit-course_id').value.trim() || null,
                 architect: getVal('edit-architect'),
                 courseType: getVal('edit-courseType'),
                 access: getVal('edit-access'),
@@ -3216,6 +3343,7 @@
                 images: _newModalImages.map(i => i.dataUrl),
                 donor: document.getElementById('new-donor').value.trim(),
                 adminNotes: document.getElementById('new-adminNotes').value.trim(),
+                course_id: document.getElementById('new-course_id').value.trim() || null,
                 createdAt: new Date().toISOString(),
             };
 

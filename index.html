@@ -20,13 +20,19 @@
             <span class="logo">EPIC Foundation</span>
             <nav class="nav-menu">
                 <a href="auctions.html" class="nav-link member-only-link" style="display:none;">Auction</a>
-                <a href="travel-events.html" class="nav-link member-only-link" style="display:none;">Travel &amp;
-                    Events</a>
+                <div class="nav-dropdown member-only-link" style="display:none;position:relative;">
+                    <a href="travel-events.html" class="nav-link" style="display:flex;align-items:center;gap:4px;">Travel &amp; Events <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M7 10l5 5 5-5z"/></svg></a>
+                    <div class="nav-dropdown-menu" style="position:absolute;top:100%;left:0;background:#111;border-radius:10px;min-width:160px;padding:0.5rem 0;z-index:200;display:none;box-shadow:0 8px 24px rgba(0,0,0,0.4);">
+                        <a href="travel-events.html#trips" style="display:block;padding:0.65rem 1.1rem;color:#fff;text-decoration:none;font-size:0.88rem;font-weight:600;transition:background 0.15s;" onmouseover="this.style.background='#222'" onmouseout="this.style.background=''">⛳ Trips</a>
+                        <a href="travel-events.html#events" style="display:block;padding:0.65rem 1.1rem;color:#fff;text-decoration:none;font-size:0.88rem;font-weight:600;transition:background 0.15s;" onmouseover="this.style.background='#222'" onmouseout="this.style.background=''">🎟 Events</a>
+                    </div>
+                </div>
                 <a href="about.html" class="nav-link">About Us</a>
                 <a href="contact.html" class="nav-link">Contact Us</a>
                 <a href="donate.html" class="nav-link" style="color:#fff;font-weight:700;">Donate ♥</a>
                 <button class="login-btn">Login</button>
             </nav>
+            <script>document.querySelectorAll('.nav-dropdown').forEach(d=>{d.addEventListener('mouseenter',()=>d.querySelector('.nav-dropdown-menu').style.display='block');d.addEventListener('mouseleave',()=>d.querySelector('.nav-dropdown-menu').style.display='none');});</script>
         </header>
 
         <!-- Hero Content -->
@@ -99,16 +105,15 @@
             <div class="about-features">
                 <div class="feature-item">
                     <h3 class="feature-title">Exclusive Access</h3>
-                    <p class="feature-text">Play legendary courses like Augusta National, Pebble Beach, and Pine Valley
-                    </p>
+                    <p class="feature-text">Gain entry to the most iconic and private courses in the world — from Augusta National and Pebble Beach to Pine Valley and beyond. These are courses that can't simply be booked online. Through EPIC Foundation, our members unlock doors that money alone can't open.</p>
                 </div>
                 <div class="feature-item">
                     <h3 class="feature-title">Charitable Impact</h3>
-                    <p class="feature-text">100% of proceeds support our partner charities and community programs</p>
+                    <p class="feature-text">Every dollar raised through EPIC Foundation goes directly toward the causes we believe in. We support Folds of Honor, Hope Kids, and Youth on Course — organizations changing lives one round at a time. When you participate, you're not just playing golf; you're investing in something that truly matters.</p>
                 </div>
                 <div class="feature-item">
                     <h3 class="feature-title">Unforgettable Experiences</h3>
-                    <p class="feature-text">Create memories that last a lifetime with rounds at dream destinations</p>
+                    <p class="feature-text">These aren't ordinary rounds of golf. Each EPIC experience is curated, member-hosted, and designed to be the round of a lifetime. Whether you're walking the same fairways as the legends or playing alongside a club member at one of the world's great courses, these are memories you'll carry forever.</p>
                 </div>
             </div>
         </div>
@@ -116,15 +121,14 @@
 
 
     <!-- Donate CTA Banner -->
-    <section class="email-signup-section" style="min-height:340px;">
-        <div class="email-signup-overlay" style="background:rgba(0,0,0,0.78);min-height:340px;">
+    <section class="email-signup-section" style="min-height:380px;">
+        <div class="email-signup-overlay" style="background:linear-gradient(rgba(0,0,0,0.72),rgba(0,0,0,0.72)),url('https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=1600&q=85') center/cover no-repeat;min-height:380px;">
             <div class="email-signup-content" style="padding:4rem 2rem;">
-                <h2 class="email-signup-title" style="font-size:clamp(1.6rem,4vw,2.4rem);">Support the Mission</h2>
-                <p class="email-signup-description">Your contribution funds youth golf programs, charitable events, and
-                    creates opportunities for deserving players. Every gift makes a difference.</p>
+                <p style="font-size:0.75rem;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:rgba(255,255,255,0.5);margin-bottom:0.75rem;">Make a Difference</p>
+                <h2 class="email-signup-title" style="font-size:clamp(1.8rem,4vw,2.6rem);margin-bottom:1rem;">Support the Mission</h2>
+                <p class="email-signup-description" style="max-width:540px;margin:0 auto 1.8rem;">Your contribution funds once-in-a-lifetime golf experiences for deserving youth, veterans, and communities that need it most. We partner with Folds of Honor, Hope Kids, and Youth on Course to make every dollar count. Every gift — no matter the size — creates real change.</p>
                 <a href="donate.html" class="subscribe-btn"
-                    style="display:inline-block;text-decoration:none;padding:0.9rem 2.4rem;font-size:1rem;font-weight:700;letter-spacing:0.03em;margin-top:1rem;">Donate
-                    Today</a>
+                    style="display:inline-block;text-decoration:none;padding:0.9rem 2.4rem;font-size:1rem;font-weight:700;letter-spacing:0.03em;">Donate Today</a>
             </div>
         </div>
     </section>

@@ -19,20 +19,27 @@
         <a href="/" class="logo">EPIC Foundation</a>
         <nav class="nav-menu">
             <a href="auctions.html" class="nav-link member-only-link" style="display:none;">Auction</a>
-            <a href="travel-events.html" class="nav-link member-only-link" style="display:none;">Travel &amp; Events</a>
+            <div class="nav-dropdown member-only-link" style="display:none;position:relative;">
+                <a href="travel-events.html" class="nav-link" style="display:flex;align-items:center;gap:4px;">Travel &amp; Events <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M7 10l5 5 5-5z"/></svg></a>
+                <div class="nav-dropdown-menu" style="position:absolute;top:100%;left:0;background:#111;border-radius:10px;min-width:160px;padding:0.5rem 0;z-index:200;display:none;box-shadow:0 8px 24px rgba(0,0,0,0.4);">
+                    <a href="travel-events.html#trips" style="display:block;padding:0.65rem 1.1rem;color:#fff;text-decoration:none;font-size:0.88rem;font-weight:600;" onmouseover="this.style.background='#222'" onmouseout="this.style.background=''">&#x26F3; Trips</a>
+                    <a href="travel-events.html#events" style="display:block;padding:0.65rem 1.1rem;color:#fff;text-decoration:none;font-size:0.88rem;font-weight:600;" onmouseover="this.style.background='#222'" onmouseout="this.style.background=''">&#x1F3DF; Events</a>
+                </div>
+            </div>
             <a href="about.html" class="nav-link">About Us</a>
             <a href="contact.html" class="nav-link">Contact Us</a>
-            <a href="donate.html" class="nav-link" style="color:#fff;font-weight:700;">Donate ♥</a>
+            <a href="donate.html" class="nav-link" style="color:#fff;font-weight:700;">Donate &#9829;</a>
             <button class="login-btn">Login</button>
         </nav>
+        <script>document.querySelectorAll('.nav-dropdown').forEach(d=>{d.addEventListener('mouseenter',()=>d.querySelector('.nav-dropdown-menu').style.display='block');d.addEventListener('mouseleave',()=>d.querySelector('.nav-dropdown-menu').style.display='none');});</script>
     </header>
 
     <!-- Hero Section -->
-    <section class="about-hero">
+    <section class="about-hero" style="background:linear-gradient(rgba(0,0,0,0.55),rgba(0,0,0,0.65)),url('https://images.unsplash.com/photo-1622396481328-9b1b9e839e6c?w=1600&q=85') center/cover no-repeat;">
         <div class="about-hero-content">
+            <p style="font-size:0.75rem;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:rgba(255,255,255,0.55);margin-bottom:0.75rem;">Our Story</p>
             <h1 class="about-hero-title">About EPIC Foundation</h1>
-            <p class="about-hero-subtitle">Creating once-in-a-lifetime golf experiences while making a lasting impact
-            </p>
+            <p class="about-hero-subtitle">Creating once-in-a-lifetime golf experiences while making a lasting impact for the causes that matter most.</p>
         </div>
     </section>
 
@@ -55,64 +62,49 @@
     </section>
 
     <!-- Three Pillars Section -->
-    <section class="pillars-section">
+    <section class="pillars-section" style="background:#fff;">
         <div class="pillars-container">
-            <h2 class="section-title">Where Your Money Goes: Our Three Pillars</h2>
+            <p style="font-size:0.75rem;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:#888;text-align:center;margin-bottom:0.75rem;">Where Your Dollars Go</p>
+            <h2 class="section-title">Our Three Charity Partners</h2>
+            <p style="text-align:center;color:#666;font-size:0.95rem;max-width:600px;margin:0 auto 3rem;line-height:1.7;">Every auction, every donation, and every round played through EPIC Foundation directly benefits three organizations that are changing lives through the game of golf.</p>
             <div class="pillars-grid">
-                <!-- Pillar 1 -->
-                <div class="pillar-card">
-                    <div class="pillar-icon">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none"
-                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                            <circle cx="9" cy="7" r="4"></circle>
-                            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-                        </svg>
+                <!-- Pillar 1: Folds of Honor -->
+                <div class="pillar-card" style="overflow:hidden;padding:0;">
+                    <div style="height:200px;overflow:hidden;">
+                        <img src="https://images.unsplash.com/photo-1547347298-4074fc3086f0?w=600&q=80" alt="Folds of Honor" style="width:100%;height:100%;object-fit:cover;transition:transform 0.4s;" onmouseover="this.style.transform='scale(1.04)'" onmouseout="this.style.transform='scale(1)'">
                     </div>
-                    <h3 class="pillar-title">Youth Golf Development</h3>
-                    <p class="pillar-description">
-                        35% of proceeds support programs that introduce golf to underserved youth, providing equipment,
-                        instruction, and access to courses. We partner with organizations like The First Tee and local
-                        junior golf programs to ensure the next generation has opportunities to learn life skills
-                        through the game.
-                    </p>
+                    <div style="padding:1.8rem 2rem;">
+                        <div style="display:inline-block;background:#b91c1c;color:#fff;font-size:0.68rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;padding:3px 10px;border-radius:20px;margin-bottom:0.8rem;">Military &amp; First Responders</div>
+                        <h3 class="pillar-title" style="margin-bottom:0.7rem;">Folds of Honor</h3>
+                        <p class="pillar-description">Folds of Honor provides educational scholarships to the spouses and children of America's fallen and disabled service members. EPIC Foundation is proud to direct proceeds toward this mission — honoring those who've sacrificed everything by investing in the futures of their families. Every round we auction helps fund a scholarship for a hero's child.</p>
+                        <a href="https://foldsofhonor.org" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:5px;margin-top:1rem;font-size:0.82rem;font-weight:700;color:#000;text-decoration:none;border-bottom:2px solid #000;padding-bottom:2px;">Learn More →</a>
+                    </div>
                 </div>
 
-                <!-- Pillar 2 -->
-                <div class="pillar-card">
-                    <div class="pillar-icon">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none"
-                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-                            <polyline points="9 22 9 12 15 12 15 22"></polyline>
-                        </svg>
+                <!-- Pillar 2: Hope Kids -->
+                <div class="pillar-card" style="overflow:hidden;padding:0;">
+                    <div style="height:200px;overflow:hidden;">
+                        <img src="https://images.unsplash.com/photo-1503454537195-1dcabb73ffb9?w=600&q=80" alt="Hope Kids" style="width:100%;height:100%;object-fit:cover;transition:transform 0.4s;" onmouseover="this.style.transform='scale(1.04)'" onmouseout="this.style.transform='scale(1)'">
                     </div>
-                    <h3 class="pillar-title">Veteran Support Services</h3>
-                    <p class="pillar-description">
-                        35% funds golf therapy programs for veterans dealing with PTSD and physical rehabilitation. Golf
-                        has proven therapeutic benefits, and we work with organizations that use the game to help
-                        veterans heal, connect, and transition back to civilian life with dignity and purpose.
-                    </p>
+                    <div style="padding:1.8rem 2rem;">
+                        <div style="display:inline-block;background:#7c3aed;color:#fff;font-size:0.68rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;padding:3px 10px;border-radius:20px;margin-bottom:0.8rem;">Children with Illness</div>
+                        <h3 class="pillar-title" style="margin-bottom:0.7rem;">Hope Kids</h3>
+                        <p class="pillar-description">Hope Kids creates extraordinary experiences for children living with cancer and other life-threatening illnesses, and for their families. EPIC Foundation channels auction proceeds toward Hope Kids events — giving these remarkable families moments of joy, connection, and hope at some of the most difficult times of their lives. Golf becomes more than a game when it's a lifeline.</p>
+                        <a href="https://hopekids.org" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:5px;margin-top:1rem;font-size:0.82rem;font-weight:700;color:#000;text-decoration:none;border-bottom:2px solid #000;padding-bottom:2px;">Learn More →</a>
+                    </div>
                 </div>
 
-                <!-- Pillar 3 -->
-                <div class="pillar-card">
-                    <div class="pillar-icon">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none"
-                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <circle cx="12" cy="12" r="10"></circle>
-                            <path
-                                d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z">
-                            </path>
-                        </svg>
+                <!-- Pillar 3: Youth on Course -->
+                <div class="pillar-card" style="overflow:hidden;padding:0;">
+                    <div style="height:200px;overflow:hidden;">
+                        <img src="https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=600&q=80" alt="Youth on Course" style="width:100%;height:100%;object-fit:cover;transition:transform 0.4s;" onmouseover="this.style.transform='scale(1.04)'" onmouseout="this.style.transform='scale(1)'">
                     </div>
-                    <h3 class="pillar-title">Environmental Conservation</h3>
-                    <p class="pillar-description">
-                        30% supports golf course sustainability initiatives and environmental conservation efforts. We
-                        fund projects that protect natural habitats, promote water conservation, and help courses
-                        transition to eco-friendly maintenance practices that preserve the game for future generations.
-                    </p>
+                    <div style="padding:1.8rem 2rem;">
+                        <div style="display:inline-block;background:#059669;color:#fff;font-size:0.68rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;padding:3px 10px;border-radius:20px;margin-bottom:0.8rem;">Youth Development</div>
+                        <h3 class="pillar-title" style="margin-bottom:0.7rem;">Youth on Course</h3>
+                        <p class="pillar-description">Youth on Course is making golf accessible to young people across North America by offering rounds for $5 or less at hundreds of participating courses. EPIC Foundation supports this mission of inclusion — ensuring that the next generation of golfers isn't limited by financial barriers. Every dollar we raise opens a course gate for a kid who might not have had the chance otherwise.</p>
+                        <a href="https://youthoncourse.org" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:5px;margin-top:1rem;font-size:0.82rem;font-weight:700;color:#000;text-decoration:none;border-bottom:2px solid #000;padding-bottom:2px;">Learn More →</a>
+                    </div>
                 </div>
             </div>
         </div>
