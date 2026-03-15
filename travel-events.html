@@ -453,23 +453,28 @@
             const activeEvents = events.filter(e => VISIBLE_STATUSES.has(e.status || 'active'));
             const eventsGrid = document.getElementById('frontend-events-grid');
             if (eventsGrid && activeEvents.length > 0) {
-                eventsGrid.innerHTML = activeEvents.map(event => `
-                    <a href="${event.link}" style="text-decoration: none; color: inherit;">
+                eventsGrid.innerHTML = activeEvents.map(event => {
+                    const price = Number(event.price) || 0;
+                    const spots = Number(event.spots) || 0;
+                    const spotsSold = Number(event.spotsSold) || 0;
+                    const remaining = Math.max(0, spots - spotsSold);
+                    return `
+                    <a href="${event.link || '#'}" style="text-decoration: none; color: inherit;">
                         <div class="event-card">
-                            <div class="event-image" style="background: url('${event.image}') center/cover;"></div>
+                            <div class="event-image" style="background: url('${event.image || ''}') center/cover; background-color:#1a1a2e;"></div>
                             <div class="event-content">
-                                <h3 class="event-title">${event.title}</h3>
-                                <p class="event-location">${event.location}</p>
-                                <p class="event-date">${event.date}</p>
+                                <h3 class="event-title">${event.title || 'Untitled Event'}</h3>
+                                <p class="event-location">${event.location || ''}</p>
+                                <p class="event-date">${event.date || ''}</p>
                                 <div class="event-details">
-                                    <span class="event-spots">${Math.max(0, event.spots - (event.spotsSold || 0))} Spots Remaining</span>
-                                    <span class="event-price">$${event.price.toLocaleString()} per person</span>
+                                    <span class="event-spots">${spots > 0 ? remaining + ' Spots Remaining' : 'Contact for Availability'}</span>
+                                    <span class="event-price">${price > 0 ? '$' + price.toLocaleString() + ' per person' : 'Price on Request'}</span>
                                 </div>
                                 <button class="event-btn">Learn More</button>
                             </div>
                         </div>
-                    </a>
-                `).join('');
+                    </a>`;
+                }).join('');
             } else if (eventsGrid) {
                 eventsGrid.innerHTML = '<p style="grid-column: 1 / -1; text-align: center; color: #666; padding: 2rem;">No upcoming events listed at this time.</p>';
             }
