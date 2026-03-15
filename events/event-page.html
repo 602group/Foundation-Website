@@ -322,7 +322,7 @@
             const extraImages = [...new Set(allImages)].filter(Boolean);
             
             const galleryHtml = extraImages.length > 0
-                ? `<section style="padding:2rem 2rem 0;max-width:980px;margin:0 auto;">
+                ? `<section style="padding:2rem 2rem 0;max-width:1200px;margin:0 auto;">
                        <h3 style="font-weight:800;margin-bottom:0.6rem;">Gallery</h3>
                        <div class="evt-gallery">${extraImages.map(url => `<img src="${url}" alt="">`).join('')}</div>
                    </section>` : '';
