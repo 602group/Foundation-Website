@@ -233,8 +233,9 @@
     </footer>
 
     <script src="../script.js"></script>
-    <script src="../shared-events.js"></script>
     <script src="../db.js"></script>
+    <script src="../shared-events.js"></script>
+    <script src="../shared-courses.js"></script>
     <script src="../auth.js"></script>
     <script>
         AUTH.applyHeader('../');
@@ -277,8 +278,14 @@
             // Set page title
             document.title = `${ev.title} — EPIC Foundation`;
 
-            // Check hero image
-            const heroImg = (ev.images && ev.images[0]) || ev.image || '';
+            // Check hero image — prefer linked course image, then event image, then gradient
+            let courseImg = '';
+            if (ev.course_id && typeof loadSharedCourses === 'function') {
+                const courses = loadSharedCourses();
+                const linkedCourse = courses.find(c => c.id === ev.course_id);
+                if (linkedCourse) courseImg = linkedCourse.featured_image_url || (linkedCourse.gallery && linkedCourse.gallery[0]) || '';
+            }
+            const heroImg = courseImg || (ev.images && ev.images[0]) || ev.image || '';
             const heroStyle = heroImg
                 ? `background:url('${heroImg}') center/cover no-repeat;`
                 : `background:linear-gradient(135deg,#1a3a10 0%,#2d5a1b 50%,#4a7c30 100%);`;
