@@ -447,8 +447,9 @@
                 destinations = loadSharedDestinations();
             }
 
-            // Load and Render Events — all active events visible to all members
-            const activeEvents = events.filter(e => (e.status || 'active') === 'active');
+            // Show events with any "live" status — active, new, or live (not draft/cancelled/archived)
+            const VISIBLE_STATUSES = new Set(['active', 'new', 'live']);
+            const activeEvents = events.filter(e => VISIBLE_STATUSES.has(e.status || 'active'));
             const eventsGrid = document.getElementById('frontend-events-grid');
             if (eventsGrid && activeEvents.length > 0) {
                 eventsGrid.innerHTML = activeEvents.map(event => `

@@ -1334,15 +1334,34 @@
             if (typeof EPICDB !== 'undefined') {
                 try {
                     const [freshEvents, freshUsers] = await Promise.all([EPICDB.getEvents(), EPICDB.getUsers()]);
-                    // Only overwrite localStorage if Postgres has data
-                    if (freshEvents && freshEvents.length) {
-                        saveSharedEvents(freshEvents);
-                        recomputeAllSpotsSold();
-                        renderEvents();
+                    const local = loadSharedEvents();
+
+                    if (freshEvents && freshEvents.length > 0) {
+                        // Merge: push any local-only events (not in DB) up to Postgres first
+                        const dbIds = new Set(freshEvents.map(e => e.id));
+                        const localOnly = local.filter(e => !dbIds.has(e.id));
+                        if (localOnly.length > 0) {
+                            console.log('EPICDB: uploading', localOnly.length, 'local-only events to Postgres…');
+                            await Promise.all(localOnly.map(ev => EPICDB.saveEvent(ev).catch(() => {})));
+                            // Fetch again to get the fully merged list
+                            const merged = await EPICDB.getEvents();
+                            if (merged && merged.length) {
+                                saveSharedEvents(merged);
+                                recomputeAllSpotsSold();
+                                renderEvents();
+                            }
+                        } else {
+                            // DB is the superset — just update localStorage
+                            saveSharedEvents(freshEvents);
+                            recomputeAllSpotsSold();
+                            renderEvents();
+                        }
                     } else if (freshEvents && freshEvents.length === 0) {
-                        // Postgres is empty — push localStorage events up to sync in background
-                        const local = loadSharedEvents();
-                        local.forEach(ev => EPICDB.saveEvent(ev).catch(() => {}));
+                        // Postgres is empty — push all localStorage events up
+                        if (local.length > 0) {
+                            console.log('EPICDB: seeding', local.length, 'events to Postgres…');
+                            await Promise.all(local.map(ev => EPICDB.saveEvent(ev).catch(() => {})));
+                        }
                     }
                     adminUsers = freshUsers || [];
                     if (adminUsers.length) {
