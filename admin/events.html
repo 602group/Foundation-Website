@@ -894,6 +894,8 @@
                                 rows="3"></textarea></div>
                         <div class="fin-group full"><label>What's Included</label><input type="text" id="d-includes"
                                 placeholder="e.g. Lodging, Meals, Greens Fees"></div>
+                        <div class="fin-group full"><label>Multi-Day Itinerary</label><textarea id="d-itinerary"
+                                rows="4" placeholder="Day 1: Arrival & Welcome Reception&#13;&#10;Day 2: Pebble Beach Round" style="padding:0.6rem 0.8rem; border:1px solid #ddd; border-radius:6px; font-family:inherit; font-size:0.88rem; resize:vertical;"></textarea></div>
                         <div class="fin-group">
                             <label>Cover Image</label>
                             <input type="hidden" id="d-image">
@@ -1063,7 +1065,8 @@
                 <div class="form-group"><label>Format / Competition Style</label><input type="text" id="new-format" placeholder="e.g. Shotgun start, Best Ball competition"></div>
 
                 <!-- SCHEDULE -->
-                <div style="font-size:0.7rem;text-transform:uppercase;letter-spacing:0.1em;color:#bbb;font-weight:700;margin:1.1rem 0 0.7rem;padding-bottom:0.3rem;border-bottom:1px solid #f0f0f0;">Day Schedule <span style="font-weight:400;text-transform:none;letter-spacing:0;">(optional)</span></div>
+                <div style="font-size:0.7rem;text-transform:uppercase;letter-spacing:0.1em;color:#bbb;font-weight:700;margin:1.1rem 0 0.7rem;padding-bottom:0.3rem;border-bottom:1px solid #f0f0f0;">Day Schedule / Itinerary <span style="font-weight:400;text-transform:none;letter-spacing:0;">(optional)</span></div>
+                <div class="form-group"><label>Multi-Day Itinerary</label><textarea id="new-itinerary" rows="4" style="width:100%;padding:0.6rem 0.8rem;border-radius:6px;border:1px solid #ddd;font-family:inherit;font-size:0.88rem;resize:vertical;" placeholder="Day 1: Arrival & Welcome Reception&#13;&#10;Day 2: Pebble Beach Round"></textarea></div>
                 <div class="form-row">
                     <div class="form-group"><label>🌅 Morning</label><input type="text" id="new-scheduleMorning" placeholder="9:30 AM Registration / 10:00 AM Breakfast"></div>
                     <div class="form-group"><label>⛳ Afternoon</label><input type="text" id="new-scheduleAfternoon" placeholder="12:00 PM Shotgun Start"></div>
@@ -1525,6 +1528,7 @@
             document.getElementById('d-spotsSold').value = e.spotsSold || 0;
             document.getElementById('d-description').value = e.description || '';
             document.getElementById('d-includes').value = e.includes || '';
+            document.getElementById('d-itinerary').value = e.itinerary || '';
             document.getElementById('d-image').value = e.image;
             document.getElementById('d-link').value = e.link || '#';
             document.getElementById('d-costVenue').value = e.costVenue || 0;
@@ -1803,6 +1807,7 @@
                 spotsSold: parseInt(document.getElementById('d-spotsSold').value) || 0,
                 description: document.getElementById('d-description').value,
                 includes: document.getElementById('d-includes').value,
+                itinerary: document.getElementById('d-itinerary').value,
                 image: newImg || existing.image || '',
                 link: document.getElementById('d-link').value || existing.link || '#',
                 costVenue: parseInt(document.getElementById('d-costVenue').value) || 0,
@@ -1934,6 +1939,7 @@
                 allowGuests: document.getElementById('new-allowGuests').checked,
                 description: document.getElementById('new-description').value,
                 includes: document.getElementById('new-includes').value,
+                itinerary: document.getElementById('new-itinerary').value,
                 format: document.getElementById('new-format').value,
                 schedule: {
                     morning: document.getElementById('new-scheduleMorning').value,

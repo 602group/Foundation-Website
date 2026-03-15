@@ -298,10 +298,16 @@
 
             // Schedule
             const sched = ev.schedule || {};
+            // If the user has provided a multi-line itinerary string, split by newline
+            let itineraryItems = [];
+            if (ev.itinerary && typeof ev.itinerary === 'string') {
+                itineraryItems = ev.itinerary.split('\n').map(s => s.trim()).filter(Boolean);
+            }
+            
             const schedItems = [
-                sched.morning ? { label: '🌅 Morning', text: sched.morning } : null,
-                sched.afternoon ? { label: '⛳ Afternoon', text: sched.afternoon } : null,
-                sched.evening ? { label: '🍸 Evening', text: sched.evening } : null,
+                sched.morning ? `<strong>Morning:</strong> ${sched.morning}` : null,
+                sched.afternoon ? `<strong>Afternoon:</strong> ${sched.afternoon}` : null,
+                sched.evening ? `<strong>Evening:</strong> ${sched.evening}` : null,
             ].filter(Boolean);
 
             // Images gallery
@@ -362,7 +368,6 @@
                         <div class="detail-column">
                             <div class="detail-content">
                                 <h3 class="detail-column-title">Event Details</h3>
-                                <div class="evt-id-badge">${ev.id}</div>
                                 ${deadlineHtml}
                                 <ul class="detail-list">
                                     ${ev.title ? `<li><strong>Event:</strong> ${ev.title}</li>` : ''}
@@ -382,19 +387,21 @@
                             <div class="detail-content">
                                 <h3 class="detail-column-title">What's Included</h3>
                                 ${ev.includes
-                    ? `<div class="includes-grid">${includeItems(ev.includes).map(item => `<div class="includes-item">${item}</div>`).join('')}</div>`
+                    ? `<ul class="detail-list" style="margin-top:0;">${includeItems(ev.includes).map(item => `<li>${item}</li>`).join('')}</ul>`
                     : '<p style="font-size:0.85rem;color:#999;">Details coming soon.</p>'}
                             </div>
                         </div>
 
                         <!-- Schedule Column -->
-                        ${schedItems.length > 0 ? `
+                        ${(itineraryItems.length > 0 || schedItems.length > 0) ? `
                         <div class="detail-column">
                             <div class="detail-content">
                                 <h3 class="detail-column-title">Schedule</h3>
-                                <div class="schedule-grid">
-                                    ${schedItems.map(s => `<div class="schedule-item"><div class="sch-label">${s.label}</div><div class="sch-text">${s.text}</div></div>`).join('')}
-                                </div>
+                                <ul class="detail-list schedule-list" style="margin-top:0;">
+                                    ${itineraryItems.length > 0
+                                        ? itineraryItems.map(item => `<li>${item.replace(/Day \d+:/, match => `<strong>${match.replace(':', '')}:</strong>`)}</li>`).join('')
+                                        : schedItems.map(s => `<li>${s}</li>`).join('')}
+                                </ul>
                             </div>
                         </div>` : ''}
 
