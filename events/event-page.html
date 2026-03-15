@@ -304,16 +304,22 @@
                 sched.evening ? { label: '🍸 Evening', text: sched.evening } : null,
             ].filter(Boolean);
 
-            // Images gallery (>1 image)
-            // Use course gallery if linked course has one, otherwise fallback to event images
-            let extraImages = (ev.images || []).filter(Boolean);
+            // Images gallery
+            // Combine course featured image, course gallery, event image, and event gallery
+            let allImages = [];
             if (ev.course_id && typeof loadSharedCourses === 'function') {
                 const courses = loadSharedCourses();
                 const linkedCourse = courses.find(c => c.id === ev.course_id);
-                if (linkedCourse && linkedCourse.gallery && linkedCourse.gallery.length > 0) {
-                    extraImages = linkedCourse.gallery;
+                if (linkedCourse) {
+                    allImages.push(linkedCourse.featured_image_url);
+                    if (linkedCourse.gallery) allImages.push(...linkedCourse.gallery);
                 }
             }
+            if (ev.image) allImages.push(ev.image);
+            if (ev.images) allImages.push(...ev.images);
+            
+            // Deduplicate and remove empty
+            const extraImages = [...new Set(allImages)].filter(Boolean);
             
             const galleryHtml = extraImages.length > 0
                 ? `<section style="padding:2rem 2rem 0;max-width:980px;margin:0 auto;">
@@ -354,7 +360,6 @@
 
                         <!-- Event Details Column -->
                         <div class="detail-column">
-                            ${heroImg ? `<div class="detail-image" style="background:url('${heroImg}') center/cover;"></div>` : '<div class="detail-image" style="background:linear-gradient(135deg,#2d5a1b,#4a7c30);"></div>'}
                             <div class="detail-content">
                                 <h3 class="detail-column-title">Event Details</h3>
                                 <div class="evt-id-badge">${ev.id}</div>
@@ -374,7 +379,6 @@
 
                         <!-- What's Included Column -->
                         <div class="detail-column">
-                            <div class="detail-image" style="background:url('https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=800&q=80') center/cover;"></div>
                             <div class="detail-content">
                                 <h3 class="detail-column-title">What's Included</h3>
                                 ${ev.includes
@@ -386,7 +390,6 @@
                         <!-- Schedule Column -->
                         ${schedItems.length > 0 ? `
                         <div class="detail-column">
-                            <div class="detail-image" style="background:url('https://images.unsplash.com/photo-1592919505780-303950717480?w=800&q=80') center/cover;"></div>
                             <div class="detail-content">
                                 <h3 class="detail-column-title">Schedule</h3>
                                 <div class="schedule-grid">
