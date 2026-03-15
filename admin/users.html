@@ -469,8 +469,11 @@
     <script src="../auth.js"></script>
     <script>
         const USERS_KEY = 'epic_users';
+        let _cachedUsers = [];
 
         function loadUsers() {
+            // Return DB-fetched cache if available, else fall back to localStorage
+            if (_cachedUsers.length > 0) return _cachedUsers;
             try { return JSON.parse(localStorage.getItem(USERS_KEY)) || []; }
             catch { return []; }
         }
@@ -485,12 +488,12 @@
             document.getElementById('statBidders').textContent = users.filter(u => (u.bids || []).length > 0).length;
         }
 
-        function renderTable() {
-            const users = loadUsers();
+        function renderTable(usersOverride) {
+            const users = usersOverride || loadUsers();
             const q = document.getElementById('searchInput').value.toLowerCase().trim();
             const list = q ? users.filter(u =>
-                (u.firstName + ' ' + u.lastName).toLowerCase().includes(q) ||
-                u.email.toLowerCase().includes(q)
+                ((u.firstName || '') + ' ' + (u.lastName || '')).toLowerCase().includes(q) ||
+                (u.email || '').toLowerCase().includes(q)
             ) : users;
 
             renderStats(users);
@@ -651,14 +654,15 @@
             }
         }
 
-        // Wait for db.js to load fresh data before rendering
+        // Always fetch from live DB then render
         (async function init() {
             const tbody = document.getElementById('usersTbody');
             tbody.innerHTML = '<tr><td colspan="8"><div class="empty-state">Loading users from database…</div></td></tr>';
             if (typeof EPICDB !== 'undefined') {
-                await EPICDB.init();
+                const fresh = await EPICDB.getUsers();
+                if (fresh && fresh.length >= 0) _cachedUsers = fresh;
             }
-            renderTable();
+            renderTable(_cachedUsers.length > 0 ? _cachedUsers : null);
         })();
     
         // ══════════════════════════════════════════════════════════════
