@@ -305,8 +305,17 @@
             ].filter(Boolean);
 
             // Images gallery (>1 image)
-            const extraImages = (ev.images || []).filter(Boolean);
-            const galleryHtml = extraImages.length > 1
+            // Use course gallery if linked course has one, otherwise fallback to event images
+            let extraImages = (ev.images || []).filter(Boolean);
+            if (ev.course_id && typeof loadSharedCourses === 'function') {
+                const courses = loadSharedCourses();
+                const linkedCourse = courses.find(c => c.id === ev.course_id);
+                if (linkedCourse && linkedCourse.gallery && linkedCourse.gallery.length > 0) {
+                    extraImages = linkedCourse.gallery;
+                }
+            }
+            
+            const galleryHtml = extraImages.length > 0
                 ? `<section style="padding:2rem 2rem 0;max-width:980px;margin:0 auto;">
                        <h3 style="font-weight:800;margin-bottom:0.6rem;">Gallery</h3>
                        <div class="evt-gallery">${extraImages.map(url => `<img src="${url}" alt="">`).join('')}</div>
