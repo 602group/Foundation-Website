@@ -427,7 +427,8 @@
     <script src="shared-events.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', async () => {
-            AUTH.requireLogin('login.html');
+            // Events are publicly visible — do NOT require login here.
+            // Nav/header still reflects auth state (profile vs login button).
             AUTH.applyGatedNav('');
 
             let events = [];
