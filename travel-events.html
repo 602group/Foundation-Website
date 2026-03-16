@@ -458,10 +458,18 @@
                     const spots = Number(event.spots) || 0;
                     const spotsSold = Number(event.spotsSold) || 0;
                     const remaining = Math.max(0, spots - spotsSold);
+
+                    // Fetch course image as fallback if event lacks custom image
+                    let finalImg = event.image || '';
+                    if (!finalImg && event.course_id && typeof loadSharedCourses === 'function') {
+                        const c = loadSharedCourses().find(x => x.id === event.course_id);
+                        if (c) finalImg = c.featured_image_url || (c.gallery && c.gallery[0]) || '';
+                    }
+
                     return `
                     <a href="${event.link || '#'}" style="text-decoration: none; color: inherit;">
                         <div class="event-card">
-                            <div class="event-image" style="background: url('${event.image || ''}') center/cover; background-color:#1a1a2e;"></div>
+                            <div class="event-image" style="background: url('${finalImg}') center/cover; background-color:#1a1a2e;"></div>
                             <div class="event-content">
                                 <h3 class="event-title">${event.title || 'Untitled Event'}</h3>
                                 <p class="event-location">${event.location || ''}</p>

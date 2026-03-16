@@ -1229,6 +1229,11 @@
             return _evtCachedCourses || [];
         }
 
+        function getCachedCoursesForEventsSync() {
+            if (_evtCachedCourses) return _evtCachedCourses;
+            return JSON.parse(localStorage.getItem('epic_courses') || '[]');
+        }
+
         async function filterEventCourseOptions(prefix) {
             prefix = prefix || 'evt';
             const searchId = prefix === 'evt' ? 'evt-course-search' : 'd-course-search';
@@ -1287,8 +1292,8 @@
             svIfBlank(titleField, course.name + ' Golf Day');
             svIfBlank(descField, course.description || course.course_description || '');
 
-            const img = course.featured_image_url || (course.gallery && course.gallery[0]) || '';
-            if (img) sv(imgField, img);
+            // We deliberately DO NOT copy the course image into the event's custom image field.
+            // This prevents stale image copies if the Course updates its photo later.
         }
 
         function renderEventCoursePreview(course, prefix) {
@@ -1405,8 +1410,18 @@
                     : '';
 
                 const isDraft = status === 'draft' || status === 'pending';
-                const thumb = e.image
-                    ? `<img src="${e.image}" style="width:44px;height:32px;object-fit:cover;border-radius:6px;flex-shrink:0;" onerror="this.style.display='none'">`
+                
+                // Fetch image dynamically: Custom Event Image -> Linked Course Image -> Placeholder
+                let coverImg = e.image || '';
+                if (!coverImg && e.course_id) {
+                    const linkedC = (typeof getCachedCoursesForEvents !== 'undefined') ? getCachedCoursesForEventsSync().find(c => c.id === e.course_id) : null;
+                    if (linkedC) {
+                        coverImg = linkedC.featured_image_url || (linkedC.gallery && linkedC.gallery[0]) || '';
+                    }
+                }
+                
+                const thumb = coverImg
+                    ? `<img src="${coverImg}" style="width:44px;height:32px;object-fit:cover;border-radius:6px;flex-shrink:0;" onerror="this.style.background='#eee';this.src=''">`
                     : `<div style="width:44px;height:32px;border-radius:6px;background:#f0f0f0;display:flex;align-items:center;justify-content:center;font-size:1rem;">⛳</div>`;
                 return `<tr onclick="openDrawer('${e.id}')" class="${currentEventId === e.id ? 'selected' : isDraft ? 'row-draft' : ''}">
                     <td style="padding:6px 8px;">${thumb}</td>
@@ -1545,6 +1560,7 @@
                     const c = courses.find(x => x.id === e.course_id);
                     if (c) {
                         document.getElementById('d-course-search').value = c.name;
+                        // Show what the linked course is, but this UI preview doesn't override the event's custom image payload.
                         renderEventCoursePreview(c, 'd');
                     } else {
                         clearEventCourse('d');

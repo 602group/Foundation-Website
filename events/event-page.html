@@ -278,14 +278,14 @@
             // Set page title
             document.title = `${ev.title} — EPIC Foundation`;
 
-            // Check hero image — prefer linked course image, then event image, then gradient
+            // Check hero image — prioritize custom Event image -> linked Course image -> gradient
             let courseImg = '';
             if (ev.course_id && typeof loadSharedCourses === 'function') {
                 const courses = loadSharedCourses();
                 const linkedCourse = courses.find(c => c.id === ev.course_id);
                 if (linkedCourse) courseImg = linkedCourse.featured_image_url || (linkedCourse.gallery && linkedCourse.gallery[0]) || '';
             }
-            const heroImg = courseImg || (ev.images && ev.images[0]) || ev.image || '';
+            const heroImg = ev.image || (ev.images && ev.images[0]) || courseImg || '';
             const heroStyle = heroImg
                 ? `background:url('${heroImg}') center/cover no-repeat;`
                 : `background:linear-gradient(135deg,#1a3a10 0%,#2d5a1b 50%,#4a7c30 100%);`;
@@ -311,8 +311,10 @@
             ].filter(Boolean);
 
             // Images gallery
-            // Combine course featured image, course gallery, event image, and event gallery
+            // Combine event image, event gallery, course featured image, and course gallery
             let allImages = [];
+            if (ev.image) allImages.push(ev.image);
+            if (ev.images) allImages.push(...ev.images);
             if (ev.course_id && typeof loadSharedCourses === 'function') {
                 const courses = loadSharedCourses();
                 const linkedCourse = courses.find(c => c.id === ev.course_id);
@@ -321,8 +323,6 @@
                     if (linkedCourse.gallery) allImages.push(...linkedCourse.gallery);
                 }
             }
-            if (ev.image) allImages.push(ev.image);
-            if (ev.images) allImages.push(...ev.images);
             
             // Deduplicate and remove empty
             const extraImages = [...new Set(allImages)].filter(Boolean);
