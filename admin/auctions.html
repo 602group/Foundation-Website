@@ -2294,7 +2294,11 @@
             setVal('edit-extension', a.extension);
 
             // Render the drag-to-reorder image manager
-                        populateDrawerBids(a.title);
+            editImages = [...(a.images || [])];
+            _newModalImages = []; // reset new modal array just in case
+            renderImageStrip();
+            
+            populateDrawerBids(a.title);
             switchTab('admin', document.querySelector('.drawer-tab'));
             // Load admin fields
             setVal('admin-status', a.status);
@@ -2712,6 +2716,8 @@
                 title: getVal('edit-title'),
                 course: adminCourse,
                 status: getVal('admin-status') || getVal('edit-status'),
+                // Images from the drag-and-drop manager
+                images: [...editImages],
                 // Donor
                 donor: donorName,
                 donorName: donorName,
